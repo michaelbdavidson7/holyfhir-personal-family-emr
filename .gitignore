@@ -1,4 +1,20 @@
-venv
-env
+# database
 db.sqlite3
 *.sqlite3
+
+# media uploads (VERY IMPORTANT for your app)
+media/
+storage/
+
+# python
+__pycache__/
+*.pyc
+
+# environment
+.env
+.venv/
+venv/
+
+# mac/windows junk
+.DS_Store
+Thumbs.db
