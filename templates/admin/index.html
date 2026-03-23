@@ -1,0 +1,91 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-8 col-12">
+        <div class="card card-primary card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Family Patients</h3>
+            <div class="card-tools">
+              <a href="{% url 'admin:patients_patientprofile_add' %}" class="btn btn-success btn-sm">
+                Add Patient
+              </a>
+            </div>
+          </div>
+
+          <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Date of Birth</th>
+                  <th>Phone</th>
+                  <th style="width: 220px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for patient in recent_patients %}
+                  <tr>
+                    <td>
+                      <strong>
+                        <a href="{% url 'admin:patients_patientprofile_change' patient.id %}">
+                          {{ patient.first_name }} {{ patient.last_name }}
+                        </a>
+                      </strong>
+                    </td>
+                    <td>{{ patient.date_of_birth|default:"-" }}</td>
+                    <td>{{ patient.phone|default:"-" }}</td>
+                    <td>
+                      <a href="{% url 'admin:patients_patientprofile_change' patient.id %}" class="btn btn-info btn-sm">
+                        Open Chart
+                      </a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center py-4">
+                      No patients yet.
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer">
+            <a href="{% url 'admin:patients_patientprofile_changelist' %}">View all patients</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-12">
+        <div class="card card-secondary card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Quick Actions</h3>
+          </div>
+          <div class="card-body">
+            <p>
+              <a href="{% url 'admin:patients_patientprofile_add' %}" class="btn btn-success btn-block">
+                Add Patient
+              </a>
+            </p>
+            <p>
+              <a href="{% url 'admin:patients_patientprofile_changelist' %}" class="btn btn-primary btn-block">
+                View Patient Profiles
+              </a>
+            </p>
+            <p>
+              <a href="{% url 'admin:documents_clinicaldocument_changelist' %}" class="btn btn-outline-secondary btn-block">
+                Clinical Documents
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
