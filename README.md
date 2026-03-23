@@ -1,9 +1,11 @@
 # HolyFHIR – Personal Family EMR
 
-HolyFHIR is a **local-first personal electronic medical record (EMR)** designed for individuals and families.  
+HolyFHIR is a **local-first, personal, small electronic medical record (EMR)** designed for individuals and families.  
 It provides a simple, private way to manage health data while supporting **FHIR (Fast Healthcare Interoperability Resources)** for import and export.
 
-Basic profile manipulation is complete, import/export FHIR is next. 
+Basic profile manipulation is complete, import/export implementation FHIR is next. 
+
+Get in control of YOUR own health data, for free!
 
 ---![picture of dashboard](image.png)
 
