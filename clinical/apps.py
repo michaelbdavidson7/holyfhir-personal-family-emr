@@ -1,4 +1,4 @@
-from django.config import AppConfig
+from django.apps import AppConfig
 
 
 class ClinicalConfig(AppConfig):
