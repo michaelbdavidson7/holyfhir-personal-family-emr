@@ -54,7 +54,7 @@ Basic profile manipulation is complete, import/export FHIR is next.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/holyfhir-personal-family-emr.git
+git clone https://github.com/michaelbdavidson7/holyfhir-personal-family-emr.git
 cd holyfhir-personal-family-emr
 ```
 2. Create a virtual environment
