@@ -135,6 +135,58 @@ JAZZMIN_SETTINGS = {
     "site_brand": "HolyFHIR Personal EMR",
     "site_logo": None,  # e.g. "my_app/static/images/logo.png"
     # "show_ui_builder": True,
+    "search_model": "patients.PatientProfile",
+    "order_with_respect_to": [
+        "patients",
+        "clinical",
+        "documents",
+        "fhir",
+        "auth",
+    ],
+
+
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+
+        "patients": "fas fa-hospital-user",
+        "patients.PatientProfile": "fas fa-id-card",
+
+        "clinical": "fas fa-notes-medical",
+        "clinical.Condition": "fas fa-heartbeat",
+        "clinical.Allergy": "fas fa-exclamation-triangle",
+        "clinical.Medication": "fas fa-pills",
+        "clinical.Immunization": "fas fa-syringe",
+        "clinical.Observation": "fas fa-chart-line",
+        "clinical.Encounter": "fas fa-stethoscope",
+
+        "documents": "fas fa-file-medical",
+        "documents.ClinicalDocument": "fas fa-file-pdf",
+
+        "fhir": "fas fa-exchange-alt",
+        "fhir.FHIRLink": "fas fa-link",
+        "fhir.FHIRResourceSnapshot": "fas fa-database",
+    },
+    "custom_links": {
+        "patients": [{
+            "name": "Add Patient",
+            "url": "admin:patients_patientprofile_add",
+            "icon": "fas fa-user-plus",
+            "permissions": ["patients.add_patientprofile"],
+        }],
+    },
+    
+#     "hide_apps": [
+#     "auth",
+#     "fhir",
+# ],
+
+# "hide_models": [
+#     "auth.Group",
+#     "fhir.FHIRLink",
+# ],
+
 }
 
 

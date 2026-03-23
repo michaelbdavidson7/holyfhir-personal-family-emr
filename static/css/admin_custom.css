@@ -1,0 +1,15 @@
+/* Make Patients app full width */
+.app-patients {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+}
+
+/* Optional: make others half width for cleaner layout */
+.app-clinical,
+.app-documents,
+.app-fhir,
+.app-auth {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+}
