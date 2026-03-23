@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,4 +134,9 @@ JAZZMIN_SETTINGS = {
     "site_header": "HolyFHIR Personal EMR",
     "site_brand": "HolyFHIR Personal EMR",
     "site_logo": None,  # e.g. "my_app/static/images/logo.png"
+    # "show_ui_builder": True,
 }
+
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
