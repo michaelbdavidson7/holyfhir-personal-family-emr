@@ -44,7 +44,7 @@ Get in control of YOUR own health data, for free!
 ## 🧱 Tech Stack
 
 - **Backend:** Django
-- **Database:** SQLite (planned: SQLCipher encryption)
+- **Database:** SQLite with optional SQLCipher encryption at rest
 - **Admin UI:** Django Admin + Jazzmin
 - **FHIR Layer:** Custom mapping + resource snapshots
 - **Desktop (planned):** Tauri wrapper
@@ -85,7 +85,42 @@ python manage.py runserver
 
 Go to:
 
-http://127.0.0.1:8000/admin
+ http://127.0.0.1:8000/admin
+
+### Enable Database Encryption At Rest
+
+Encryption is opt-in so the existing local SQLite workflow keeps working unchanged.
+
+1. Install a SQLCipher-compatible Python driver in your virtual environment.
+```bash
+pip install sqlcipher3
+```
+`sqlcipher3` is the recommended driver because it has current wheel support across Windows, macOS, and Linux. If a specific environment cannot install it cleanly, `pysqlcipher3` remains a legacy fallback, but it usually expects a system `libsqlcipher` install first.
+2. Set an encryption key before running the app.
+```bash
+# macOS/Linux
+export DATABASE_ENCRYPTION_KEY="replace-with-a-strong-passphrase"
+
+# Windows PowerShell
+$env:DATABASE_ENCRYPTION_KEY="replace-with-a-strong-passphrase"
+```
+3. Start Django normally. When `DATABASE_ENCRYPTION_KEY` is present, the app switches from the stock SQLite backend to the bundled SQLCipher backend automatically.
+
+Optional database settings:
+
+- `DATABASE_NAME`: override the database path
+- `DATABASE_ENCRYPTION_REQUIRED=1`: fail fast if no encryption key is configured
+- `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size
+- `DATABASE_KDF_ITER`: SQLCipher PBKDF iteration count
+- `DATABASE_CIPHER_COMPATIBILITY`: compatibility mode for older SQLCipher databases
+
+To encrypt an existing plaintext database file:
+
+```bash
+python manage.py encrypt_sqlite_db --source db.sqlite3 --target db.encrypted.sqlite3
+```
+
+The command reads the encryption key from `DATABASE_ENCRYPTION_KEY` unless `--key` is supplied directly.
 
 
 🔄 FHIR Roadmap
