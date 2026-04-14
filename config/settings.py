@@ -184,6 +184,12 @@ JAZZMIN_SETTINGS = {
             "icon": "fas fa-user-plus",
             "permissions": ["patients.add_patientprofile"],
         }],
+        "fhir": [{
+            "name": "Import FHIR Data",
+            "url": "fhir_import",
+            "icon": "fas fa-file-import",
+            "permissions": ["fhir.add_fhirresourcesnapshot"],
+        }],
     },
     
 #     "hide_apps": [

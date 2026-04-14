@@ -109,6 +109,12 @@ Go to:
 
  http://127.0.0.1:8000/admin
 
+### Import FHIR data
+
+From the Django Admin, open **FHIR / Interop > Import FHIR Data** and upload or paste a FHIR JSON Bundle or single resource.
+
+The importer currently maps Patient, Condition, AllergyIntolerance, MedicationStatement, MedicationRequest, Immunization, Observation, and Encounter resources into the local EMR models. It also saves each raw resource as a FHIR snapshot for traceability.
+
 ### Database Encryption At Rest
 
 Database encryption is always enforced. Django loads `.env` automatically at startup when the file exists. The `.env` file is ignored by Git, and startup fails if it is missing any key listed in `.env.example`.

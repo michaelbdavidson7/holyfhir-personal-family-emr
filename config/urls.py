@@ -19,11 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path
+from fhir.views import import_fhir_data
 
 def admin_root_redirect(request):
     return redirect("/admin/patients/patientprofile/")
     
 urlpatterns = [
+    path('admin/fhir/import/', import_fhir_data, name='fhir_import'),
     path('admin/', admin.site.urls),
 ]
 

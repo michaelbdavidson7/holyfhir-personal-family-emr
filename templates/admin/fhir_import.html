@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      <h2>Import FHIR Data</h2>
+      <p>
+        Upload or paste a FHIR JSON Bundle, Patient, Condition, AllergyIntolerance,
+        MedicationStatement, MedicationRequest, Immunization, Observation, or Encounter.
+      </p>
+      {{ form.non_field_errors }}
+      <div class="form-row">
+        {{ form.fhir_file.errors }}
+        {{ form.fhir_file.label_tag }}
+        {{ form.fhir_file }}
+        <div class="help">{{ form.fhir_file.help_text }}</div>
+      </div>
+      <div class="form-row">
+        {{ form.fhir_json.errors }}
+        {{ form.fhir_json.label_tag }}
+        {{ form.fhir_json }}
+        <div class="help">{{ form.fhir_json.help_text }}</div>
+      </div>
+    </fieldset>
+    <div class="submit-row">
+      <input type="submit" value="Import FHIR data" class="default">
+    </div>
+  </form>
+</div>
+{% endblock %}
