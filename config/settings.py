@@ -14,9 +14,16 @@ import os
 from pathlib import Path
 
 from config.database import build_default_database_config
+from config.env import load_env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_env(
+    BASE_DIR,
+    env_file_name=os.getenv("DJANGO_ENV_FILE", ".env"),
+    example_file_name=os.getenv("DJANGO_ENV_EXAMPLE_FILE", ".env.example"),
+)
 
 
 # Quick-start development settings - unsuitable for production

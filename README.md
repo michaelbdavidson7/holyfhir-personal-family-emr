@@ -106,13 +106,29 @@ $env:DATABASE_ENCRYPTION_KEY="replace-with-a-strong-passphrase"
 ```
 3. Start Django normally. When `DATABASE_ENCRYPTION_KEY` is present, the app switches from the stock SQLite backend to the bundled SQLCipher backend automatically.
 
+You can also create a local `.env` file from the committed template:
+
+```bash
+cp .env.example .env
+```
+
+On Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Django loads `.env` automatically at startup when the file exists. The `.env` file is ignored by Git, and startup fails if it is missing any key listed in `.env.example`.
+
 Optional database settings:
 
-- `DATABASE_NAME`: override the database path
-- `DATABASE_ENCRYPTION_REQUIRED=1`: fail fast if no encryption key is configured
-- `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size
-- `DATABASE_KDF_ITER`: SQLCipher PBKDF iteration count
-- `DATABASE_CIPHER_COMPATIBILITY`: compatibility mode for older SQLCipher databases
+- `DATABASE_NAME`: database path. Default: `db.sqlite3`
+- `DATABASE_TIMEOUT`: SQLite/SQLCipher connection timeout in seconds. Default: `20.0`
+- `DATABASE_ENCRYPTION_KEY`: enables SQLCipher when set. Default: unset
+- `DATABASE_ENCRYPTION_REQUIRED`: fail fast if no encryption key is configured. Default: `0`
+- `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size. Default: `4096`
+- `DATABASE_KDF_ITER`: SQLCipher PBKDF iteration count. Default: `256000`
+- `DATABASE_CIPHER_COMPATIBILITY`: SQLCipher compatibility mode. Default: `4`
 
 To encrypt an existing plaintext database file:
 

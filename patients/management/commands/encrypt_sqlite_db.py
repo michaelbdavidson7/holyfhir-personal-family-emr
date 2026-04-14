@@ -4,6 +4,11 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
+from config.database import (
+    DEFAULT_DATABASE_CIPHER_COMPATIBILITY,
+    DEFAULT_DATABASE_CIPHER_PAGE_SIZE,
+    DEFAULT_DATABASE_KDF_ITER,
+)
 from config.sqlcipher import get_sqlcipher_dbapi
 
 
@@ -26,12 +31,23 @@ class Command(BaseCommand):
             default="DATABASE_ENCRYPTION_KEY",
             help="Environment variable to read the encryption key from when --key is not supplied.",
         )
-        parser.add_argument("--cipher-page-size", type=int, help="Optional SQLCipher page size for the target database.")
-        parser.add_argument("--kdf-iter", type=int, help="Optional SQLCipher PBKDF iteration count for the target database.")
+        parser.add_argument(
+            "--cipher-page-size",
+            default=DEFAULT_DATABASE_CIPHER_PAGE_SIZE,
+            type=int,
+            help=f"SQLCipher page size for the target database. Default: {DEFAULT_DATABASE_CIPHER_PAGE_SIZE}.",
+        )
+        parser.add_argument(
+            "--kdf-iter",
+            default=DEFAULT_DATABASE_KDF_ITER,
+            type=int,
+            help=f"SQLCipher PBKDF iteration count for the target database. Default: {DEFAULT_DATABASE_KDF_ITER}.",
+        )
         parser.add_argument(
             "--cipher-compatibility",
+            default=DEFAULT_DATABASE_CIPHER_COMPATIBILITY,
             type=int,
-            help="Optional SQLCipher compatibility mode for opening legacy databases.",
+            help=f"SQLCipher compatibility mode. Default: {DEFAULT_DATABASE_CIPHER_COMPATIBILITY}.",
         )
         parser.add_argument("--force", action="store_true", help="Overwrite the target file if it already exists.")
 
