@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -38,8 +39,9 @@ def _env_int(name, default):
 def build_default_database_config(base_dir: Path):
     database_name = os.getenv("DATABASE_NAME", str(base_dir / "db.sqlite3"))
     encryption_key = os.getenv("DATABASE_ENCRYPTION_KEY", "").strip()
+    is_bootstrap_command = len(sys.argv) > 1 and sys.argv[1] == "bootstrap_secrets"
 
-    if not encryption_key:
+    if not encryption_key and not is_bootstrap_command:
         raise ImproperlyConfigured(
             "DATABASE_ENCRYPTION_KEY is required. HolyFHIR stores EMR data and database encryption is always enforced."
         )

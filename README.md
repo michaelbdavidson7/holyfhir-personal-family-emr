@@ -69,19 +69,23 @@ venv\Scripts\activate      # Windows
 ```bash
 pip install -r requirements.txt
 ```
-4. Create a local `.env` file from the committed template:
+4. Create local development secrets:
 
 ```bash
-cp .env.example .env
+python manage.py bootstrap_secrets
 ```
 
-On Windows PowerShell:
+This creates `.env` from `.env.example`, generates `DATABASE_ENCRYPTION_KEY`, and generates Django's `SECRET_KEY`.
+
+If `.env` already exists, the command prompts before rewriting it. If you use `--rotate`, it prints a strong warning because changing `DATABASE_ENCRYPTION_KEY` can make an existing encrypted database unreadable without a migration/re-encryption plan. For scripts only, pass `--yes` to skip prompts.
+
+If you prefer to edit `.env` manually, copy the template first:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-5. Replace `DATABASE_ENCRYPTION_KEY` in `.env` with a unique strong passphrase.
+Then replace `DATABASE_ENCRYPTION_KEY` and `SECRET_KEY` with unique strong values.
 
 ```powershell
 .\venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(48))"
@@ -145,6 +149,10 @@ The command reads the encryption key from `DATABASE_ENCRYPTION_KEY` unless `--ke
 🔐 Security Roadmap
  - SQLCipher database encryption
  - OS keychain integration
+ - First-run end-user secret generation
+ - Store database encryption key in OS secure storage
+ - Store Django secret key in OS secure storage or protected app config
+ - Encrypted backup and recovery-key export flow
  - Encrypted file storage
  - Secure export handling
 

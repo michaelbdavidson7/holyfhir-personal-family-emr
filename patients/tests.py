@@ -3,6 +3,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 
@@ -139,3 +141,97 @@ class EnvFileTests(SimpleTestCase):
                 load_env(base_dir)
 
                 self.assertNotIn("DATABASE_NAME", os.environ)
+
+
+class BootstrapSecretsCommandTests(SimpleTestCase):
+    def test_bootstrap_secrets_creates_env_with_generated_secrets(self):
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(temp_dir)
+            env_path = base_dir / ".env"
+
+            call_command("bootstrap_secrets", env_file=str(env_path), yes=True)
+
+            values = parse_env_file(env_path)
+
+        self.assertNotEqual(values["DATABASE_ENCRYPTION_KEY"], "replace-with-a-strong-passphrase")
+        self.assertGreaterEqual(len(values["DATABASE_ENCRYPTION_KEY"]), 48)
+        self.assertNotEqual(values["SECRET_KEY"], "django-insecure-development-only-change-me")
+        self.assertEqual(values["DATABASE_NAME"], "db.sqlite3")
+
+    def test_bootstrap_secrets_preserves_existing_secrets(self):
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(temp_dir)
+            env_path = base_dir / ".env"
+            env_path.write_text(
+                "\n".join(
+                    [
+                        "DJANGO_SETTINGS_MODULE=config.settings",
+                        "DJANGO_ENV_FILE=.env",
+                        "DJANGO_ENV_EXAMPLE_FILE=.env.example",
+                        "SECRET_KEY=existing-secret-key",
+                        "DEBUG=1",
+                        "ALLOWED_HOSTS=",
+                        "DATABASE_NAME=db.sqlite3",
+                        "DATABASE_TIMEOUT=20.0",
+                        "DATABASE_ENCRYPTION_KEY=existing-db-key",
+                        "DATABASE_CIPHER_PAGE_SIZE=4096",
+                        "DATABASE_KDF_ITER=256000",
+                        "DATABASE_CIPHER_COMPATIBILITY=4",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            call_command("bootstrap_secrets", env_file=str(env_path), yes=True)
+
+            values = parse_env_file(env_path)
+
+        self.assertEqual(values["DATABASE_ENCRYPTION_KEY"], "existing-db-key")
+        self.assertEqual(values["SECRET_KEY"], "existing-secret-key")
+
+    def test_bootstrap_secrets_aborts_before_rewriting_existing_env_without_confirmation(self):
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(temp_dir)
+            env_path = base_dir / ".env"
+            original_content = "DATABASE_ENCRYPTION_KEY=existing-db-key\nSECRET_KEY=existing-secret-key\n"
+            env_path.write_text(original_content, encoding="utf-8")
+
+            with patch("builtins.input", return_value="no"):
+                with self.assertRaises(CommandError):
+                    call_command("bootstrap_secrets", env_file=str(env_path))
+
+            self.assertEqual(env_path.read_text(encoding="utf-8"), original_content)
+
+    def test_bootstrap_secrets_rotates_existing_secrets_with_confirmation(self):
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(temp_dir)
+            env_path = base_dir / ".env"
+            env_path.write_text(
+                "\n".join(
+                    [
+                        "DJANGO_SETTINGS_MODULE=config.settings",
+                        "DJANGO_ENV_FILE=.env",
+                        "DJANGO_ENV_EXAMPLE_FILE=.env.example",
+                        "SECRET_KEY=existing-secret-key",
+                        "DEBUG=1",
+                        "ALLOWED_HOSTS=",
+                        "DATABASE_NAME=db.sqlite3",
+                        "DATABASE_TIMEOUT=20.0",
+                        "DATABASE_ENCRYPTION_KEY=existing-db-key",
+                        "DATABASE_CIPHER_PAGE_SIZE=4096",
+                        "DATABASE_KDF_ITER=256000",
+                        "DATABASE_CIPHER_COMPATIBILITY=4",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with patch("builtins.input", return_value="yes"):
+                call_command("bootstrap_secrets", env_file=str(env_path), rotate=True)
+
+            values = parse_env_file(env_path)
+
+        self.assertNotEqual(values["DATABASE_ENCRYPTION_KEY"], "existing-db-key")
+        self.assertNotEqual(values["SECRET_KEY"], "existing-secret-key")
