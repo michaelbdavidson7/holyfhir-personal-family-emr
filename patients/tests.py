@@ -11,6 +11,7 @@ from django.test import SimpleTestCase
 from config.database import (
     DEFAULT_DATABASE_CIPHER_COMPATIBILITY,
     DEFAULT_DATABASE_CIPHER_PAGE_SIZE,
+    DEFAULT_DATABASE_NAME,
     DEFAULT_DATABASE_KDF_ITER,
     DEFAULT_DATABASE_TIMEOUT,
     build_default_database_config,
@@ -170,7 +171,7 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
         self.assertNotEqual(values["DATABASE_ENCRYPTION_KEY"], "replace-with-a-strong-passphrase")
         self.assertGreaterEqual(len(values["DATABASE_ENCRYPTION_KEY"]), 48)
         self.assertNotEqual(values["SECRET_KEY"], "django-insecure-development-only-change-me")
-        self.assertEqual(values["DATABASE_NAME"], "db.sqlite3")
+        self.assertEqual(values["DATABASE_NAME"], DEFAULT_DATABASE_NAME)
 
     def test_bootstrap_secrets_preserves_existing_secrets(self):
         with TemporaryDirectory() as temp_dir:

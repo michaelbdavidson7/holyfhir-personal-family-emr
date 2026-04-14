@@ -32,7 +32,7 @@ Get in control of YOUR own health data, for free!
 
 - 🖥️ **Local-first architecture**
   - Runs entirely on your machine
-  - Uses SQLite (no external database required)
+  - Uses SQLCipher-encrypted SQLite (no external database required)
   - No cloud dependency
 
 - 🔐 **Privacy-first design**
@@ -123,7 +123,7 @@ Optional database settings:
 - `SECRET_KEY`: Django secret key. Default: development-only placeholder
 - `DEBUG`: enable Django debug mode. Default: `1`
 - `ALLOWED_HOSTS`: comma-separated allowed hosts. Default: empty
-- `DATABASE_NAME`: database path. Default: `db.sqlite3`
+- `DATABASE_NAME`: encrypted database path. Default: `holyfhir.encrypted.sqlite3`
 - `DATABASE_TIMEOUT`: SQLite/SQLCipher connection timeout in seconds. Default: `20.0`
 - `DATABASE_ENCRYPTION_KEY`: required SQLCipher encryption key
 - `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size. Default: `4096`
@@ -133,7 +133,7 @@ Optional database settings:
 To encrypt an existing plaintext database file:
 
 ```bash
-python manage.py encrypt_sqlite_db --source db.sqlite3 --target db.encrypted.sqlite3
+python manage.py encrypt_sqlite_db --source db.sqlite3 --target holyfhir.encrypted.sqlite3
 ```
 
 The command reads the encryption key from `DATABASE_ENCRYPTION_KEY` unless `--key` is supplied directly.

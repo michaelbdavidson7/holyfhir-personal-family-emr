@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 
 DEFAULT_DATABASE_TIMEOUT = 20.0
+DEFAULT_DATABASE_NAME = "holyfhir.encrypted.sqlite3"
 DEFAULT_DATABASE_CIPHER_PAGE_SIZE = 4096
 DEFAULT_DATABASE_KDF_ITER = 256000
 DEFAULT_DATABASE_CIPHER_COMPATIBILITY = 4
@@ -37,7 +38,7 @@ def _env_int(name, default):
 
 
 def build_default_database_config(base_dir: Path):
-    database_name = os.getenv("DATABASE_NAME", str(base_dir / "db.sqlite3"))
+    database_name = os.getenv("DATABASE_NAME", str(base_dir / DEFAULT_DATABASE_NAME))
     encryption_key = os.getenv("DATABASE_ENCRYPTION_KEY", "").strip()
     is_bootstrap_command = len(sys.argv) > 1 and sys.argv[1] == "bootstrap_secrets"
 

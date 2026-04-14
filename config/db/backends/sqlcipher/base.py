@@ -74,7 +74,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         if _is_plaintext_sqlite_database(database_name):
             raise ImproperlyConfigured(
                 f"{database_name} is a plaintext SQLite database, but HolyFHIR now requires SQLCipher encryption. "
-                "Encrypt it with `python manage.py encrypt_sqlite_db --source db.sqlite3 --target db.encrypted.sqlite3`, "
+                "Encrypt it with `python manage.py encrypt_sqlite_db --source db.sqlite3 --target holyfhir.encrypted.sqlite3`, "
                 "then set DATABASE_NAME to the encrypted database path. For a fresh install, move/delete the plaintext "
                 "database and run migrations again."
             )
@@ -100,7 +100,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
                     "The database may have been encrypted with a different DATABASE_ENCRYPTION_KEY, "
                     "DATABASE_NAME may point at the wrong file, or the SQLCipher settings may not match. "
                     "If this is an old plaintext SQLite database, encrypt it first with `python manage.py "
-                    "encrypt_sqlite_db --source db.sqlite3 --target db.encrypted.sqlite3`."
+                    "encrypt_sqlite_db --source db.sqlite3 --target holyfhir.encrypted.sqlite3`."
                 ) from exc
 
         register_functions(conn)
