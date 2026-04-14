@@ -17,15 +17,12 @@ from config.env import load_env, parse_env_file
 
 
 class DatabaseConfigTests(SimpleTestCase):
-    def test_defaults_to_plain_sqlite_when_no_key_is_set(self):
+    def test_requires_encryption_key(self):
         with patch.dict("os.environ", {}, clear=True):
-            databases = build_default_database_config(Path("/tmp/personal-emr"))
+            with self.assertRaises(ImproperlyConfigured):
+                build_default_database_config(Path("/tmp/personal-emr"))
 
-        self.assertEqual(databases["default"]["ENGINE"], "django.db.backends.sqlite3")
-        self.assertEqual(databases["default"]["NAME"], str(Path("/tmp/personal-emr") / "db.sqlite3"))
-        self.assertEqual(databases["default"]["OPTIONS"]["timeout"], DEFAULT_DATABASE_TIMEOUT)
-
-    def test_switches_to_sqlcipher_when_key_is_present(self):
+    def test_always_uses_sqlcipher_when_key_is_present(self):
         with patch.dict(
             "os.environ",
             {
@@ -43,6 +40,7 @@ class DatabaseConfigTests(SimpleTestCase):
             databases["default"]["OPTIONS"]["cipher_compatibility"],
             DEFAULT_DATABASE_CIPHER_COMPATIBILITY,
         )
+        self.assertEqual(databases["default"]["OPTIONS"]["timeout"], DEFAULT_DATABASE_TIMEOUT)
 
     def test_can_override_database_defaults(self):
         with patch.dict(
@@ -65,12 +63,6 @@ class DatabaseConfigTests(SimpleTestCase):
         self.assertEqual(databases["default"]["OPTIONS"]["kdf_iter"], 512000)
         self.assertEqual(databases["default"]["OPTIONS"]["cipher_compatibility"], 4)
 
-    def test_can_require_encryption_key(self):
-        with patch.dict("os.environ", {"DATABASE_ENCRYPTION_REQUIRED": "1"}, clear=True):
-            with self.assertRaises(ImproperlyConfigured):
-                build_default_database_config(Path("/tmp/personal-emr"))
-
-
 class EnvFileTests(SimpleTestCase):
     def test_env_example_contains_supported_settings_keys(self):
         values = parse_env_file(Path(".env.example"))
@@ -85,7 +77,6 @@ class EnvFileTests(SimpleTestCase):
             "DATABASE_NAME",
             "DATABASE_TIMEOUT",
             "DATABASE_ENCRYPTION_KEY",
-            "DATABASE_ENCRYPTION_REQUIRED",
             "DATABASE_CIPHER_PAGE_SIZE",
             "DATABASE_KDF_ITER",
             "DATABASE_CIPHER_COMPATIBILITY",
@@ -102,7 +93,7 @@ class EnvFileTests(SimpleTestCase):
                         "# comment",
                         "DATABASE_NAME=db.sqlite3",
                         "DATABASE_TIMEOUT='20.0'",
-                        'export DATABASE_ENCRYPTION_REQUIRED="0"',
+                        'export DEBUG="1"',
                         "DATABASE_ENCRYPTION_KEY=value#not-comment",
                         "DATABASE_CIPHER_PAGE_SIZE=4096 # comment",
                     ]
@@ -114,7 +105,7 @@ class EnvFileTests(SimpleTestCase):
 
         self.assertEqual(values["DATABASE_NAME"], "db.sqlite3")
         self.assertEqual(values["DATABASE_TIMEOUT"], "20.0")
-        self.assertEqual(values["DATABASE_ENCRYPTION_REQUIRED"], "0")
+        self.assertEqual(values["DEBUG"], "1")
         self.assertEqual(values["DATABASE_ENCRYPTION_KEY"], "value#not-comment")
         self.assertEqual(values["DATABASE_CIPHER_PAGE_SIZE"], "4096")
 

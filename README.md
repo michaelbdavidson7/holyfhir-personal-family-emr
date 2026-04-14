@@ -44,7 +44,7 @@ Get in control of YOUR own health data, for free!
 ## 🧱 Tech Stack
 
 - **Backend:** Django
-- **Database:** SQLite with optional SQLCipher encryption at rest
+- **Database:** SQLCipher-encrypted SQLite
 - **Admin UI:** Django Admin + Jazzmin
 - **FHIR Layer:** Custom mapping + resource snapshots
 - **Desktop (planned):** Tauri wrapper
@@ -69,44 +69,7 @@ venv\Scripts\activate      # Windows
 ```bash
 pip install -r requirements.txt
 ```
-4. Run migrations
-```bash
-python manage.py migrate
-```
-5. Create admin user
-```bash
-python manage.py createsuperuser
-```
-6. Start the server
-```bash
-python manage.py runserver
-```
-7. Open the app
-
-Go to:
-
- http://127.0.0.1:8000/admin
-
-### Enable Database Encryption At Rest
-
-Encryption is opt-in so the existing local SQLite workflow keeps working unchanged.
-
-1. Install a SQLCipher-compatible Python driver in your virtual environment.
-```bash
-pip install sqlcipher3
-```
-`sqlcipher3` is the recommended driver because it has current wheel support across Windows, macOS, and Linux. If a specific environment cannot install it cleanly, `pysqlcipher3` remains a legacy fallback, but it usually expects a system `libsqlcipher` install first.
-2. Set an encryption key before running the app.
-```bash
-# macOS/Linux
-export DATABASE_ENCRYPTION_KEY="replace-with-a-strong-passphrase"
-
-# Windows PowerShell
-$env:DATABASE_ENCRYPTION_KEY="replace-with-a-strong-passphrase"
-```
-3. Start Django normally. When `DATABASE_ENCRYPTION_KEY` is present, the app switches from the stock SQLite backend to the bundled SQLCipher backend automatically.
-
-You can also create a local `.env` file from the committed template:
+4. Create a local `.env` file from the committed template:
 
 ```bash
 cp .env.example .env
@@ -118,7 +81,35 @@ On Windows PowerShell:
 Copy-Item .env.example .env
 ```
 
-Django loads `.env` automatically at startup when the file exists. The `.env` file is ignored by Git, and startup fails if it is missing any key listed in `.env.example`.
+5. Replace `DATABASE_ENCRYPTION_KEY` in `.env` with a unique strong passphrase.
+
+```powershell
+.\venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+6. Run migrations
+```bash
+python manage.py migrate
+```
+7. Create admin user
+```bash
+python manage.py createsuperuser
+```
+8. Start the server
+```bash
+python manage.py runserver
+```
+9. Open the app
+
+Go to:
+
+ http://127.0.0.1:8000/admin
+
+### Database Encryption At Rest
+
+Database encryption is always enforced. Django loads `.env` automatically at startup when the file exists. The `.env` file is ignored by Git, and startup fails if it is missing any key listed in `.env.example`.
+
+`sqlcipher3` is the recommended driver because it has current wheel support across Windows, macOS, and Linux. If a specific environment cannot install it cleanly, `pysqlcipher3` remains a legacy fallback, but it usually expects a system `libsqlcipher` install first.
 
 Optional database settings:
 
@@ -130,8 +121,7 @@ Optional database settings:
 - `ALLOWED_HOSTS`: comma-separated allowed hosts. Default: empty
 - `DATABASE_NAME`: database path. Default: `db.sqlite3`
 - `DATABASE_TIMEOUT`: SQLite/SQLCipher connection timeout in seconds. Default: `20.0`
-- `DATABASE_ENCRYPTION_KEY`: enables SQLCipher when set. Default: unset
-- `DATABASE_ENCRYPTION_REQUIRED`: fail fast if no encryption key is configured. Default: `0`
+- `DATABASE_ENCRYPTION_KEY`: required SQLCipher encryption key
 - `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size. Default: `4096`
 - `DATABASE_KDF_ITER`: SQLCipher PBKDF iteration count. Default: `256000`
 - `DATABASE_CIPHER_COMPATIBILITY`: SQLCipher compatibility mode. Default: `4`
