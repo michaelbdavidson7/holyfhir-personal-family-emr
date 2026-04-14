@@ -18,6 +18,10 @@ def _env_flag(name, default=False):
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def env_flag(name, default=False):
+    return _env_flag(name, default=default)
+
+
 def _env_float(name, default):
     value = os.getenv(name)
     if value is None or value == "":

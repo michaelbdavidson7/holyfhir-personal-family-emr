@@ -122,6 +122,12 @@ Django loads `.env` automatically at startup when the file exists. The `.env` fi
 
 Optional database settings:
 
+- `DJANGO_SETTINGS_MODULE`: Django settings module. Default: `config.settings`
+- `DJANGO_ENV_FILE`: environment file to load. Default: `.env`
+- `DJANGO_ENV_EXAMPLE_FILE`: environment template used for key validation. Default: `.env.example`
+- `SECRET_KEY`: Django secret key. Default: development-only placeholder
+- `DEBUG`: enable Django debug mode. Default: `1`
+- `ALLOWED_HOSTS`: comma-separated allowed hosts. Default: empty
 - `DATABASE_NAME`: database path. Default: `db.sqlite3`
 - `DATABASE_TIMEOUT`: SQLite/SQLCipher connection timeout in seconds. Default: `20.0`
 - `DATABASE_ENCRYPTION_KEY`: enables SQLCipher when set. Default: unset

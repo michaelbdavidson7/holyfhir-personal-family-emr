@@ -72,6 +72,27 @@ class DatabaseConfigTests(SimpleTestCase):
 
 
 class EnvFileTests(SimpleTestCase):
+    def test_env_example_contains_supported_settings_keys(self):
+        values = parse_env_file(Path(".env.example"))
+
+        expected_keys = {
+            "DJANGO_SETTINGS_MODULE",
+            "DJANGO_ENV_FILE",
+            "DJANGO_ENV_EXAMPLE_FILE",
+            "SECRET_KEY",
+            "DEBUG",
+            "ALLOWED_HOSTS",
+            "DATABASE_NAME",
+            "DATABASE_TIMEOUT",
+            "DATABASE_ENCRYPTION_KEY",
+            "DATABASE_ENCRYPTION_REQUIRED",
+            "DATABASE_CIPHER_PAGE_SIZE",
+            "DATABASE_KDF_ITER",
+            "DATABASE_CIPHER_COMPATIBILITY",
+        }
+
+        self.assertEqual(set(values), expected_keys)
+
     def test_parse_env_file_supports_comments_quotes_and_export(self):
         with TemporaryDirectory() as temp_dir:
             env_file = Path(temp_dir) / ".env"

@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
-from config.database import build_default_database_config
+from config.database import build_default_database_config, env_flag
 from config.env import load_env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,12 +30,16 @@ load_env(
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5yfh&l49z4a&-he2nay+3hvybl!jtdek&!c=-f609&5xh==sw7'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-development-only-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_flag('DEBUG', default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv('ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
 
 
 # Application definition
