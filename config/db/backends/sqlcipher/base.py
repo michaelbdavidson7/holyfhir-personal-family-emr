@@ -1,6 +1,7 @@
 import warnings
-from itertools import tee
 from collections.abc import Mapping
+from itertools import tee
+from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import FORMAT_QMARK_REGEX
@@ -9,9 +10,26 @@ from django.db.backends.sqlite3.base import register_functions
 
 from config.sqlcipher import get_sqlcipher_dbapi
 
+SQLITE_HEADER = b"SQLite format 3\x00"
+
 
 def _sql_quote(value):
     return str(value).replace("'", "''")
+
+
+def _is_plaintext_sqlite_database(database_name):
+    if database_name in {None, "", ":memory:"}:
+        return False
+
+    if str(database_name).startswith("file:"):
+        return False
+
+    database_path = Path(database_name)
+    if not database_path.exists() or not database_path.is_file():
+        return False
+
+    with database_path.open("rb") as database_file:
+        return database_file.read(len(SQLITE_HEADER)) == SQLITE_HEADER
 
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):
@@ -47,10 +65,19 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
 
     def get_new_connection(self, conn_params):
         database = get_sqlcipher_dbapi()
+        database_name = conn_params.get("database")
         passphrase = conn_params.pop("passphrase", None)
         cipher_page_size = conn_params.pop("cipher_page_size", None)
         kdf_iter = conn_params.pop("kdf_iter", None)
         cipher_compatibility = conn_params.pop("cipher_compatibility", None)
+
+        if _is_plaintext_sqlite_database(database_name):
+            raise ImproperlyConfigured(
+                f"{database_name} is a plaintext SQLite database, but HolyFHIR now requires SQLCipher encryption. "
+                "Encrypt it with `python manage.py encrypt_sqlite_db --source db.sqlite3 --target db.encrypted.sqlite3`, "
+                "then set DATABASE_NAME to the encrypted database path. For a fresh install, move/delete the plaintext "
+                "database and run migrations again."
+            )
 
         conn = database.connect(**conn_params)
 
@@ -64,7 +91,17 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
                 conn.execute(f"PRAGMA kdf_iter = {int(kdf_iter)}")
 
             # Force an initial page read so invalid keys fail fast.
-            conn.execute("SELECT count(*) FROM sqlite_master")
+            try:
+                conn.execute("SELECT count(*) FROM sqlite_master")
+            except database.DatabaseError as exc:
+                conn.close()
+                raise ImproperlyConfigured(
+                    f"Unable to open encrypted database {database_name}. "
+                    "The database may have been encrypted with a different DATABASE_ENCRYPTION_KEY, "
+                    "DATABASE_NAME may point at the wrong file, or the SQLCipher settings may not match. "
+                    "If this is an old plaintext SQLite database, encrypt it first with `python manage.py "
+                    "encrypt_sqlite_db --source db.sqlite3 --target db.encrypted.sqlite3`."
+                ) from exc
 
         register_functions(conn)
         conn.execute("PRAGMA foreign_keys = ON")

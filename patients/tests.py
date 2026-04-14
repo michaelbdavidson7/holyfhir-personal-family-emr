@@ -15,6 +15,7 @@ from config.database import (
     DEFAULT_DATABASE_TIMEOUT,
     build_default_database_config,
 )
+from config.db.backends.sqlcipher.base import _is_plaintext_sqlite_database
 from config.env import load_env, parse_env_file
 
 
@@ -64,6 +65,19 @@ class DatabaseConfigTests(SimpleTestCase):
         self.assertEqual(databases["default"]["OPTIONS"]["cipher_page_size"], 8192)
         self.assertEqual(databases["default"]["OPTIONS"]["kdf_iter"], 512000)
         self.assertEqual(databases["default"]["OPTIONS"]["cipher_compatibility"], 4)
+
+    def test_detects_plaintext_sqlite_database_files(self):
+        with TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "db.sqlite3"
+            database_path.write_bytes(b"SQLite format 3\x00" + b"unused")
+
+            self.assertTrue(_is_plaintext_sqlite_database(database_path))
+
+    def test_plaintext_detector_ignores_missing_files(self):
+        with TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "missing.sqlite3"
+
+            self.assertFalse(_is_plaintext_sqlite_database(database_path))
 
 class EnvFileTests(SimpleTestCase):
     def test_env_example_contains_supported_settings_keys(self):
