@@ -147,4 +147,4 @@ class EnvFileTests(SimpleTestCase):
             with patch.dict("os.environ", {}, clear=True):
                 load_env(base_dir)
 
-            self.assertNotIn("DATABASE_NAME", os.environ)
+                self.assertNotIn("DATABASE_NAME", os.environ)
