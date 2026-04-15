@@ -183,3 +183,70 @@ It is not a certified medical system and should not be relied upon as a sole sou
 📄 License
 
 TBD
+
+## Desktop app with Tauri
+
+This repo includes a first Tauri desktop shell. It starts the local Django app on `127.0.0.1:8787` and opens the Django Admin inside a native desktop window.
+
+### Developer setup
+
+Install the normal Python dependencies first, then install the desktop toolchain:
+
+```bash
+pip install -r requirements.txt
+npm install
+```
+
+You also need Rust and the platform prerequisites from the Tauri setup guide:
+
+https://tauri.app/start/prerequisites/
+
+Start the desktop app in development:
+
+```bash
+npm run desktop:dev
+```
+
+Build an installer or app bundle:
+
+```bash
+npm run desktop:build
+```
+
+The current desktop build still expects Python and the Python dependencies to be available. The Tauri shell is the first step toward a true one-click offline app, not the final end-user installer yet.
+
+### Beginner roadmap to a standalone offline app
+
+1. Make the current Tauri shell reliable for developers.
+   - Confirm `npm run desktop:dev` opens the app.
+   - Confirm closing the desktop window also stops the Django server.
+   - Add friendly error messages when Python, `.env`, or database setup is missing.
+
+2. Move first-run setup into the desktop app.
+   - On first launch, generate `.env` secrets automatically.
+   - Run migrations automatically.
+   - Create a simple first-user setup screen instead of requiring `createsuperuser`.
+
+3. Store private keys in the OS keychain.
+   - Use a Tauri keychain or stronghold approach for `DATABASE_ENCRYPTION_KEY`.
+   - Keep `.env` for development only.
+   - Add a recovery-key export flow so users do not lose their medical data.
+
+4. Bundle the backend for real end users.
+   - Package Python and the Django app as a Tauri sidecar, or convert the backend into a standalone executable.
+   - Include the exact Python dependencies needed by SQLCipher.
+   - Store user data under the operating system app data directory, not inside the installed app folder.
+
+5. Add offline backup and restore.
+   - Export an encrypted backup file.
+   - Restore from that backup on a new machine.
+   - Add a clear warning that losing the recovery key means losing access to the encrypted data.
+
+6. Replace the admin-only workflow over time.
+   - Keep Django Admin for power-user maintenance.
+   - Add beginner-friendly screens for patients, medications, allergies, documents, FHIR import, backup, and restore.
+
+7. Test the installer like a normal user.
+   - Test on a clean Windows machine with no Python or Node installed.
+   - Test airplane-mode launch.
+   - Test upgrade from an older app version without losing the encrypted database.

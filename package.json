@@ -1,0 +1,14 @@
+{
+  "name": "holyfhir-personal-emr",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "django:dev": "python manage.py runserver 127.0.0.1:8000"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}
