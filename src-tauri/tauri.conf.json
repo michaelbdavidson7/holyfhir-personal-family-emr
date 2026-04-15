@@ -30,7 +30,8 @@
       "../documents",
       "../fhir",
       "../templates",
-      "../static"
+      "../static",
+      "../desktop-backend/dist/HolyFHIRBackend"
     ]
   }
 }

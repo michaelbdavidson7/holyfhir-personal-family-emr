@@ -16,6 +16,8 @@ __pycache__/
 venv/
 node_modules/
 npm-debug.log*
+desktop-backend/build/
+desktop-backend/dist/
 
 # mac/windows junk
 .DS_Store

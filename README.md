@@ -213,7 +213,14 @@ Build an installer or app bundle:
 npm run desktop:build
 ```
 
-The current desktop build still expects Python and the Python dependencies to be available. The Tauri shell is the first step toward a true one-click offline app, not the final end-user installer yet.
+The desktop build bundles a PyInstaller backend executable that includes Python and the installed Python dependencies. End users should not need to install Python separately for the packaged Windows app.
+
+If `npm run desktop:build` fails with `PermissionError: [WinError 5] Access is denied` for `HolyFHIRBackend.exe`, an older backend process is still running. Stop it and rebuild:
+
+```powershell
+Get-Process HolyFHIRBackend -ErrorAction SilentlyContinue | Stop-Process -Force
+npm run desktop:build
+```
 
 ### Beginner roadmap to a standalone offline app
 
@@ -232,9 +239,9 @@ The current desktop build still expects Python and the Python dependencies to be
    - Keep `.env` for development only.
    - Add a recovery-key export flow so users do not lose their medical data.
 
-4. Bundle the backend for real end users.
-   - Package Python and the Django app as a Tauri sidecar, or convert the backend into a standalone executable.
-   - Include the exact Python dependencies needed by SQLCipher.
+4. Harden the bundled backend for real end users.
+   - Keep the PyInstaller backend executable bundled with the Tauri app.
+   - Verify the exact Python dependencies needed by SQLCipher on clean Windows machines.
    - Store user data under the operating system app data directory, not inside the installed app folder.
 
 5. Add offline backup and restore.

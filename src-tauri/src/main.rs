@@ -86,6 +86,38 @@ fn configure_django_command(command: &mut Command, paths: &RuntimePaths) {
         .env("DATABASE_NAME", &paths.database_file);
 }
 
+fn bundled_backend_executable(paths: &RuntimePaths) -> PathBuf {
+    paths
+        .project_root
+        .join("HolyFHIRBackend")
+        .join("HolyFHIRBackend.exe")
+}
+
+fn django_command(paths: &RuntimePaths) -> Result<Command, String> {
+    let mut command = if cfg!(debug_assertions) {
+        let mut command = Command::new(python_executable());
+        command.arg("manage.py");
+        command
+    } else {
+        let backend_executable = bundled_backend_executable(paths);
+
+        if !backend_executable.exists() {
+            return Err(format!(
+                "missing bundled backend executable: {:?}",
+                backend_executable
+            ));
+        }
+
+        let mut command = Command::new(backend_executable);
+        command.arg("--project-root").arg(&paths.project_root);
+        command
+    };
+
+    configure_django_command(&mut command, paths);
+
+    Ok(command)
+}
+
 fn command_output(command: &mut Command, paths: &RuntimePaths, label: &str) -> Result<(), String> {
     append_log(paths, format!("running {label}"));
 
@@ -122,10 +154,8 @@ fn bootstrap_django(paths: &RuntimePaths) -> Result<(), String> {
     }
 
     if !paths.env_file.exists() {
-        let mut command = Command::new(python_executable());
-        configure_django_command(&mut command, paths);
+        let mut command = django_command(paths)?;
         command
-            .arg("manage.py")
             .arg("bootstrap_secrets")
             .arg("--env-file")
             .arg(&paths.env_file)
@@ -135,9 +165,8 @@ fn bootstrap_django(paths: &RuntimePaths) -> Result<(), String> {
         command_output(&mut command, paths, "bootstrap_secrets")?;
     }
 
-    let mut command = Command::new(python_executable());
-    configure_django_command(&mut command, paths);
-    command.arg("manage.py").arg("migrate").arg("--noinput");
+    let mut command = django_command(paths)?;
+    command.arg("migrate").arg("--noinput");
     command_output(&mut command, paths, "migrate")?;
 
     Ok(())
@@ -145,12 +174,9 @@ fn bootstrap_django(paths: &RuntimePaths) -> Result<(), String> {
 
 fn start_django(paths: &RuntimePaths) -> Result<Child, String> {
     let url = format!("{HOST}:{PORT}");
-    let mut command = Command::new(python_executable());
-
-    configure_django_command(&mut command, paths);
+    let mut command = django_command(paths)?;
 
     command
-        .arg("manage.py")
         .arg("runserver")
         .arg(url)
         .arg("--noreload")
