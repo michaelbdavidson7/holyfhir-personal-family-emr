@@ -14,6 +14,8 @@ use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 const HOST: &str = "127.0.0.1";
 const PORT: u16 = 8787;
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 struct DjangoProcess(Mutex<Option<Child>>);
 
@@ -31,9 +33,41 @@ fn project_root(app: &tauri::AppHandle) -> PathBuf {
     if cfg!(debug_assertions) {
         env::current_dir().expect("failed to read current working directory")
     } else {
-        app.path()
+        let resource_dir = app
+            .path()
             .resource_dir()
-            .expect("failed to find bundled resources directory")
+            .expect("failed to find bundled resources directory");
+
+        [
+            resource_dir.clone(),
+            resource_dir.join("_up_"),
+            installed_app_dir()
+                .map(|path| path.join("_up_"))
+                .unwrap_or_else(|_| resource_dir.join("_up_")),
+        ]
+        .into_iter()
+        .find(|path| path.join(".env.example").exists() && path.join("manage.py").exists())
+        .unwrap_or(resource_dir)
+    }
+}
+
+fn installed_app_dir() -> Result<PathBuf, String> {
+    env::current_exe()
+        .map_err(|error| format!("failed to find current executable path: {error}"))?
+        .parent()
+        .map(Path::to_path_buf)
+        .ok_or_else(|| "failed to find current executable directory".to_string())
+}
+
+fn early_log(message: impl AsRef<str>) {
+    let Ok(app_dir) = installed_app_dir() else {
+        return;
+    };
+
+    let log_file = app_dir.join("holyfhir-desktop.log");
+
+    if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(log_file) {
+        let _ = writeln!(file, "{}", message.as_ref());
     }
 }
 
@@ -44,10 +78,7 @@ fn runtime_paths(app: &tauri::AppHandle) -> Result<RuntimePaths, String> {
     } else if cfg!(debug_assertions) {
         project_root.join(".desktop-data")
     } else {
-        project_root
-            .parent()
-            .map(Path::to_path_buf)
-            .ok_or_else(|| format!("failed to find parent directory for {:?}", project_root))?
+        installed_app_dir()?
     };
 
     fs::create_dir_all(&app_data_dir)
@@ -83,14 +114,65 @@ fn configure_django_command(command: &mut Command, paths: &RuntimePaths) {
         .env("DJANGO_SETTINGS_MODULE", "config.settings")
         .env("DJANGO_ENV_FILE", &paths.env_file)
         .env("DJANGO_ENV_EXAMPLE_FILE", &paths.env_example_file)
-        .env("DATABASE_NAME", &paths.database_file);
+        .env("DATABASE_NAME", &paths.database_file)
+        .env("HOLYFHIR_BACKEND_LOG", &paths.log_file);
 }
 
+#[cfg(target_os = "windows")]
+fn hide_backend_console(command: &mut Command) {
+    use std::os::windows::process::CommandExt;
+
+    command.creation_flags(CREATE_NO_WINDOW);
+}
+
+#[cfg(not(target_os = "windows"))]
+fn hide_backend_console(_command: &mut Command) {}
+
 fn bundled_backend_executable(paths: &RuntimePaths) -> PathBuf {
-    paths
+    let candidates = [
+        paths
+            .project_root
+            .join("desktop-backend")
+            .join("dist")
+            .join("HolyFHIRBackend")
+            .join("HolyFHIRBackend.exe"),
+        paths
+            .project_root
+            .join("HolyFHIRBackend")
+            .join("HolyFHIRBackend.exe"),
+    ];
+
+    candidates
+        .iter()
+        .find(|path| path.exists())
+        .cloned()
+        .unwrap_or_else(|| {
+            paths
+                .project_root
+                .join("desktop-backend")
+                .join("dist")
+                .join("HolyFHIRBackend")
+                .join("HolyFHIRBackend.exe")
+        })
+}
+
+fn bundled_backend_candidates(paths: &RuntimePaths) -> String {
+    [
+        paths
+            .project_root
+            .join("desktop-backend")
+            .join("dist")
+            .join("HolyFHIRBackend")
+            .join("HolyFHIRBackend.exe"),
+        paths
         .project_root
         .join("HolyFHIRBackend")
-        .join("HolyFHIRBackend.exe")
+            .join("HolyFHIRBackend.exe"),
+    ]
+    .iter()
+    .map(|path| format!("{path:?}"))
+    .collect::<Vec<_>>()
+    .join(", ")
 }
 
 fn django_command(paths: &RuntimePaths) -> Result<Command, String> {
@@ -103,8 +185,8 @@ fn django_command(paths: &RuntimePaths) -> Result<Command, String> {
 
         if !backend_executable.exists() {
             return Err(format!(
-                "missing bundled backend executable: {:?}",
-                backend_executable
+                "missing bundled backend executable. Tried: {}",
+                bundled_backend_candidates(paths)
             ));
         }
 
@@ -114,6 +196,7 @@ fn django_command(paths: &RuntimePaths) -> Result<Command, String> {
     };
 
     configure_django_command(&mut command, paths);
+    hide_backend_console(&mut command);
 
     Ok(command)
 }
@@ -223,6 +306,8 @@ fn show_app_window(app: &mut tauri::App, url: WebviewUrl, title: &str) -> tauri:
 fn show_startup_error(app: &mut tauri::App, paths: Option<&RuntimePaths>, message: &str) -> tauri::Result<()> {
     if let Some(paths) = paths {
         append_log(paths, format!("startup error: {message}"));
+    } else {
+        early_log(format!("startup error before runtime paths were ready: {message}"));
     }
 
     show_app_window(
@@ -233,6 +318,8 @@ fn show_startup_error(app: &mut tauri::App, paths: Option<&RuntimePaths>, messag
 }
 
 fn main() {
+    early_log("HolyFHIR desktop process started");
+
     tauri::Builder::default()
         .manage(DjangoProcess(Mutex::new(None)))
         .setup(|app| {

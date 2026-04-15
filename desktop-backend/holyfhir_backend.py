@@ -4,7 +4,22 @@ import sys
 from pathlib import Path
 
 
+def configure_logging():
+    log_file = os.environ.get("HOLYFHIR_BACKEND_LOG", "").strip()
+
+    if not log_file:
+        return
+
+    log_path = Path(log_file)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    stream = log_path.open("a", encoding="utf-8", buffering=1)
+    sys.stdout = stream
+    sys.stderr = stream
+
+
 def main():
+    configure_logging()
+
     parser = argparse.ArgumentParser(
         prog="HolyFHIRBackend",
         description="Bundled Django command runner for HolyFHIR Personal EMR.",
