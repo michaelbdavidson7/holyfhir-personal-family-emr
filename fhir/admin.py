@@ -19,6 +19,7 @@ class FHIRResourceSnapshotAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        "patient",
         "resource_type",
         "source",
         "is_valid",

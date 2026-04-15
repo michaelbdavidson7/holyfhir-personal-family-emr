@@ -1,63 +1,9 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html, format_html_join
+
 from .models import PatientProfile
 
-from clinical.models import (
-    Condition,
-    Allergy,
-    Medication,
-    Immunization,
-    Observation,
-    Encounter,
-)
-from documents.models import ClinicalDocument
-
-class ConditionInline(admin.StackedInline):
-    model = Condition
-    extra = 0
-    fields = ("name", "clinical_status", "onset_date", "abatement_date", "notes")
-    show_change_link = True
-
-
-class AllergyInline(admin.StackedInline):
-    model = Allergy
-    extra = 0
-    fields = ("substance", "category", "criticality", "reaction", "severity", "notes")
-    show_change_link = True
-
-
-class MedicationInline(admin.StackedInline):
-    model = Medication
-    extra = 0
-    fields = ("name", "dosage_text", "frequency", "status", "start_date", "end_date")
-    show_change_link = True
-
-
-class ImmunizationInline(admin.StackedInline):
-    model = Immunization
-    extra = 0
-    fields = ("vaccine_name", "occurrence_date", "lot_number", "manufacturer")
-    show_change_link = True
-
-
-class ObservationInline(admin.StackedInline):
-    model = Observation
-    extra = 0
-    fields = ("category", "name", "value_string", "value_quantity", "unit", "effective_datetime")
-    show_change_link = True
-
-
-class EncounterInline(admin.StackedInline):
-    model = Encounter
-    extra = 0
-    fields = ("encounter_type", "status", "start_time", "end_time", "provider_name", "facility_name")
-    show_change_link = True
-
-
-class ClinicalDocumentInline(admin.StackedInline):
-    model = ClinicalDocument
-    extra = 0
-    fields = ("title", "document_type", "source_name", "source_date", "file")
-    show_change_link = True
 
 @admin.register(PatientProfile)
 class PatientProfileAdmin(admin.ModelAdmin):
@@ -84,7 +30,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
         "created_at",
     )
 
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("related_records", "created_at", "updated_at")
 
     fieldsets = (
         ("Basic Info", {
@@ -125,17 +71,42 @@ class PatientProfileAdmin(admin.ModelAdmin):
                 "emergency_contact_relationship",
             )
         }),
+        ("Records", {
+            "fields": ("related_records",)
+        }),
         ("Meta", {
             "fields": ("created_at", "updated_at")
         }),
     )
-    
-    inlines = [
-        ConditionInline,
-        AllergyInline,
-        MedicationInline,
-        ImmunizationInline,
-        ObservationInline,
-        EncounterInline,
-        ClinicalDocumentInline,
-    ]
+
+    @admin.display(description="Related records")
+    def related_records(self, obj):
+        if not obj or not obj.pk:
+            return "Save this patient before adding clinical records."
+
+        rows = [
+            self._related_record_link(obj, "Conditions", "clinical_condition", obj.conditions.count()),
+            self._related_record_link(obj, "Allergies", "clinical_allergy", obj.allergies.count()),
+            self._related_record_link(obj, "Medications", "clinical_medication", obj.medications.count()),
+            self._related_record_link(obj, "Immunizations", "clinical_immunization", obj.immunizations.count()),
+            self._related_record_link(obj, "Observations", "clinical_observation", obj.observations.count()),
+            self._related_record_link(obj, "Encounters", "clinical_encounter", obj.encounters.count()),
+            self._related_record_link(obj, "Documents", "documents_clinicaldocument", obj.documents.count()),
+            self._related_record_link(obj, "FHIR snapshots", "fhir_fhirresourcesnapshot", obj.fhir_snapshots.count()),
+        ]
+
+        return format_html("<ul>{}</ul>", format_html_join("", "<li>{}</li>", ((row,) for row in rows)))
+
+    def _related_record_link(self, obj, label, admin_model_name, count):
+        changelist_url = reverse(f"admin:{admin_model_name}_changelist")
+        add_url = reverse(f"admin:{admin_model_name}_add")
+        query = f"patient__id__exact={obj.pk}"
+        return format_html(
+            '<a href="{}?{}">{} ({})</a> <span class="quiet">|</span> <a href="{}?patient={}">Add</a>',
+            changelist_url,
+            query,
+            label,
+            count,
+            add_url,
+            obj.pk,
+        )

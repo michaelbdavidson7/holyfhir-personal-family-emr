@@ -20,6 +20,7 @@ class ClinicalDocumentAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        "patient",
         "document_type",
         "source_date",
     )
