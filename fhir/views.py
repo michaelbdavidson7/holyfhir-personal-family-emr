@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .forms import FHIRImportForm
-from .importer import import_fhir_json
+from .importer import import_fhir_payloads
 
 
 @staff_member_required
@@ -12,7 +12,10 @@ def import_fhir_data(request):
     if request.method == "POST":
         form = FHIRImportForm(request.POST, request.FILES)
         if form.is_valid():
-            result = import_fhir_json(form.cleaned_data["payload"])
+            result = import_fhir_payloads(
+                form.cleaned_data["payloads"],
+                target_patient=form.cleaned_data.get("patient"),
+            )
             if result.errors:
                 for error in result.errors:
                     messages.warning(request, error)

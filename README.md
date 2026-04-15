@@ -111,7 +111,7 @@ Go to:
 
 ### Import FHIR data
 
-From the Django Admin, open **FHIR / Interop > Import FHIR Data** and upload or paste a FHIR JSON Bundle or single resource.
+From the Django Admin, open **FHIR / Interop > Import FHIR Data**, optionally choose an existing patient profile to attach the import to, and upload a MyChart `Requested Record` ZIP export, an NDJSON file, a FHIR JSON Bundle, or a single resource.
 
 The importer currently maps Patient, Condition, AllergyIntolerance, MedicationStatement, MedicationRequest, Immunization, Observation, and Encounter resources into the local EMR models. It also saves each raw resource as a FHIR snapshot for traceability.
 

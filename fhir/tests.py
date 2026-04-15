@@ -1,11 +1,16 @@
+import json
 from datetime import date
+from io import BytesIO
+from zipfile import ZipFile
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from clinical.models import Condition, Medication, Observation
 from patients.models import PatientProfile
 
-from .importer import import_fhir_json, loads_fhir_json
+from .forms import FHIRImportForm
+from .importer import import_fhir_json, import_fhir_payloads, loads_fhir_documents, loads_fhir_json
 from .models import FHIRLink, FHIRResourceSnapshot
 
 
@@ -129,6 +134,53 @@ class FHIRImportTests(TestCase):
         self.assertEqual(Condition.objects.get().name, "Resolved asthma")
         self.assertEqual(FHIRResourceSnapshot.objects.count(), 4)
 
+    def test_import_can_attach_to_existing_patient(self):
+        existing_patient = PatientProfile.objects.create(
+            first_name="Mike",
+            last_name="Davidson",
+            email="existing@example.test",
+        )
+        payload = {
+            "resourceType": "Bundle",
+            "entry": [
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "id": "epic-patient-id",
+                        "name": [{"family": "Davidson", "given": ["Michael"]}],
+                        "telecom": [{"system": "phone", "value": "555-0199"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Condition",
+                        "id": "cond-1",
+                        "subject": {"reference": "Patient/epic-patient-id"},
+                        "code": {"text": "Asthma"},
+                    }
+                },
+            ],
+        }
+
+        result = import_fhir_json(payload, target_patient=existing_patient)
+
+        self.assertEqual(result.created, 1)
+        self.assertEqual(result.updated, 1)
+        self.assertEqual(PatientProfile.objects.count(), 1)
+
+        existing_patient.refresh_from_db()
+        self.assertEqual(existing_patient.first_name, "Mike")
+        self.assertEqual(existing_patient.email, "existing@example.test")
+        self.assertEqual(existing_patient.phone, "555-0199")
+        self.assertEqual(Condition.objects.get().patient, existing_patient)
+        self.assertTrue(
+            FHIRLink.objects.filter(
+                resource_type="Patient",
+                resource_id="epic-patient-id",
+                django_object_id=existing_patient.id,
+            ).exists()
+        )
+
     def test_missing_patient_reference_is_snapshotted_as_invalid(self):
         result = import_fhir_json(
             {
@@ -148,3 +200,58 @@ class FHIRImportTests(TestCase):
     def test_loads_fhir_json_rejects_invalid_json(self):
         with self.assertRaises(ValueError):
             loads_fhir_json("{not-json")
+
+    def test_loads_ndjson_resources(self):
+        payloads = loads_fhir_documents(
+            "\n".join(
+                [
+                    json.dumps({"resourceType": "Patient", "id": "pat-1"}),
+                    json.dumps({"resourceType": "Condition", "id": "cond-1"}),
+                ]
+            ),
+            "export.ndjson",
+        )
+
+        self.assertEqual([payload["resourceType"] for payload in payloads], ["Patient", "Condition"])
+
+    def test_form_accepts_mychart_zip_export(self):
+        archive_content = BytesIO()
+        with ZipFile(archive_content, "w") as archive:
+            archive.writestr(
+                "Requested Record/FHIR/Patient11694.NDJSON",
+                json.dumps(
+                    {
+                        "resourceType": "Patient",
+                        "id": "pat-1",
+                        "name": [{"family": "Rivera", "given": ["Maya"]}],
+                    }
+                )
+                + "\n",
+            )
+            archive.writestr(
+                "Requested Record/FHIR/condition1168.NDJSON",
+                json.dumps(
+                    {
+                        "resourceType": "Condition",
+                        "id": "cond-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "code": {"text": "Asthma"},
+                    }
+                )
+                + "\n",
+            )
+            archive.writestr("Requested Record/readme.txt", "not fhir")
+
+        uploaded_file = SimpleUploadedFile(
+            "Requested Record.zip",
+            archive_content.getvalue(),
+            content_type="application/zip",
+        )
+        form = FHIRImportForm(data={}, files={"fhir_file": uploaded_file})
+
+        self.assertTrue(form.is_valid(), form.errors)
+        result = import_fhir_payloads(form.cleaned_data["payloads"])
+
+        self.assertEqual(result.created, 2)
+        self.assertEqual(PatientProfile.objects.count(), 1)
+        self.assertEqual(Condition.objects.count(), 1)

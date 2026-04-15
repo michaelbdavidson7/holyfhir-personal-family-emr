@@ -1,19 +1,31 @@
+from io import BytesIO
+from pathlib import PurePosixPath
+from zipfile import BadZipFile, ZipFile
+
 from django import forms
 
-from .importer import loads_fhir_json
+from patients.models import PatientProfile
+
+from .importer import loads_fhir_documents
 
 
 class FHIRImportForm(forms.Form):
+    patient = forms.ModelChoiceField(
+        label="Attach to patient",
+        queryset=PatientProfile.objects.order_by("last_name", "first_name", "id"),
+        required=False,
+        help_text="Choose an existing profile to attach this import to. Leave blank to create or update from the FHIR Patient resource.",
+    )
     fhir_file = forms.FileField(
         label="FHIR JSON file",
         required=False,
-        help_text="Upload a FHIR Bundle or a single FHIR resource as JSON.",
+        help_text="Upload a MyChart ZIP export, NDJSON file, FHIR Bundle, or single FHIR resource JSON.",
     )
     fhir_json = forms.CharField(
         label="FHIR JSON",
         widget=forms.Textarea(attrs={"rows": 14}),
         required=False,
-        help_text="Paste a FHIR Bundle or single resource when you do not have a file.",
+        help_text="Paste a FHIR Bundle, NDJSON, or single resource when you do not have a file.",
     )
 
     def clean(self):
@@ -22,22 +34,58 @@ class FHIRImportForm(forms.Form):
         pasted_json = cleaned_data.get("fhir_json", "").strip()
 
         if not uploaded_file and not pasted_json:
-            raise forms.ValidationError("Upload a FHIR JSON file or paste FHIR JSON.")
+            raise forms.ValidationError("Upload a FHIR ZIP/JSON/NDJSON file or paste FHIR JSON.")
 
         if uploaded_file and pasted_json:
             raise forms.ValidationError("Use either a file upload or pasted JSON, not both.")
 
         if uploaded_file:
-            try:
-                raw = uploaded_file.read().decode("utf-8")
-            except UnicodeDecodeError as exc:
-                raise forms.ValidationError("FHIR file must be UTF-8 encoded JSON.") from exc
+            cleaned_data["payloads"] = self._payloads_from_upload(uploaded_file)
         else:
-            raw = pasted_json
+            try:
+                cleaned_data["payloads"] = loads_fhir_documents(pasted_json, "pasted FHIR JSON")
+            except ValueError as exc:
+                raise forms.ValidationError(str(exc)) from exc
+
+        return cleaned_data
+
+    def _payloads_from_upload(self, uploaded_file):
+        filename = uploaded_file.name or ""
+        content = uploaded_file.read()
+        if filename.lower().endswith(".zip"):
+            return self._payloads_from_zip(content)
 
         try:
-            cleaned_data["payload"] = loads_fhir_json(raw)
+            raw = content.decode("utf-8-sig")
+        except UnicodeDecodeError as exc:
+            raise forms.ValidationError("FHIR file must be UTF-8 encoded JSON/NDJSON or a ZIP export.") from exc
+
+        try:
+            return loads_fhir_documents(raw, filename)
         except ValueError as exc:
             raise forms.ValidationError(str(exc)) from exc
 
-        return cleaned_data
+    def _payloads_from_zip(self, content):
+        payloads = []
+        try:
+            with ZipFile(BytesIO(content)) as archive:
+                for name in archive.namelist():
+                    path = PurePosixPath(name)
+                    if path.name.startswith(".") or not path.name:
+                        continue
+                    if path.suffix.lower() not in {".json", ".ndjson"}:
+                        continue
+                    try:
+                        raw = archive.read(name).decode("utf-8-sig")
+                    except UnicodeDecodeError as exc:
+                        raise forms.ValidationError(f"{name} must be UTF-8 encoded.") from exc
+                    try:
+                        payloads.extend(loads_fhir_documents(raw, path.name))
+                    except ValueError as exc:
+                        raise forms.ValidationError(f"{name}: {exc}") from exc
+        except BadZipFile as exc:
+            raise forms.ValidationError("Uploaded ZIP file could not be opened.") from exc
+
+        if not payloads:
+            raise forms.ValidationError("ZIP file did not contain any FHIR JSON or NDJSON files.")
+        return payloads

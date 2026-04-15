@@ -7,10 +7,17 @@
     <fieldset class="module aligned">
       <h2>Import FHIR Data</h2>
       <p>
-        Upload or paste a FHIR JSON Bundle, Patient, Condition, AllergyIntolerance,
-        MedicationStatement, MedicationRequest, Immunization, Observation, or Encounter.
+        Upload a MyChart Requested Record ZIP, an NDJSON file, or paste a FHIR JSON Bundle,
+        Patient, Condition, AllergyIntolerance, MedicationStatement, MedicationRequest,
+        Immunization, Observation, or Encounter.
       </p>
       {{ form.non_field_errors }}
+      <div class="form-row">
+        {{ form.patient.errors }}
+        {{ form.patient.label_tag }}
+        {{ form.patient }}
+        <div class="help">{{ form.patient.help_text }}</div>
+      </div>
       <div class="form-row">
         {{ form.fhir_file.errors }}
         {{ form.fhir_file.label_tag }}

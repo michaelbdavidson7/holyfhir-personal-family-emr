@@ -37,15 +37,22 @@ class FHIRImportResult:
         return self.created + self.updated
 
 
-def import_fhir_json(payload, source="imported"):
-    resources = _extract_resources(payload)
+def import_fhir_json(payload, source="imported", target_patient=None):
+    return import_fhir_payloads([payload], source=source, target_patient=target_patient)
+
+
+def import_fhir_payloads(payloads, source="imported", target_patient=None):
+    resources = []
+    for payload in payloads:
+        resources.extend(_extract_resources(payload))
+
     result = FHIRImportResult()
     patient_by_reference = {}
 
     with transaction.atomic():
         for resource in resources:
             if resource.get("resourceType") == "Patient":
-                patient, created = _import_patient(resource)
+                patient, created = _import_patient(resource, target_patient=target_patient)
                 _record_import(result, created)
                 _snapshot(resource, patient, source, result)
                 _link(resource, patient, "patients.PatientProfile", patient.id, "fhir_to_internal")
@@ -56,7 +63,7 @@ def import_fhir_json(payload, source="imported"):
             if resource_type == "Patient":
                 continue
 
-            patient = _resolve_patient(resource, patient_by_reference)
+            patient = _resolve_patient(resource, patient_by_reference, default_patient=target_patient)
             if resource_type not in SUPPORTED_RESOURCE_TYPES:
                 result.unsupported += 1
                 _snapshot(resource, patient, source, result, is_valid=False, errors=["Unsupported resource type."])
@@ -84,6 +91,12 @@ def import_fhir_json(payload, source="imported"):
     return result
 
 
+def loads_fhir_documents(raw, filename="FHIR JSON"):
+    if _looks_like_ndjson(filename, raw):
+        return _loads_ndjson(raw)
+    return [loads_fhir_json(raw)]
+
+
 def loads_fhir_json(raw):
     try:
         payload = json.loads(raw)
@@ -92,6 +105,31 @@ def loads_fhir_json(raw):
     if not isinstance(payload, dict):
         raise ValueError("FHIR import must be a JSON object.")
     return payload
+
+
+def _looks_like_ndjson(filename, raw):
+    if filename.lower().endswith(".ndjson"):
+        return True
+    stripped = raw.strip()
+    return "\n" in stripped and not stripped.startswith(("{", "["))
+
+
+def _loads_ndjson(raw):
+    payloads = []
+    for line_number, line in enumerate(raw.splitlines(), start=1):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        try:
+            payload = json.loads(stripped)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Invalid NDJSON on line {line_number}: {exc.msg}") from exc
+        if not isinstance(payload, dict):
+            raise ValueError(f"FHIR NDJSON line {line_number} must be a JSON object.")
+        payloads.append(payload)
+    if not payloads:
+        raise ValueError("FHIR NDJSON file does not contain any resources.")
+    return payloads
 
 
 def _extract_resources(payload):
@@ -110,17 +148,26 @@ def _extract_resources(payload):
     raise ValueError("FHIR JSON must include a resourceType.")
 
 
-def _import_patient(resource):
+def _import_patient(resource, target_patient=None):
     defaults = _patient_defaults(resource)
-    patient = _object_for_resource(resource, "patients.PatientProfile")
+    patient = target_patient or _object_for_resource(resource, "patients.PatientProfile")
     if patient:
-        for field, value in defaults.items():
-            setattr(patient, field, value)
+        if target_patient:
+            _fill_blank_patient_fields(patient, defaults)
+        else:
+            for field, value in defaults.items():
+                setattr(patient, field, value)
         patient.save()
         return patient, False
 
     patient = PatientProfile.objects.create(**defaults)
     return patient, True
+
+
+def _fill_blank_patient_fields(patient, defaults):
+    for field, value in defaults.items():
+        if value and not getattr(patient, field):
+            setattr(patient, field, value)
 
 
 def _patient_defaults(resource):
@@ -279,7 +326,7 @@ def _object_for_resource(resource, django_model):
     return None
 
 
-def _resolve_patient(resource, patient_by_reference):
+def _resolve_patient(resource, patient_by_reference, default_patient=None):
     subject = resource.get("subject") or resource.get("patient")
     reference = subject.get("reference") if isinstance(subject, dict) else None
     if reference in patient_by_reference:
@@ -293,7 +340,7 @@ def _resolve_patient(resource, patient_by_reference):
         ).first()
         if link:
             return PatientProfile.objects.filter(pk=link.django_object_id).first()
-    return None
+    return default_patient
 
 
 def _patient_references(resource, patient):
