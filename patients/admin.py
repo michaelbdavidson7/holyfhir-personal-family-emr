@@ -156,19 +156,24 @@ class UserAdmin(DjangoUserAdmin):
             return "Save this user before configuring recovery."
 
         if not hasattr(obj, "recovery_credential"):
-            return "No recovery key has been created for this user yet."
+            return format_html(
+                'No recovery key has been created for this user yet. <a href="{}">Generate recovery key</a>.',
+                reverse("admin_recovery_key_generate"),
+            )
 
         credential = obj.recovery_credential
 
         if credential.last_used_at:
             return format_html(
-                "Recovery key is configured. Last used: {}. The raw key cannot be viewed here.",
+                'Recovery key is configured. Last used: {}. The raw key cannot be viewed here. <a href="{}">Rotate recovery key</a>.',
                 credential.last_used_at,
+                reverse("admin_recovery_key_generate"),
             )
 
         return format_html(
-            "Recovery key is configured. Created: {}. The raw key cannot be viewed here.",
+            'Recovery key is configured. Created: {}. The raw key cannot be viewed here. <a href="{}">Rotate recovery key</a>.',
             credential.created_at,
+            reverse("admin_recovery_key_generate"),
         )
 
 
