@@ -144,6 +144,12 @@ SESSION_COOKIE_AGE = ONE_HUNDRED_YEARS_IN_SECONDS
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
 
+# Login brute-force protection. This is local cache-backed throttling for the
+# desktop app, not account recovery or remote abuse prevention.
+HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_USERNAME = 5
+HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_CLIENT = 20
+HOLYFHIR_LOGIN_LOCKOUT_SECONDS = 15 * 60
+
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "HolyFHIR Personal EMR",

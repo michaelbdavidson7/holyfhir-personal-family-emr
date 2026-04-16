@@ -19,8 +19,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path
+from config.auth_forms import RateLimitedAdminAuthenticationForm
 from fhir.views import import_fhir_data
 from patients.views import first_run_setup
+
+admin.site.login_form = RateLimitedAdminAuthenticationForm
 
 def admin_root_redirect(request):
     return redirect("/admin/patients/patientprofile/")

@@ -6,7 +6,7 @@ from unittest.mock import patch
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase, override_settings
 
 from config.database import (
     DEFAULT_DATABASE_CIPHER_COMPATIBILITY,
@@ -16,6 +16,7 @@ from config.database import (
     DEFAULT_DATABASE_TIMEOUT,
     build_default_database_config,
 )
+from config.auth_forms import RateLimitedAdminAuthenticationForm, _cache_key
 from config.db.backends.sqlcipher.base import _is_plaintext_sqlite_database
 from config.env import load_env, parse_env_file
 
@@ -250,3 +251,36 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
 
         self.assertNotEqual(values["DATABASE_ENCRYPTION_KEY"], "existing-db-key")
         self.assertNotEqual(values["SECRET_KEY"], "existing-secret-key")
+
+
+class LoginRateLimitTests(SimpleTestCase):
+    def test_login_blocks_when_username_has_too_many_failures(self):
+        request = RequestFactory().post("/admin/login/")
+        request.META["REMOTE_ADDR"] = "127.0.0.1"
+
+        username_key = _cache_key("login-failures:username", "owner")
+        client_key = _cache_key("login-failures:client", "127.0.0.1")
+
+        with override_settings(
+            HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_USERNAME=1,
+            HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_CLIENT=20,
+            HOLYFHIR_LOGIN_LOCKOUT_SECONDS=60,
+        ), patch("django.contrib.auth.forms.authenticate", return_value=None):
+            form = RateLimitedAdminAuthenticationForm(
+                request=request,
+                data={"username": "owner", "password": "wrong-password"},
+            )
+            self.assertFalse(form.is_valid())
+
+            form = RateLimitedAdminAuthenticationForm(
+                request=request,
+                data={"username": "owner", "password": "another-wrong-password"},
+            )
+            self.assertFalse(form.is_valid())
+
+        self.assertIn("Too many failed login attempts.", form.errors["__all__"][0])
+
+        from django.core.cache import cache
+
+        cache.delete(username_key)
+        cache.delete(client_key)
