@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unlock HolyFHIR</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #18212a;
+        background: #f4f7f8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+      }
+
+      main {
+        width: min(100%, 430px);
+        background: #ffffff;
+        border: 1px solid #d4dde3;
+        border-radius: 8px;
+        box-shadow: 0 18px 45px rgba(18, 31, 42, 0.11);
+        padding: 32px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        line-height: 1.15;
+      }
+
+      p {
+        color: #52616c;
+        line-height: 1.5;
+      }
+
+      label {
+        display: block;
+        margin: 18px 0 6px;
+        font-weight: 650;
+      }
+
+      input {
+        width: 100%;
+        border: 1px solid #b9c6cf;
+        border-radius: 6px;
+        padding: 11px 12px;
+        font: inherit;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 20px;
+        border: 0;
+        border-radius: 6px;
+        background: #246f8f;
+        color: #ffffff;
+        padding: 12px 16px;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .logout-button {
+        background: transparent;
+        color: #52616c;
+        border: 1px solid #b9c6cf;
+        margin-top: 12px;
+      }
+
+      .logout-button:hover {
+        color: #18212a;
+        border-color: #7b8a94;
+      }
+
+      .message {
+        border: 1px solid #b84232;
+        border-radius: 8px;
+        background: #fff4f2;
+        color: #5d160f;
+        padding: 12px 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>HolyFHIR is locked</h1>
+      <p>Enter your password to return to your local records.</p>
+
+      {% for message in messages %}
+        <p class="message">{{ message }}</p>
+      {% endfor %}
+
+      {% if locked_out %}
+        <p class="message">Too many unlock attempts. Try again in about {{ remaining_seconds }} seconds.</p>
+      {% else %}
+        <form method="post">
+          {% csrf_token %}
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" autofocus>
+          <button type="submit">Unlock HolyFHIR</button>
+        </form>
+      {% endif %}
+
+      <form method="post" action="{% url 'admin:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout-button">Log out instead</button>
+      </form>
+    </main>
+  </body>
+</html>

@@ -201,6 +201,10 @@
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end" id="jazzy-usermenu">
                         <span class="dropdown-header">{% trans 'Account' %}</span>
                         <div class="dropdown-divider"></div>
+                        <a href="{% url 'app_lock' %}" class="dropdown-item" id="holyfhir-lock-app-link">
+                            <i class="fas fa-lock me-2"></i> {% trans 'Lock app' %}
+                        </a>
+                        <div class="dropdown-divider"></div>
                         {% if perms|can_view_self %}
                             <a href="{% jazzy_admin_url request.user request.current_app|default:"admin" %}" class="dropdown-item">
                                 <i class="fas fa-user-cog me-2"></i> {% trans 'Edit System User Settings' %}
@@ -410,6 +414,16 @@
 {% endif %}
 
 {% block extrajs %}{% endblock %}
+{% if holyfhir_lock_shortcut_enabled %}
+<script>
+    document.addEventListener("keydown", function (event) {
+        if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "l") {
+            event.preventDefault();
+            window.location.href = "{% url 'app_lock' %}";
+        }
+    });
+</script>
+{% endif %}
 
 </body>
 </html>

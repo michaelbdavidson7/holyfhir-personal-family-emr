@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'clinical',
     'documents',
     'fhir',
+    'system_settings',
 ]
 
 MIDDLEWARE = [
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'system_settings.middleware.AppLockMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -82,6 +84,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 "patients.context_processors.admin_recent_patients",
+                "system_settings.context_processors.system_settings",
             ],
         },
     },
@@ -172,6 +175,7 @@ JAZZMIN_SETTINGS = {
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
         "System": "fas fa-cog",
+        "system_settings.SystemSettings": "fas fa-sliders-h",
 
         "patients": "fas fa-hospital-user",
         "patients.PatientProfile": "fas fa-id-card",
@@ -224,6 +228,7 @@ JAZZMIN_SETTINGS = {
 
     "hide_models": [
         "patients.RecoveryCredential",
+        "system_settings.SystemSettings",
         "fhir.FHIRLink",
         "fhir.FHIRResourceSnapshot",
     ],

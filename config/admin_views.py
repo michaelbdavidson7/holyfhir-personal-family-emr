@@ -6,9 +6,11 @@ from django.urls import reverse
 
 from patients.models import RecoveryCredential
 from patients.recovery import generate_recovery_key, hash_recovery_key
+from system_settings.models import SystemSettings
 
 
 def settings_hub(request):
+    system_settings = SystemSettings.get_solo()
     recovery_credential = None
 
     if request.user.is_authenticated:
@@ -32,6 +34,12 @@ def settings_hub(request):
         }
 
     cards = [
+        {
+            "title": "App Settings",
+            "description": "Manage lock-screen behavior and local desktop preferences.",
+            "url": reverse("admin:system_settings_systemsettings_change", args=[system_settings.pk]),
+            "icon": "fas fa-sliders-h",
+        },
         {
             "title": "Users",
             "description": "Manage the local system owner account and password.",
