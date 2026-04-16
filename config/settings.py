@@ -137,6 +137,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Desktop/local-first behavior: keep the owner signed in for a long time.
+# The session can still be cleared by deleting app data, clearing cookies, or changing secrets.
+ONE_HUNDRED_YEARS_IN_SECONDS = 60 * 60 * 24 * 365 * 100
+SESSION_COOKIE_AGE = ONE_HUNDRED_YEARS_IN_SECONDS
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_SAVE_EVERY_REQUEST = True
+
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "HolyFHIR Personal EMR",
