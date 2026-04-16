@@ -2,14 +2,17 @@ import hashlib
 
 from django.conf import settings
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
+from django.db import OperationalError, ProgrammingError
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from patients.models import LoginLockout
 
-def _cache_key(prefix, value):
+
+def _lockout_key(value):
     digest = hashlib.sha256(str(value).encode("utf-8")).hexdigest()
-    return f"holyfhir:{prefix}:{digest}"
+    return digest
 
 
 def _client_identifier(request):
@@ -19,10 +22,52 @@ def _client_identifier(request):
     return request.META.get("REMOTE_ADDR", "unknown")
 
 
-def _increment_failure(key, timeout):
-    attempts = cache.get(key, 0) + 1
-    cache.set(key, attempts, timeout)
-    return attempts
+def _get_lockout(scope, key):
+    try:
+        lockout, _ = LoginLockout.objects.get_or_create(
+            scope=scope,
+            key=key,
+        )
+    except (OperationalError, ProgrammingError):
+        return None
+
+    return lockout
+
+
+def _increment_failure(scope, key, limit, timeout):
+    lockout = _get_lockout(scope, key)
+
+    if lockout is None:
+        return
+
+    lockout.failure_count += 1
+
+    if lockout.failure_count >= limit:
+        lockout.locked_until = timezone.now() + timezone.timedelta(seconds=timeout)
+
+    lockout.save(update_fields=["failure_count", "locked_until", "updated_at"])
+
+
+def _is_locked(scope, key):
+    lockout = _get_lockout(scope, key)
+
+    if lockout is None:
+        return False
+
+    if lockout.is_locked():
+        return True
+
+    if lockout.locked_until is not None:
+        lockout.delete()
+
+    return False
+
+
+def _clear_failure(scope, key):
+    try:
+        LoginLockout.objects.filter(scope=scope, key=key).delete()
+    except (OperationalError, ProgrammingError):
+        pass
 
 
 class RateLimitedAdminAuthenticationForm(AdminAuthenticationForm):
@@ -47,16 +92,16 @@ class RateLimitedAdminAuthenticationForm(AdminAuthenticationForm):
         username_limit = settings.HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_USERNAME
         client_limit = settings.HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_CLIENT
 
-        username_key = _cache_key("login-failures:username", username.lower())
-        client_key = _cache_key("login-failures:client", client)
+        username_key = _lockout_key(username.lower())
+        client_key = _lockout_key(client)
 
-        if cache.get(username_key, 0) >= username_limit:
+        if _is_locked(LoginLockout.SCOPE_USERNAME, username_key):
             raise ValidationError(
                 self.error_messages["locked"],
                 code="locked",
             )
 
-        if cache.get(client_key, 0) >= client_limit:
+        if _is_locked(LoginLockout.SCOPE_CLIENT, client_key):
             raise ValidationError(
                 self.error_messages["locked"],
                 code="locked",
@@ -65,10 +110,10 @@ class RateLimitedAdminAuthenticationForm(AdminAuthenticationForm):
         try:
             cleaned_data = super().clean()
         except ValidationError:
-            _increment_failure(username_key, timeout)
-            _increment_failure(client_key, timeout)
+            _increment_failure(LoginLockout.SCOPE_USERNAME, username_key, username_limit, timeout)
+            _increment_failure(LoginLockout.SCOPE_CLIENT, client_key, client_limit, timeout)
             raise
 
-        cache.delete(username_key)
-        cache.delete(client_key)
+        _clear_failure(LoginLockout.SCOPE_USERNAME, username_key)
+        _clear_failure(LoginLockout.SCOPE_CLIENT, client_key)
         return cleaned_data

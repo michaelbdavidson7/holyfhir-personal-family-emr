@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class PatientProfile(models.Model):
@@ -34,3 +35,32 @@ class PatientProfile(models.Model):
         
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class LoginLockout(models.Model):
+    SCOPE_USERNAME = "username"
+    SCOPE_CLIENT = "client"
+
+    SCOPE_CHOICES = (
+        (SCOPE_USERNAME, "Username"),
+        (SCOPE_CLIENT, "Client"),
+    )
+
+    scope = models.CharField(max_length=20, choices=SCOPE_CHOICES)
+    key = models.CharField(max_length=64)
+    failure_count = models.PositiveIntegerField(default=0)
+    locked_until = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["scope", "key"], name="unique_login_lockout_scope_key"),
+        ]
+        verbose_name = "Login Lockout"
+        verbose_name_plural = "Login Lockouts"
+
+    def is_locked(self):
+        return self.locked_until is not None and self.locked_until > timezone.now()
+
+    def __str__(self):
+        return f"{self.scope}:{self.key}"
