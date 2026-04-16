@@ -17,8 +17,9 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import path, re_path
 from config.auth_forms import RateLimitedAdminAuthenticationForm
 from config.admin_views import fhir_interop_hub, recovery_key_generate, settings_hub
 from fhir.views import import_fhir_data
@@ -29,9 +30,18 @@ admin.site.login_form = RateLimitedAdminAuthenticationForm
 
 def admin_root_redirect(request):
     return redirect("/admin/patients/patientprofile/")
+
+
+def favicon(request):
+    return HttpResponse(status=204)
+
+
+def unknown_path_redirect(request, unmatched_path=None):
+    return redirect("/admin/")
     
 urlpatterns = [
     path('', first_run_setup, name='first_run_setup'),
+    path('favicon.ico', favicon, name='favicon'),
     path('setup/', first_run_setup, name='setup'),
     path('recovery/reset/', recovery_key_reset_start, name='recovery_key_reset_start'),
     path('recovery/reset/confirm/', recovery_key_reset_confirm, name='recovery_key_reset_confirm'),
@@ -46,3 +56,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [
+    re_path(r"^(?P<unmatched_path>.*)$", unknown_path_redirect, name="unknown_path_redirect"),
+]
