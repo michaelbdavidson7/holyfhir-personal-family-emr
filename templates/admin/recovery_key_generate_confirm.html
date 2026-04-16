@@ -1,0 +1,52 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-8 col-12">
+        <div class="card card-outline card-warning">
+          <div class="card-header">
+            <h3 class="card-title">
+              {% if has_existing_key %}
+                Rotate recovery key
+              {% else %}
+                Generate recovery key
+              {% endif %}
+            </h3>
+          </div>
+          <div class="card-body">
+            {% if has_existing_key %}
+              <p>
+                This will replace the existing recovery key for your system user.
+                The old recovery key will stop working.
+              </p>
+            {% else %}
+              <p>
+                This will create a recovery key for your system user.
+              </p>
+            {% endif %}
+
+            <div class="alert alert-warning">
+              <strong>HolyFHIR can only show the new recovery key once.</strong>
+              Save it somewhere private before leaving the next page.
+            </div>
+
+            <form method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-warning">
+                {% if has_existing_key %}
+                  Rotate and show new key
+                {% else %}
+                  Generate and show key
+                {% endif %}
+              </button>
+              <a href="{% url 'admin_settings' %}" class="btn btn-outline-secondary ml-2">Cancel</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

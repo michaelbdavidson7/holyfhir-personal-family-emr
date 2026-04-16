@@ -1,8 +1,11 @@
 from django.contrib import admin
+from django.contrib import messages
+from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from patients.models import RecoveryCredential
+from patients.recovery import generate_recovery_key, hash_recovery_key
 
 
 def settings_hub(request):
@@ -54,8 +57,44 @@ def settings_hub(request):
         "title": "Settings",
         "settings_cards": cards,
         "recovery_status": recovery_status,
+        "recovery_key_action_url": reverse("admin_recovery_key_generate"),
     }
     return render(request, "admin/settings_hub.html", context)
+
+
+def recovery_key_generate(request):
+    if not request.user.is_authenticated:
+        return redirect("admin:login")
+
+    credential = RecoveryCredential.objects.filter(user=request.user).first()
+
+    if request.method == "POST":
+        recovery_key = generate_recovery_key()
+        RecoveryCredential.objects.update_or_create(
+            user=request.user,
+            defaults={"recovery_key_hash": hash_recovery_key(recovery_key)},
+        )
+
+        messages.warning(
+            request,
+            "Save this recovery key now. HolyFHIR cannot show it again.",
+        )
+        return render(
+            request,
+            "admin/recovery_key_generated.html",
+            {
+                **admin.site.each_context(request),
+                "title": "Recovery Key Generated",
+                "recovery_key": recovery_key,
+            },
+        )
+
+    context = {
+        **admin.site.each_context(request),
+        "title": "Generate Recovery Key",
+        "has_existing_key": credential is not None,
+    }
+    return render(request, "admin/recovery_key_generate_confirm.html", context)
 
 
 def fhir_interop_hub(request):

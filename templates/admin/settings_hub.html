@@ -22,6 +22,15 @@
                     {% endif %}
                   </p>
                 {% endif %}
+                <p class="mb-0 mt-3">
+                  <a href="{{ recovery_key_action_url }}" class="btn {% if recovery_status.configured %}btn-outline-warning{% else %}btn-warning{% endif %} btn-sm">
+                    {% if recovery_status.configured %}
+                      Rotate recovery key
+                    {% else %}
+                      Generate recovery key
+                    {% endif %}
+                  </a>
+                </p>
               </div>
             </div>
           </div>
