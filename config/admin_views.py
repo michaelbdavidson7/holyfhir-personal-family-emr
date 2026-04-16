@@ -7,7 +7,7 @@ def settings_hub(request):
     cards = [
         {
             "title": "Users",
-            "description": "Manage the local owner account and password.",
+            "description": "Manage the local system owner account and password.",
             "url": reverse("admin:auth_user_changelist"),
             "icon": "fas fa-user",
         },
