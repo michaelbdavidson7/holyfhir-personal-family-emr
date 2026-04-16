@@ -367,7 +367,7 @@ fn main() {
 
             show_app_window(
                 app,
-                WebviewUrl::External(format!("http://{HOST}:{PORT}/admin/").parse().unwrap()),
+                WebviewUrl::External(format!("http://{HOST}:{PORT}/").parse().unwrap()),
                 "HolyFHIR Personal EMR",
             )?;
 
