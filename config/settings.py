@@ -165,7 +165,7 @@ JAZZMIN_SETTINGS = {
         "patients",
         "clinical",
         "documents",
-        "interop",
+        "fhir",
         "System",
     ],
 
@@ -174,7 +174,7 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
-        "System": "fas fa-cog",
+        "system": "fas fa-cog",
         "system_settings.SystemSettings": "fas fa-sliders-h",
 
         "patients": "fas fa-hospital-user",
