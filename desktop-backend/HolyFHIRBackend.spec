@@ -19,6 +19,7 @@ hiddenimports += collect_submodules("patients")
 hiddenimports += collect_submodules("clinical")
 hiddenimports += collect_submodules("documents")
 hiddenimports += collect_submodules("fhir")
+hiddenimports += collect_submodules("system_settings")
 
 a = Analysis(
     ["holyfhir_backend.py"],

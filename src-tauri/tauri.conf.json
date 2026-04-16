@@ -29,6 +29,7 @@
       "../clinical",
       "../documents",
       "../fhir",
+      "../system_settings",
       "../templates",
       "../static",
       "../desktop-backend/dist/HolyFHIRBackend"
