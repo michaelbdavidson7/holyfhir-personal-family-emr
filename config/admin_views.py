@@ -2,8 +2,32 @@ from django.contrib import admin
 from django.shortcuts import render
 from django.urls import reverse
 
+from patients.models import RecoveryCredential
+
 
 def settings_hub(request):
+    recovery_credential = None
+
+    if request.user.is_authenticated:
+        recovery_credential = RecoveryCredential.objects.filter(user=request.user).first()
+
+    if recovery_credential:
+        recovery_status = {
+            "configured": True,
+            "message": "Configured",
+            "detail": "A recovery key hash exists for this system user.",
+            "created_at": recovery_credential.created_at,
+            "last_used_at": recovery_credential.last_used_at,
+        }
+    else:
+        recovery_status = {
+            "configured": False,
+            "message": "Not configured",
+            "detail": "No recovery key has been created for this system user yet.",
+            "created_at": None,
+            "last_used_at": None,
+        }
+
     cards = [
         {
             "title": "Users",
@@ -29,6 +53,7 @@ def settings_hub(request):
         **admin.site.each_context(request),
         "title": "Settings",
         "settings_cards": cards,
+        "recovery_status": recovery_status,
     }
     return render(request, "admin/settings_hub.html", context)
 

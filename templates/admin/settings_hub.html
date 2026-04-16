@@ -3,6 +3,32 @@
 {% block content %}
 <div class="content">
   <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="card card-outline {% if recovery_status.configured %}card-success{% else %}card-warning{% endif %}">
+          <div class="card-body">
+            <div class="d-flex align-items-start">
+              <div class="mr-3 {% if recovery_status.configured %}text-success{% else %}text-warning{% endif %}" aria-hidden="true">
+                <i class="fas fa-key fa-2x"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">Recovery key: {{ recovery_status.message }}</h3>
+                <p class="text-muted mb-2">{{ recovery_status.detail }}</p>
+                {% if recovery_status.created_at %}
+                  <p class="mb-0 small text-muted">
+                    Created {{ recovery_status.created_at }}
+                    {% if recovery_status.last_used_at %}
+                      · Last used {{ recovery_status.last_used_at }}
+                    {% endif %}
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
       {% for card in settings_cards %}
         <div class="col-lg-4 col-md-6 col-12">

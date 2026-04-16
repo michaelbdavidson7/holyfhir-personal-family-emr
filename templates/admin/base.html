@@ -358,10 +358,11 @@
     {% if not is_popup %}
         <footer class="app-footer {{ jazzmin_ui.footer_classes }}">
             <div class="float-end d-none d-sm-inline">
-                <b>{% trans 'Jazzmin version' %}</b> {% get_jazzmin_version %}
+                HolyFHIR is not a certified medical record system.
             </div>
             {% autoescape off %}
-                <strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong> {% trans 'All rights reserved.' %}
+                <strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong>
+                Keep original records and use clinical judgment.
             {% endautoescape %}
         </footer>
         {% if jazzmin_settings.show_ui_builder %}
