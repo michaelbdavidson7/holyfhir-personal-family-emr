@@ -20,8 +20,9 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path
 from config.auth_forms import RateLimitedAdminAuthenticationForm
+from config.admin_views import settings_hub
 from fhir.views import import_fhir_data
-from patients.views import first_run_setup
+from patients.views import first_run_setup, recovery_key_reset_confirm, recovery_key_reset_start
 
 admin.site.login_form = RateLimitedAdminAuthenticationForm
 
@@ -31,6 +32,9 @@ def admin_root_redirect(request):
 urlpatterns = [
     path('', first_run_setup, name='first_run_setup'),
     path('setup/', first_run_setup, name='setup'),
+    path('recovery/reset/', recovery_key_reset_start, name='recovery_key_reset_start'),
+    path('recovery/reset/confirm/', recovery_key_reset_confirm, name='recovery_key_reset_confirm'),
+    path('admin/settings/', admin.site.admin_view(settings_hub), name='admin_settings'),
     path('admin/fhir/import/', import_fhir_data, name='fhir_import'),
     path('admin/', admin.site.urls),
 ]

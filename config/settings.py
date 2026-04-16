@@ -47,7 +47,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
-    'django.contrib.auth',
+    'config.apps.HolyFHIRAuthConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -163,14 +163,15 @@ JAZZMIN_SETTINGS = {
         "clinical",
         "documents",
         "fhir",
-        "auth",
+        "System",
     ],
 
 
     "icons": {
-        "auth": "fas fa-users-cog",
+        "auth": "fas fa-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
+        "System": "fas fa-cog",
 
         "patients": "fas fa-hospital-user",
         "patients.PatientProfile": "fas fa-id-card",
@@ -191,6 +192,12 @@ JAZZMIN_SETTINGS = {
         "fhir.FHIRResourceSnapshot": "fas fa-database",
     },
     "custom_links": {
+        "System": [{
+            "name": "Settings",
+            "url": "admin_settings",
+            "icon": "fas fa-cog",
+            "permissions": ["auth.view_user"],
+        }],
         "patients": [{
             "name": "Add Patient",
             "url": "admin:patients_patientprofile_add",
@@ -205,10 +212,13 @@ JAZZMIN_SETTINGS = {
         }],
     },
     
-#     "hide_apps": [
-#     "auth",
-#     "fhir",
-# ],
+    "hide_apps": [
+        "auth",
+    ],
+
+    "hide_models": [
+        "patients.RecoveryCredential",
+    ],
 
 # "hide_models": [
 #     "auth.Group",

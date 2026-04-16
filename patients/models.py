@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -64,3 +65,21 @@ class LoginLockout(models.Model):
 
     def __str__(self):
         return f"{self.scope}:{self.key}"
+
+
+class RecoveryCredential(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="recovery_credential",
+    )
+    recovery_key_hash = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Recovery Credential"
+        verbose_name_plural = "Recovery Credentials"
+
+    def __str__(self):
+        return f"Recovery credential for {self.user}"

@@ -6,6 +6,7 @@ from unittest.mock import patch
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.exceptions import ImproperlyConfigured
+from django.contrib.auth import get_user_model
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 
 from config.database import (
@@ -20,6 +21,9 @@ from config.auth_forms import RateLimitedAdminAuthenticationForm, _lockout_key
 from config.db.backends.sqlcipher.base import _is_plaintext_sqlite_database
 from config.env import load_env, parse_env_file
 from patients.models import LoginLockout
+from patients.forms import RecoveryKeyPasswordResetForm
+from patients.models import RecoveryCredential
+from patients.recovery import check_recovery_key, generate_recovery_key, hash_recovery_key
 
 
 class DatabaseConfigTests(SimpleTestCase):
@@ -286,3 +290,47 @@ class LoginRateLimitTests(TestCase):
                 locked_until__isnull=False,
             ).exists()
         )
+
+
+class RecoveryKeyTests(TestCase):
+    def test_recovery_key_hash_checks_normalized_key(self):
+        recovery_key = generate_recovery_key()
+        recovery_hash = hash_recovery_key(recovery_key)
+
+        self.assertTrue(check_recovery_key(recovery_key.lower().replace("-", " "), recovery_hash))
+
+    def test_recovery_key_reset_form_validates_user_and_key(self):
+        User = get_user_model()
+        user = User.objects.create_user(username="owner", password="old-password")
+        recovery_key = generate_recovery_key()
+        RecoveryCredential.objects.create(
+            user=user,
+            recovery_key_hash=hash_recovery_key(recovery_key),
+        )
+
+        form = RecoveryKeyPasswordResetForm(
+            data={
+                "username": "owner",
+                "recovery_key": recovery_key,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["user"], user)
+
+    def test_recovery_key_reset_form_rejects_invalid_key(self):
+        User = get_user_model()
+        user = User.objects.create_user(username="owner", password="old-password")
+        RecoveryCredential.objects.create(
+            user=user,
+            recovery_key_hash=hash_recovery_key(generate_recovery_key()),
+        )
+
+        form = RecoveryKeyPasswordResetForm(
+            data={
+                "username": "owner",
+                "recovery_key": "HFIR-WRNG-WRNG-WRNG-WRNG-WRNG",
+            }
+        )
+
+        self.assertFalse(form.is_valid())

@@ -1,8 +1,13 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 
-from .models import PatientProfile
+from .models import PatientProfile, RecoveryCredential
+
+
+User = get_user_model()
 
 
 @admin.register(PatientProfile)
@@ -110,3 +115,98 @@ class PatientProfileAdmin(admin.ModelAdmin):
             add_url,
             obj.pk,
         )
+
+
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class UserAdmin(DjangoUserAdmin):
+    readonly_fields = (*DjangoUserAdmin.readonly_fields, "recovery_key_status_detail")
+
+    fieldsets = (
+        *DjangoUserAdmin.fieldsets,
+        (
+            "Recovery key",
+            {
+                "fields": ("recovery_key_status_detail",),
+                "description": (
+                    "Recovery keys are not fully enabled in first-run setup yet. "
+                    "The raw recovery key is never stored and cannot be viewed here."
+                ),
+            },
+        ),
+    )
+
+    def get_list_display(self, request):
+        base_list_display = list(super().get_list_display(request))
+
+        if "recovery_key_status" not in base_list_display:
+            base_list_display.append("recovery_key_status")
+
+        return base_list_display
+
+    @admin.display(description="Recovery key", boolean=True)
+    def recovery_key_status(self, obj):
+        return hasattr(obj, "recovery_credential")
+
+    @admin.display(description="Recovery key status")
+    def recovery_key_status_detail(self, obj):
+        if not obj or not obj.pk:
+            return "Save this user before configuring recovery."
+
+        if not hasattr(obj, "recovery_credential"):
+            return "No recovery key has been created for this user yet."
+
+        credential = obj.recovery_credential
+
+        if credential.last_used_at:
+            return format_html(
+                "Recovery key is configured. Last used: {}. The raw key cannot be viewed here.",
+                credential.last_used_at,
+            )
+
+        return format_html(
+            "Recovery key is configured. Created: {}. The raw key cannot be viewed here.",
+            credential.created_at,
+        )
+
+
+@admin.register(RecoveryCredential)
+class RecoveryCredentialAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "hash_preview",
+        "created_at",
+        "last_used_at",
+    )
+    search_fields = (
+        "user__username",
+        "user__email",
+        "recovery_key_hash",
+    )
+    readonly_fields = (
+        "user",
+        "recovery_key_hash",
+        "created_at",
+        "last_used_at",
+    )
+    fields = (
+        "user",
+        "recovery_key_hash",
+        "created_at",
+        "last_used_at",
+    )
+
+    @admin.display(description="Stored hash")
+    def hash_preview(self, obj):
+        if not obj.recovery_key_hash:
+            return "-"
+
+        return f"{obj.recovery_key_hash[:24]}..."
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
