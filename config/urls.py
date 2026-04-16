@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path
 from config.auth_forms import RateLimitedAdminAuthenticationForm
-from config.admin_views import settings_hub
+from config.admin_views import fhir_interop_hub, settings_hub
 from fhir.views import import_fhir_data
 from patients.views import first_run_setup, recovery_key_reset_confirm, recovery_key_reset_start
 
@@ -35,6 +35,7 @@ urlpatterns = [
     path('recovery/reset/', recovery_key_reset_start, name='recovery_key_reset_start'),
     path('recovery/reset/confirm/', recovery_key_reset_confirm, name='recovery_key_reset_confirm'),
     path('admin/settings/', admin.site.admin_view(settings_hub), name='admin_settings'),
+    path('admin/fhir/interop/', admin.site.admin_view(fhir_interop_hub), name='fhir_interop_hub'),
     path('admin/fhir/import/', import_fhir_data, name='fhir_import'),
     path('admin/', admin.site.urls),
 ]

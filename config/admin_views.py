@@ -31,3 +31,27 @@ def settings_hub(request):
         "settings_cards": cards,
     }
     return render(request, "admin/settings_hub.html", context)
+
+
+def fhir_interop_hub(request):
+    cards = [
+        {
+            "title": "FHIR Links",
+            "description": "Review connections between local records and FHIR resources.",
+            "url": reverse("admin:fhir_fhirlink_changelist"),
+            "icon": "fas fa-link",
+        },
+        {
+            "title": "FHIR Resource Snapshots",
+            "description": "Inspect imported raw FHIR resources kept for traceability.",
+            "url": reverse("admin:fhir_fhirresourcesnapshot_changelist"),
+            "icon": "fas fa-database",
+        },
+    ]
+
+    context = {
+        **admin.site.each_context(request),
+        "title": "FHIR / Interop",
+        "interop_cards": cards,
+    }
+    return render(request, "admin/fhir_interop_hub.html", context)

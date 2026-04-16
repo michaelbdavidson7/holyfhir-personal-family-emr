@@ -162,7 +162,7 @@ JAZZMIN_SETTINGS = {
         "patients",
         "clinical",
         "documents",
-        "fhir",
+        "interop",
         "System",
     ],
 
@@ -190,6 +190,7 @@ JAZZMIN_SETTINGS = {
         "fhir": "fas fa-exchange-alt",
         "fhir.FHIRLink": "fas fa-link",
         "fhir.FHIRResourceSnapshot": "fas fa-database",
+        "interop": "fas fa-exchange-alt",
     },
     "custom_links": {
         "System": [{
@@ -205,6 +206,11 @@ JAZZMIN_SETTINGS = {
             "permissions": ["patients.add_patientprofile"],
         }],
         "fhir": [{
+            "name": "FHIR / Interop",
+            "url": "fhir_interop_hub",
+            "icon": "fas fa-exchange-alt",
+            "permissions": ["fhir.view_fhirresourcesnapshot"],
+        }, {
             "name": "Import FHIR Data",
             "url": "fhir_import",
             "icon": "fas fa-file-import",
@@ -218,6 +224,8 @@ JAZZMIN_SETTINGS = {
 
     "hide_models": [
         "patients.RecoveryCredential",
+        "fhir.FHIRLink",
+        "fhir.FHIRResourceSnapshot",
     ],
 
 # "hide_models": [
