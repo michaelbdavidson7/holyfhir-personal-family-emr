@@ -36,7 +36,7 @@ def settings_hub(request):
     cards = [
         {
             "title": "App Settings",
-            "description": "Manage lock-screen behavior and local desktop preferences.",
+            "description": f"Manage local time, lock-screen behavior, and desktop preferences. Current time zone: {system_settings.time_zone}.",
             "url": reverse("admin:system_settings_systemsettings_change", args=[system_settings.pk]),
             "icon": "fas fa-sliders-h",
         },

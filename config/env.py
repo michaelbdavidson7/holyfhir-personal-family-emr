@@ -77,7 +77,7 @@ def load_env(base_dir: Path, env_file_name=".env", example_file_name=".env.examp
         return
 
     env_values = parse_env_file(env_path)
-    missing_keys = sorted(required_keys - set(env_values))
+    missing_keys = sorted(key for key in required_keys - set(env_values) if not os.getenv(key))
 
     if missing_keys:
         missing = ", ".join(missing_keys)

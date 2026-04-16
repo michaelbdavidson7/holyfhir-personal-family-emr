@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import get_random_secret_key
 
 from config.env import parse_env_file
+from config.file_backups import backup_existing_file
 
 
 SECRET_PLACEHOLDERS = {
@@ -60,6 +61,8 @@ class Command(BaseCommand):
         for key in example_values:
             merged_values.setdefault(key, example_values[key])
 
+        self._apply_runtime_defaults(merged_values, env_values)
+
         existing_real_secret_keys = [
             key
             for key in sorted(SECRET_KEYS)
@@ -85,11 +88,14 @@ class Command(BaseCommand):
         )
 
         env_path.parent.mkdir(parents=True, exist_ok=True)
+        backup_path = backup_existing_file(env_path)
         self._write_env_file(env_path, example_path, example_values, merged_values)
 
         os.environ.setdefault("DATABASE_ENCRYPTION_KEY", merged_values["DATABASE_ENCRYPTION_KEY"])
         os.environ.setdefault("SECRET_KEY", merged_values["SECRET_KEY"])
 
+        if backup_path:
+            self.stdout.write(self.style.WARNING(f"Backed up previous .env to {backup_path}"))
         self.stdout.write(self.style.SUCCESS(f"Bootstrapped local secrets in {env_path}"))
         if options["rotate"]:
             self.stdout.write(
@@ -107,6 +113,11 @@ class Command(BaseCommand):
     def _set_secret(self, values, key, generated_value, rotate=False):
         if rotate or values.get(key, "") in SECRET_PLACEHOLDERS[key]:
             values[key] = generated_value
+
+    def _apply_runtime_defaults(self, values, env_values):
+        for key in ("DATABASE_NAME", "TIME_ZONE"):
+            if key not in env_values and os.getenv(key):
+                values[key] = os.environ[key]
 
     def _confirm_existing_env_update(self, env_path, assume_yes=False):
         if assume_yes:

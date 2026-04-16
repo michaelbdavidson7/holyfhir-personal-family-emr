@@ -98,6 +98,45 @@ fn python_executable() -> String {
     env::var("HOLYFHIR_PYTHON").unwrap_or_else(|_| "python".to_string())
 }
 
+fn detected_time_zone() -> String {
+    if let Ok(time_zone) = env::var("TIME_ZONE") {
+        if !time_zone.trim().is_empty() {
+            return time_zone;
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(output) = Command::new("tzutil").arg("/g").output() {
+            if output.status.success() {
+                let windows_time_zone = String::from_utf8_lossy(&output.stdout).trim().to_string();
+
+                if let Some(iana_time_zone) = windows_to_iana_time_zone(&windows_time_zone) {
+                    return iana_time_zone.to_string();
+                }
+            }
+        }
+    }
+
+    "America/New_York".to_string()
+}
+
+#[cfg(target_os = "windows")]
+fn windows_to_iana_time_zone(windows_time_zone: &str) -> Option<&'static str> {
+    match windows_time_zone {
+        "Alaskan Standard Time" => Some("America/Anchorage"),
+        "Atlantic Standard Time" => Some("America/Halifax"),
+        "Central Standard Time" => Some("America/Chicago"),
+        "Eastern Standard Time" => Some("America/New_York"),
+        "Hawaiian Standard Time" => Some("Pacific/Honolulu"),
+        "Mountain Standard Time" => Some("America/Denver"),
+        "Pacific Standard Time" => Some("America/Los_Angeles"),
+        "US Mountain Standard Time" => Some("America/Phoenix"),
+        "UTC" => Some("UTC"),
+        _ => None,
+    }
+}
+
 fn append_log(paths: &RuntimePaths, message: impl AsRef<str>) {
     if let Ok(mut file) = OpenOptions::new()
         .create(true)
@@ -115,6 +154,7 @@ fn configure_django_command(command: &mut Command, paths: &RuntimePaths) {
         .env("DJANGO_ENV_FILE", &paths.env_file)
         .env("DJANGO_ENV_EXAMPLE_FILE", &paths.env_example_file)
         .env("DATABASE_NAME", &paths.database_file)
+        .env("TIME_ZONE", detected_time_zone())
         .env("HOLYFHIR_BACKEND_LOG", &paths.log_file);
 }
 

@@ -95,6 +95,7 @@ class EnvFileTests(SimpleTestCase):
             "DJANGO_ENV_FILE",
             "DJANGO_ENV_EXAMPLE_FILE",
             "SECRET_KEY",
+            "TIME_ZONE",
             "DEBUG",
             "ALLOWED_HOSTS",
             "DATABASE_NAME",
@@ -138,8 +139,9 @@ class EnvFileTests(SimpleTestCase):
             (base_dir / ".env.example").write_text("DATABASE_NAME=db.sqlite3\nDATABASE_TIMEOUT=20.0\n", encoding="utf-8")
             (base_dir / ".env").write_text("DATABASE_NAME=db.sqlite3\n", encoding="utf-8")
 
-            with self.assertRaises(ImproperlyConfigured):
-                load_env(base_dir)
+            with patch.dict("os.environ", {}, clear=True):
+                with self.assertRaises(ImproperlyConfigured):
+                    load_env(base_dir)
 
     def test_load_env_sets_values_without_overriding_process_environment(self):
         with TemporaryDirectory() as temp_dir:
@@ -152,6 +154,17 @@ class EnvFileTests(SimpleTestCase):
 
                 self.assertEqual(os.environ["DATABASE_NAME"], "from-shell.sqlite3")
                 self.assertEqual(os.environ["DATABASE_TIMEOUT"], "30.0")
+
+    def test_load_env_allows_required_key_from_process_environment(self):
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(temp_dir)
+            (base_dir / ".env.example").write_text("TIME_ZONE=America/New_York\n", encoding="utf-8")
+            (base_dir / ".env").write_text("", encoding="utf-8")
+
+            with patch.dict("os.environ", {"TIME_ZONE": "America/Chicago"}, clear=True):
+                load_env(base_dir)
+
+                self.assertEqual(os.environ["TIME_ZONE"], "America/Chicago")
 
     def test_load_env_allows_missing_env_file(self):
         with TemporaryDirectory() as temp_dir:
@@ -170,7 +183,8 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
             base_dir = Path(temp_dir)
             env_path = base_dir / ".env"
 
-            call_command("bootstrap_secrets", env_file=str(env_path), yes=True)
+            with patch.dict("os.environ", {}, clear=True):
+                call_command("bootstrap_secrets", env_file=str(env_path), yes=True)
 
             values = parse_env_file(env_path)
 
@@ -178,6 +192,7 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
         self.assertGreaterEqual(len(values["DATABASE_ENCRYPTION_KEY"]), 48)
         self.assertNotEqual(values["SECRET_KEY"], "django-insecure-development-only-change-me")
         self.assertEqual(values["DATABASE_NAME"], DEFAULT_DATABASE_NAME)
+        self.assertEqual(values["TIME_ZONE"], "America/New_York")
 
     def test_bootstrap_secrets_preserves_existing_secrets(self):
         with TemporaryDirectory() as temp_dir:
@@ -207,9 +222,14 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
             call_command("bootstrap_secrets", env_file=str(env_path), yes=True)
 
             values = parse_env_file(env_path)
+            backups = list(base_dir.glob(".env.backup.*"))
+            backup_count = len(backups)
+            backup_content = backups[0].read_text(encoding="utf-8") if backups else ""
 
         self.assertEqual(values["DATABASE_ENCRYPTION_KEY"], "existing-db-key")
         self.assertEqual(values["SECRET_KEY"], "existing-secret-key")
+        self.assertEqual(backup_count, 1)
+        self.assertIn("existing-db-key", backup_content)
 
     def test_bootstrap_secrets_aborts_before_rewriting_existing_env_without_confirmation(self):
         with TemporaryDirectory() as temp_dir:
@@ -223,6 +243,7 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
                     call_command("bootstrap_secrets", env_file=str(env_path))
 
             self.assertEqual(env_path.read_text(encoding="utf-8"), original_content)
+            self.assertEqual(list(base_dir.glob(".env.backup.*")), [])
 
     def test_bootstrap_secrets_rotates_existing_secrets_with_confirmation(self):
         with TemporaryDirectory() as temp_dir:

@@ -123,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv("TIME_ZONE", "America/New_York")
 
 USE_I18N = True
 
@@ -160,6 +160,8 @@ JAZZMIN_SETTINGS = {
     "site_brand": "HolyFHIR Personal EMR",
     "site_logo": None,  # e.g. "my_app/static/images/logo.png"
     # "show_ui_builder": True,
+    "changeform_format": "single",
+
     "search_model": "patients.PatientProfile",
     "order_with_respect_to": [
         "patients",
