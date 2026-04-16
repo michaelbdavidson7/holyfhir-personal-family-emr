@@ -1,9 +1,18 @@
+from django import forms
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
 
 
 class FirstRunOwnerForm(UserCreationForm):
+    confirm_no_password_recovery = forms.BooleanField(
+        label="I understand HolyFHIR cannot recover this password for me.",
+        required=True,
+        error_messages={
+            "required": "Please confirm that you understand there is no password recovery yet.",
+        },
+    )
+
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
         fields = ("username",)

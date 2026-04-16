@@ -46,6 +46,21 @@
         line-height: 1.5;
       }
 
+      .warning {
+        border: 1px solid #b84232;
+        border-radius: 8px;
+        background: #fff4f2;
+        color: #5d160f;
+        padding: 14px 16px;
+        margin-bottom: 24px;
+      }
+
+      .warning strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #8f2418;
+      }
+
       label {
         display: block;
         margin: 18px 0 6px;
@@ -59,6 +74,12 @@
         border-radius: 6px;
         padding: 11px 12px;
         font: inherit;
+      }
+
+      input[type="checkbox"] {
+        width: auto;
+        margin-right: 8px;
+        transform: translateY(1px);
       }
 
       input:focus {
@@ -115,6 +136,11 @@
     <main>
       <h1>Create your owner account</h1>
       <p>This account unlocks your local HolyFHIR records on this computer. Choose a password you can remember.</p>
+
+      <div class="warning">
+        <strong>No password recovery yet.</strong>
+        If this password is lost, HolyFHIR cannot recover it for you. Keep it somewhere safe before adding medical records.
+      </div>
 
       <form method="post" novalidate>
         {% csrf_token %}

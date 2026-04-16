@@ -1,0 +1,228 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
+{{ form.media }}
+<style>
+  body.login {
+    background: #f4f7f8;
+  }
+
+  body.login #jazzy-navbar,
+  body.login .main-sidebar,
+  body.login .main-header,
+  body.login .content-header,
+  body.login .navbar,
+  body.login .sidebar,
+  body.login .brand-link,
+  body.login .main-footer {
+    display: none !important;
+  }
+
+  body.login .wrapper,
+  body.login .content-wrapper {
+    margin-left: 0 !important;
+    min-height: 100vh !important;
+    background: #f4f7f8 !important;
+  }
+
+  body.login #content {
+    width: 100%;
+    padding: 0;
+  }
+
+  body.login .content {
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .login-container {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+  }
+
+  .login-card {
+    width: min(100%, 440px);
+    background: #ffffff;
+    border: 1px solid #d4dde3;
+    border-radius: 8px;
+    box-shadow: 0 18px 45px rgba(18, 31, 42, 0.11);
+    padding: 32px;
+  }
+
+  .login-header {
+    margin-bottom: 22px;
+  }
+
+  .login-title {
+    margin: 0 0 6px;
+    color: #18212a;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .login-subtitle {
+    margin: 0;
+    color: #52616c;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .password-recovery-warning {
+    border: 1px solid #b84232;
+    border-radius: 8px;
+    background: #fff4f2;
+    color: #5d160f;
+    padding: 12px 14px;
+    margin: 0 0 16px;
+    line-height: 1.4;
+  }
+
+  .password-recovery-warning strong {
+    display: block;
+    color: #8f2418;
+    margin-bottom: 3px;
+  }
+
+  .login-card .form-row {
+    padding: 0;
+    margin: 0 0 16px;
+    border: 0;
+  }
+
+  .login-card label {
+    display: block;
+    margin: 0 0 6px;
+    color: #26333d;
+    font-weight: 650;
+  }
+
+  .login-card input[type="text"],
+  .login-card input[type="password"] {
+    width: 100%;
+    border: 1px solid #b9c6cf;
+    border-radius: 6px;
+    padding: 11px 12px;
+    font: inherit;
+  }
+
+  .login-card input[type="text"]:focus,
+  .login-card input[type="password"]:focus {
+    outline: 3px solid #b8d9ef;
+    border-color: #2877a8;
+  }
+
+  .login-card .submit-row {
+    margin: 22px 0 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+  }
+
+  .login-card .submit-row input {
+    width: 100%;
+    border: 0;
+    border-radius: 6px;
+    background: #246f8f;
+    color: #ffffff;
+    padding: 12px 16px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .login-card .submit-row input:hover {
+    background: #1d5d79;
+  }
+
+  .login-card .errornote,
+  .login-container > .errornote {
+    margin: 0 0 16px;
+    border-radius: 8px;
+  }
+
+  .app-sidebar {
+    display: none;
+  }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div id="content-main" class="login-card">
+    <div class="login-header">
+      <h1 class="login-title">HolyFHIR Personal EMR</h1>
+      <p class="login-subtitle">Sign in to your local records.</p>
+    </div>
+
+    {% if form.errors and not form.non_field_errors %}
+      <p class="errornote">
+        {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+      </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+        <p class="errornote">{{ error }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <div class="password-recovery-warning">
+      <strong>No password recovery yet.</strong>
+      If this password is lost, HolyFHIR cannot recover it for you. Keep it somewhere safe.
+    </div>
+
+    {% if user.is_authenticated %}
+      <p class="errornote">
+        {% blocktranslate trimmed %}
+          You are authenticated as {{ username }}, but are not authorized to
+          access this page. Would you like to login to a different account?
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">
+      {% csrf_token %}
+
+      <div class="form-row">
+        {{ form.username.errors }}
+        {{ form.username.label_tag }}
+        {{ form.username }}
+      </div>
+
+      <div class="form-row">
+        {{ form.password.errors }}
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        <input type="hidden" name="next" value="{{ next }}">
+      </div>
+
+      {% url 'admin_password_reset' as password_reset_url %}
+      {% if password_reset_url %}
+        <div class="password-reset-link">
+          <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+        </div>
+      {% endif %}
+
+      <div class="submit-row">
+        <input type="submit" value="{% translate 'Log in' %}">
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
