@@ -1,0 +1,88 @@
+name: Windows desktop build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "release/**"
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-installer:
+    name: Build Windows installer
+    runs-on: windows-latest
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings
+      SECRET_KEY: github-actions-build-only-secret
+      DATABASE_ENCRYPTION_KEY: github-actions-build-only-database-key
+      DATABASE_NAME: github-actions-build.sqlite3
+      DEBUG: "0"
+      ALLOWED_HOSTS: "127.0.0.1,localhost"
+      TIME_ZONE: America/New_York
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Create Python virtual environment
+        shell: pwsh
+        run: python -m venv venv
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: |
+          .\venv\Scripts\python.exe -m pip install --upgrade pip wheel setuptools
+          .\venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-build.txt
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Check Django project
+        shell: pwsh
+        run: .\venv\Scripts\python.exe manage.py check
+
+      - name: Check Tauri Rust project
+        shell: pwsh
+        run: cargo check --manifest-path src-tauri\Cargo.toml
+
+      - name: Build desktop installer
+        run: npm run desktop:build
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HolyFHIR-Personal-EMR-Windows-Installer
+          path: src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
+
+      - name: Attach installer to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: src-tauri/target/release/bundle/nsis/*.exe
+          draft: true
