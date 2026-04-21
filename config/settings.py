@@ -211,6 +211,12 @@ JAZZMIN_SETTINGS = {
             "icon": "fas fa-user-plus",
             "permissions": ["patients.add_patientprofile"],
         }],
+        "clinical": [{
+            "name": "Observation Charts",
+            "url": "observation_charts",
+            "icon": "fas fa-chart-area",
+            "permissions": ["clinical.view_observation"],
+        }],
         "fhir": [{
             "name": "FHIR / Interop",
             "url": "fhir_interop_hub",

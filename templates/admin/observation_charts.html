@@ -1,0 +1,315 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+{{ chart_series|json_script:"chart-series-data" }}
+
+<style>
+  .chart-page {
+    max-width: 1280px;
+  }
+
+  .chart-toolbar {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.4fr) minmax(220px, 2fr) repeat(2, minmax(140px, 0.8fr)) auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .chart-toolbar label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .chart-toolbar select,
+  .chart-toolbar input {
+    width: 100%;
+  }
+
+  .observation-name-list {
+    min-height: 116px;
+  }
+
+  .chart-shell {
+    min-height: 420px;
+  }
+
+  .chart-svg {
+    width: 100%;
+    min-height: 420px;
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 12px 0 0;
+  }
+
+  .chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
+
+  .chart-legend-swatch {
+    width: 18px;
+    height: 4px;
+    border-radius: 4px;
+  }
+
+  .chart-empty {
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+    padding: 32px;
+    background: #ffffff;
+  }
+
+  @media (max-width: 900px) {
+    .chart-toolbar {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="content chart-page">
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12">
+        <h1 class="h3 mb-2">Observation Charts</h1>
+        <p class="text-muted mb-0">
+          Trend numeric observations over time. Calendar-only medical dates stay stored as dates; this chart uses observation timestamps.
+        </p>
+      </div>
+    </div>
+
+    <div class="card card-outline card-primary mb-3">
+      <div class="card-body">
+        <form method="get" class="chart-toolbar">
+          <div>
+            <label for="patient">Patient</label>
+            <select id="patient" name="patient" class="form-control">
+              <option value="">All patients</option>
+              {% for patient in patients %}
+                <option value="{{ patient.pk }}" {% if selected_patient_id == patient.pk|stringformat:"s" %}selected{% endif %}>
+                  {{ patient }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label for="names">Observations</label>
+            <select id="names" name="names" class="form-control observation-name-list" multiple>
+              {% for name in available_names %}
+                <option value="{{ name }}" {% if name in selected_names %}selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+            <p class="help-block mb-0">Select up to {{ max_series }}. Hold Ctrl to choose more than one.</p>
+          </div>
+
+          <div>
+            <label for="start">Start</label>
+            <input id="start" type="date" name="start" class="form-control" value="{{ start }}">
+          </div>
+
+          <div>
+            <label for="end">End</label>
+            <input id="end" type="date" name="end" class="form-control" value="{{ end }}">
+          </div>
+
+          <div>
+            <button type="submit" class="btn btn-primary">Update chart</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if chart_series %}
+      <div class="card card-outline card-info mb-3">
+        <div class="card-body">
+          <div id="observation-chart" class="chart-shell" aria-label="Observation trend chart"></div>
+          <div id="observation-chart-legend" class="chart-legend"></div>
+        </div>
+      </div>
+
+      <div class="card card-outline card-secondary">
+        <div class="card-body table-responsive p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Observation</th>
+                <th>When</th>
+                <th>Value</th>
+                <th>Patient</th>
+                <th>Reference range</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for series in chart_series %}
+                {% for point in series.points %}
+                  <tr>
+                    <td>{{ series.name }}</td>
+                    <td>{{ point.label }}</td>
+                    <td>{{ point.value }} {{ point.unit|default:series.unit }}</td>
+                    <td>{{ point.patient }}</td>
+                    <td>{{ point.reference_range|default:"-" }}</td>
+                  </tr>
+                {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <div class="chart-empty">
+        <h2 class="h5">No chartable observations yet</h2>
+        <p class="text-muted">
+          Add observations with a numeric value and an observation time, then return here to chart them.
+        </p>
+        <a href="{{ observation_add_url }}" class="btn btn-primary">Add observation</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  (function () {
+    const dataElement = document.getElementById("chart-series-data");
+    const target = document.getElementById("observation-chart");
+    const legend = document.getElementById("observation-chart-legend");
+
+    if (!dataElement || !target || !legend) {
+      return;
+    }
+
+    const series = JSON.parse(dataElement.textContent);
+    const colors = ["#2563eb", "#dc2626", "#059669", "#9333ea", "#ca8a04", "#0f766e"];
+    const points = series.flatMap((item, seriesIndex) => item.points.map((point) => ({
+      seriesIndex,
+      name: item.name,
+      unit: point.unit || item.unit || "",
+      x: new Date(point.x).getTime(),
+      label: point.label,
+      value: Number(point.value),
+      patient: point.patient
+    }))).filter((point) => Number.isFinite(point.x) && Number.isFinite(point.value));
+
+    if (!points.length) {
+      target.innerHTML = '<div class="chart-empty">No numeric values matched the current filters.</div>';
+      return;
+    }
+
+    const width = 1000;
+    const height = 420;
+    const margin = { top: 24, right: 34, bottom: 58, left: 70 };
+    const plotWidth = width - margin.left - margin.right;
+    const plotHeight = height - margin.top - margin.bottom;
+    const minX = Math.min(...points.map((point) => point.x));
+    const maxX = Math.max(...points.map((point) => point.x));
+    let minY = Math.min(...points.map((point) => point.value));
+    let maxY = Math.max(...points.map((point) => point.value));
+
+    if (minY === maxY) {
+      minY -= 1;
+      maxY += 1;
+    }
+
+    const yPadding = (maxY - minY) * 0.08;
+    minY -= yPadding;
+    maxY += yPadding;
+
+    function xScale(value) {
+      if (minX === maxX) {
+        return margin.left + plotWidth / 2;
+      }
+      return margin.left + ((value - minX) / (maxX - minX)) * plotWidth;
+    }
+
+    function yScale(value) {
+      return margin.top + plotHeight - ((value - minY) / (maxY - minY)) * plotHeight;
+    }
+
+    function svgText(x, y, text, anchor, className) {
+      return `<text x="${x}" y="${y}" text-anchor="${anchor}" class="${className}">${escapeHtml(text)}</text>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    const yTicks = Array.from({ length: 5 }, (_, index) => minY + ((maxY - minY) / 4) * index);
+    const xTicks = Array.from({ length: 4 }, (_, index) => minX + ((maxX - minX) / 3) * index);
+    let svg = `
+      <svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img">
+        <style>
+          .grid { stroke: #e7ebf0; stroke-width: 1; }
+          .axis { stroke: #6b7280; stroke-width: 1.25; }
+          .tick-label { fill: #4b5563; font-size: 13px; }
+          .point-label { fill: #111827; font-size: 12px; }
+        </style>
+        <line class="axis" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" />
+        <line class="axis" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${margin.left + plotWidth}" y2="${margin.top + plotHeight}" />
+    `;
+
+    yTicks.forEach((tick) => {
+      const y = yScale(tick);
+      svg += `<line class="grid" x1="${margin.left}" y1="${y}" x2="${margin.left + plotWidth}" y2="${y}" />`;
+      svg += svgText(margin.left - 10, y + 4, tick.toFixed(1), "end", "tick-label");
+    });
+
+    xTicks.forEach((tick) => {
+      const x = xScale(tick);
+      const label = new Date(tick).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+      svg += `<line class="grid" x1="${x}" y1="${margin.top}" x2="${x}" y2="${margin.top + plotHeight}" />`;
+      svg += svgText(x, margin.top + plotHeight + 30, label, "middle", "tick-label");
+    });
+
+    series.forEach((item, seriesIndex) => {
+      const itemPoints = item.points
+        .map((point) => ({ ...point, xValue: new Date(point.x).getTime(), yValue: Number(point.value) }))
+        .filter((point) => Number.isFinite(point.xValue) && Number.isFinite(point.yValue))
+        .sort((a, b) => a.xValue - b.xValue);
+
+      if (!itemPoints.length) {
+        return;
+      }
+
+      const color = colors[seriesIndex % colors.length];
+      const path = itemPoints.map((point, index) => {
+        const command = index === 0 ? "M" : "L";
+        return `${command} ${xScale(point.xValue).toFixed(2)} ${yScale(point.yValue).toFixed(2)}`;
+      }).join(" ");
+
+      svg += `<path d="${path}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />`;
+
+      itemPoints.forEach((point) => {
+        const x = xScale(point.xValue);
+        const y = yScale(point.yValue);
+        const title = `${item.name}: ${point.value} ${point.unit || item.unit || ""} on ${point.label}`;
+        svg += `<circle cx="${x}" cy="${y}" r="5" fill="#ffffff" stroke="${color}" stroke-width="3"><title>${escapeHtml(title)}</title></circle>`;
+      });
+    });
+
+    svg += "</svg>";
+    target.innerHTML = svg;
+    legend.innerHTML = series.map((item, index) => `
+      <span class="chart-legend-item">
+        <span class="chart-legend-swatch" style="background:${colors[index % colors.length]}"></span>
+        <span>${escapeHtml(item.name)}${item.unit ? " (" + escapeHtml(item.unit) + ")" : ""}</span>
+      </span>
+    `).join("");
+  }());
+</script>
+{% endblock %}
