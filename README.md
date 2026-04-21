@@ -1,259 +1,296 @@
-# HolyFHIR – Personal Family EMR
+# HolyFHIR Personal EMR
 
-HolyFHIR is a **local-first, personal, small electronic medical record (EMR)** designed for individuals and families.  
-It provides a simple, private way to manage health data while supporting **FHIR (Fast Healthcare Interoperability Resources)** for import and export.
+HolyFHIR is a private, local health-record app for people who want to keep a personal copy of their medical information.
 
-Basic profile manipulation is complete, import/export implementation FHIR is next. 
+It is meant to help you organize things like patients, medications, allergies, conditions, documents, visits, and imported FHIR records from Epic's MyChart. The app runs on your computer and does not require a cloud account.
 
-Get in control of YOUR own health data, for free!
+## Plain-English Summary
 
----![picture of dashboard](image.png)
+- Your data stays on your computer.
+- The Windows desktop app includes the backend it needs.
+- You can keep records for yourself or family members.
+- You can import some FHIR records, including MyChart requested-record exports.
+- You can chart numeric observations, such as blood pressure, weight, glucose, or lab values.
+- You should still keep the original records from your doctor, hospital, pharmacy, or lab.
 
-## ✨ Features
+## A Friendly Warning
 
-- 👨‍👩‍👧‍👦 **Family-focused patient management**
-  - Manage multiple patient profiles (yourself, children, relatives)
+HolyFHIR is early software. It is not a certified medical record system and should not be your only copy of important health information.
 
-- 🏥 **Clinical records**
-  - Medications
-  - Allergies
-  - Conditions
-  - Immunizations
-  - Observations (labs, vitals)
-  - Encounters
+Please treat it like a personal organizer for medical records, not as a replacement for your doctor, patient portal, pharmacy records, or official chart.
 
-- 📄 **Document storage**
-  - Upload and manage clinical documents (PDFs, reports, scans)
+## For Friends Testing The Windows App
 
-- 🔄 **FHIR support (in progress)**
-  - Import FHIR Bundles and resources
-  - Export patient data as FHIR-compliant JSON
-  - Snapshot storage of raw FHIR data
+If someone sent you a HolyFHIR installer:
 
-- 🖥️ **Local-first architecture**
-  - Runs entirely on your machine
-  - Uses SQLCipher-encrypted SQLite (no external database required)
-  - No cloud dependency
+1. Download the Windows setup `.exe`.
+2. Run the installer.
+3. Open **HolyFHIR Personal EMR**.
+4. Create your first system user.
+5. Save your password and recovery key somewhere safe.
 
-- 🔐 **Privacy-first design**
-  - Your data stays on your device
-  - No tracking, no external services
+Windows may warn you because the installer is not code-signed yet. That warning is expected for early friend builds.
 
----
+Do not delete this folder unless you mean to remove local HolyFHIR data:
 
-## 🧱 Tech Stack
+```text
+C:\Users\<you>\AppData\Local\HolyFHIR Personal EMR
+```
 
-- **Backend:** Django
-- **Database:** SQLCipher-encrypted SQLite
-- **Admin UI:** Django Admin + Jazzmin
-- **FHIR Layer:** Custom mapping + resource snapshots
-- **Desktop (planned):** Tauri wrapper
+Useful files in that folder:
 
----
+- `.env`: local app settings and generated secrets
+- `holyfhir.encrypted.sqlite3`: encrypted database
+- `holyfhir-desktop.log`: log file for troubleshooting
+- `.env.backup.*`: automatic backups made before `.env` changes
 
-## 🚀 Getting Started
+## What You Can Track
 
-### 1. Clone the repository
+- Patient profiles
+- Conditions
+- Allergies
+- Medications
+- Immunizations
+- Observations, such as vitals and labs
+- Encounters, such as office visits or hospital visits
+- Clinical documents, such as PDFs and reports
+- Imported FHIR resources
 
-```bash
+On each patient profile, HolyFHIR shows related conditions, allergies, and medications so the most important context is easy to find.
+
+## FHIR Import
+
+FHIR is a healthcare data format. You do not need to understand it to use the import page.
+
+In the app, open:
+
+```text
+FHIR / Interop > Import FHIR Data
+```
+
+Supported input:
+
+- MyChart `Requested Record` ZIP export
+- FHIR JSON Bundle
+- single FHIR JSON resource
+- NDJSON
+
+Currently mapped resources:
+
+- Patient
+- Condition
+- AllergyIntolerance
+- MedicationStatement
+- MedicationRequest
+- Immunization
+- Observation
+- Encounter
+
+HolyFHIR also keeps a raw copy of each imported FHIR resource for traceability.
+
+## Observation Charts
+
+Open:
+
+```text
+Clinical Items for Patients > Observation Charts
+```
+
+The chart page lets you:
+
+- choose a patient
+- pick up to 6 numeric observations
+- choose a date range
+- view a simple offline chart
+
+Only numeric observations can be charted. Text-only notes are intentionally skipped.
+
+## Passwords And Recovery Keys
+
+HolyFHIR is designed for local use. That means there is no cloud account where someone can reset your password for you.
+
+Please save:
+
+- your app password
+- your recovery key
+- backups of your data when backup support is finished
+
+If the password, encryption key, and recovery material are all lost, the data may not be recoverable.
+
+## Current Status
+
+HolyFHIR is still early. The biggest things to finish before a wider release are:
+
+- better backup and restore
+- friendlier first-run recovery-key setup
+- release-build debug/static behavior
+- GitHub Actions dependency verification
+- more FHIR date/time tests
+- signed Windows installer
+
+## Developer Setup
+
+These steps are for people working on the code.
+
+### 1. Clone
+
+```powershell
 git clone https://github.com/michaelbdavidson7/holyfhir-personal-family-emr.git
 cd holyfhir-personal-family-emr
 ```
-2. Create a virtual environment
-```bash
+
+### 2. Create a Python virtual environment
+
+```powershell
 python -m venv venv
-source venv/bin/activate   # macOS/Linux
-venv\Scripts\activate      # Windows
+.\venv\Scripts\activate
 ```
-3. Install dependencies
-```bash
+
+### 3. Install Python dependencies
+
+```powershell
 pip install -r requirements.txt
 ```
-4. Create local development secrets:
 
-```bash
+For desktop packaging:
+
+```powershell
+pip install -r requirements-build.txt
+```
+
+### 4. Create local secrets
+
+```powershell
 python manage.py bootstrap_secrets
 ```
 
-This creates `.env` from `.env.example`, generates `DATABASE_ENCRYPTION_KEY`, and generates Django's `SECRET_KEY`.
+This creates `.env`, generates the database encryption key, and generates Django's secret key.
 
-If `.env` already exists, the command prompts before rewriting it. If you use `--rotate`, it prints a strong warning because changing `DATABASE_ENCRYPTION_KEY` can make an existing encrypted database unreadable without a migration/re-encryption plan. For scripts only, pass `--yes` to skip prompts.
+If `.env` already exists, HolyFHIR prompts before rewriting it and creates a timestamped backup first:
 
-If you prefer to edit `.env` manually, copy the template first:
-
-```powershell
-Copy-Item .env.example .env
+```text
+.env.backup.YYYYMMDD-HHMMSS
 ```
 
-Then replace `DATABASE_ENCRYPTION_KEY` and `SECRET_KEY` with unique strong values.
+Do not casually rotate `DATABASE_ENCRYPTION_KEY`. Changing it can make an existing encrypted database unreadable without a migration or restore plan.
+
+### 5. Run migrations
 
 ```powershell
-.\venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
-
-6. Run migrations
-```bash
 python manage.py migrate
 ```
-7. Create admin user
-```bash
-python manage.py createsuperuser
-```
-8. Start the server
-```bash
+
+### 6. Start the Django app
+
+```powershell
 python manage.py runserver
 ```
-9. Open the app
 
-Go to:
+Open:
 
- http://127.0.0.1:8000/admin
-
-### Import FHIR data
-
-From the Django Admin, open **FHIR / Interop > Import FHIR Data**, optionally choose an existing patient profile to attach the import to, and upload a MyChart `Requested Record` ZIP export, an NDJSON file, a FHIR JSON Bundle, or a single resource.
-
-The importer currently maps Patient, Condition, AllergyIntolerance, MedicationStatement, MedicationRequest, Immunization, Observation, and Encounter resources into the local EMR models. It also saves each raw resource as a FHIR snapshot for traceability.
-
-### Database Encryption At Rest
-
-Database encryption is always enforced. Django loads `.env` automatically at startup when the file exists. The `.env` file is ignored by Git, and startup fails if it is missing any key listed in `.env.example`.
-
-`sqlcipher3` is the recommended driver because it has current wheel support across Windows, macOS, and Linux. If a specific environment cannot install it cleanly, `pysqlcipher3` remains a legacy fallback, but it usually expects a system `libsqlcipher` install first.
-
-Optional database settings:
-
-- `DJANGO_SETTINGS_MODULE`: Django settings module. Default: `config.settings`
-- `DJANGO_ENV_FILE`: environment file to load. Default: `.env`
-- `DJANGO_ENV_EXAMPLE_FILE`: environment template used for key validation. Default: `.env.example`
-- `SECRET_KEY`: Django secret key. Default: development-only placeholder
-- `DEBUG`: enable Django debug mode. Default: `1`
-- `ALLOWED_HOSTS`: comma-separated allowed hosts. Default: empty
-- `DATABASE_NAME`: encrypted database path. Default: `holyfhir.encrypted.sqlite3`
-- `DATABASE_TIMEOUT`: SQLite/SQLCipher connection timeout in seconds. Default: `20.0`
-- `DATABASE_ENCRYPTION_KEY`: required SQLCipher encryption key
-- `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size. Default: `4096`
-- `DATABASE_KDF_ITER`: SQLCipher PBKDF iteration count. Default: `256000`
-- `DATABASE_CIPHER_COMPATIBILITY`: SQLCipher compatibility mode. Default: `4`
-
-To encrypt an existing plaintext database file:
-
-```bash
-python manage.py encrypt_sqlite_db --source db.sqlite3 --target holyfhir.encrypted.sqlite3
+```text
+http://127.0.0.1:8000/admin/
 ```
 
-The command reads the encryption key from `DATABASE_ENCRYPTION_KEY` unless `--key` is supplied directly.
+## Desktop Development
 
+Install Node dependencies:
 
-🔄 FHIR Roadmap
- - Import FHIR Bundle (Patient, Medication, Allergy, Condition)
- - Export patient as FHIR Bundle
- - Mapping layer (internal models ↔ FHIR resources)
- - Validation and error reporting
- - SMART on FHIR (future)
-
-🔐 Security Roadmap
- - SQLCipher database encryption
- - OS keychain integration
- - First-run end-user secret generation
- - Store database encryption key in OS secure storage
- - Store Django secret key in OS secure storage or protected app config
- - Encrypted backup and recovery-key export flow
- - Encrypted file storage
- - Secure export handling
-
-🧭 Vision
-
-HolyFHIR aims to become a simple, private, interoperable personal health record system:
-
-Easy enough for individuals and families
-Structured enough for real medical use
-Compatible with healthcare standards (FHIR)
-Fully under user control
-
-⚠️ Disclaimer
-
-This project is for personal use and experimentation.
-It is not a certified medical system and should not be relied upon as a sole source of medical truth.
-
-📌 Status
-
-🚧 Early development (Phase 1 complete – core data + admin UI)
-
-📄 License
-
-TBD
-
-## Desktop app with Tauri
-
-This repo includes a first Tauri desktop shell. It starts the local Django app on `127.0.0.1:8787` and opens the Django Admin inside a native desktop window.
-
-### Developer setup
-
-Install the normal Python dependencies first, then install the desktop toolchain:
-
-```bash
-pip install -r requirements.txt
+```powershell
 npm install
 ```
 
-You also need Rust and the platform prerequisites from the Tauri setup guide:
+Install Rust and the Tauri prerequisites:
 
+```text
 https://tauri.app/start/prerequisites/
+```
 
-Start the desktop app in development:
+Run the desktop app in development:
 
-```bash
+```powershell
 npm run desktop:dev
 ```
 
-Build an installer or app bundle:
+The desktop app starts Django on:
 
-```bash
+```text
+http://127.0.0.1:8787/
+```
+
+## Building A Windows Installer
+
+Build the backend and Windows installer:
+
+```powershell
 npm run desktop:build
 ```
 
-The desktop build bundles a PyInstaller backend executable that includes Python and the installed Python dependencies. End users should not need to install Python separately for the packaged Windows app.
+The installer is created under:
 
-If `npm run desktop:build` fails with `PermissionError: [WinError 5] Access is denied` for `HolyFHIRBackend.exe`, an older backend process is still running. Stop it and rebuild:
+```text
+src-tauri\target\release\bundle\nsis\
+```
+
+Share the NSIS setup `.exe`, not the raw `src-tauri\target\release\holyfhir.exe`.
+
+If the build fails with a Windows permission error for `HolyFHIRBackend.exe`, an old backend process is probably still running:
 
 ```powershell
 Get-Process HolyFHIRBackend -ErrorAction SilentlyContinue | Stop-Process -Force
 npm run desktop:build
 ```
 
-### Beginner roadmap to a standalone offline app
+## GitHub Actions Builds
 
-1. Make the current Tauri shell reliable for developers.
-   - Confirm `npm run desktop:dev` opens the app.
-   - Confirm closing the desktop window also stops the Django server.
-   - Add friendly error messages when Python, `.env`, or database setup is missing.
+The workflow at `.github/workflows/windows-desktop-build.yml` builds the Windows installer on GitHub Actions.
 
-2. Move first-run setup into the desktop app.
-   - On first launch, generate `.env` secrets automatically.
-   - Run migrations automatically.
-   - Create a simple first-user setup screen instead of requiring `createsuperuser`.
+It runs when:
 
-3. Store private keys in the OS keychain.
-   - Use a Tauri keychain or stronghold approach for `DATABASE_ENCRYPTION_KEY`.
-   - Keep `.env` for development only.
-   - Add a recovery-key export flow so users do not lose their medical data.
+- pushing a branch named `release/**`
+- pushing a tag named `v*`
+- manually starting the workflow from the GitHub Actions tab
 
-4. Harden the bundled backend for real end users.
-   - Keep the PyInstaller backend executable bundled with the Tauri app.
-   - Verify the exact Python dependencies needed by SQLCipher on clean Windows machines.
-   - Store user data under the operating system app data directory, not inside the installed app folder.
+Branch build:
 
-5. Add offline backup and restore.
-   - Export an encrypted backup file.
-   - Restore from that backup on a new machine.
-   - Add a clear warning that losing the recovery key means losing access to the encrypted data.
+```powershell
+git checkout -b release/v0.1.1
+git push origin release/v0.1.1
+```
 
-6. Replace the admin-only workflow over time.
-   - Keep Django Admin for power-user maintenance.
-   - Add beginner-friendly screens for patients, medications, allergies, documents, FHIR import, backup, and restore.
+Release build:
 
-7. Test the installer like a normal user.
-   - Test on a clean Windows machine with no Python or Node installed.
-   - Test airplane-mode launch.
-   - Test upgrade from an older app version without losing the encrypted database.
+```powershell
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+Release-tag builds upload the NSIS installer artifact and attach it to a draft GitHub Release.
+
+## Environment Settings
+
+`.env.example` defines the supported local settings:
+
+- `DJANGO_SETTINGS_MODULE`: Django settings module
+- `DJANGO_ENV_FILE`: environment file to load
+- `DJANGO_ENV_EXAMPLE_FILE`: template used for key validation
+- `SECRET_KEY`: Django secret key
+- `TIME_ZONE`: local display timezone
+- `DEBUG`: Django debug mode
+- `ALLOWED_HOSTS`: comma-separated allowed hosts
+- `DATABASE_NAME`: encrypted database path
+- `DATABASE_TIMEOUT`: SQLite/SQLCipher connection timeout
+- `DATABASE_ENCRYPTION_KEY`: required SQLCipher encryption key
+- `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size
+- `DATABASE_KDF_ITER`: SQLCipher PBKDF iteration count
+- `DATABASE_CIPHER_COMPATIBILITY`: SQLCipher compatibility mode
+
+## Medical Date Handling
+
+HolyFHIR stores calendar-only clinical facts, such as date of birth or medication start date, as dates. Exact moments, such as imports, lockouts, encounters, and timed observations, use timezone-aware datetimes.
+
+That distinction matters because medical dates should not move to the previous or next day because of timezone conversion.
+
+## License
+
+TBD
