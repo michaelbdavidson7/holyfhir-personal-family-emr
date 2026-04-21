@@ -4,14 +4,91 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 
+from clinical.models import Allergy, Condition, Medication
+
 from .models import PatientProfile, RecoveryCredential
 
 
 User = get_user_model()
 
 
+class ConditionInline(admin.TabularInline):
+    model = Condition
+    extra = 0
+    max_num = 0
+    can_delete = False
+    show_change_link = True
+    fields = (
+        "name",
+        "clinical_status",
+        "onset_date",
+        "abatement_date",
+        "icd10_code",
+        "snomed_code",
+    )
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class AllergyInline(admin.TabularInline):
+    model = Allergy
+    extra = 0
+    max_num = 0
+    can_delete = False
+    show_change_link = True
+    fields = (
+        "substance",
+        "category",
+        "criticality",
+        "reaction",
+        "severity",
+    )
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class MedicationInline(admin.TabularInline):
+    model = Medication
+    extra = 0
+    max_num = 0
+    can_delete = False
+    show_change_link = True
+    fields = (
+        "name",
+        "status",
+        "dosage_text",
+        "frequency",
+        "start_date",
+        "end_date",
+    )
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(PatientProfile)
 class PatientProfileAdmin(admin.ModelAdmin):
+    inlines = (
+        ConditionInline,
+        AllergyInline,
+        MedicationInline,
+    )
+
+
     list_display = (
         "id",
         "first_name",
