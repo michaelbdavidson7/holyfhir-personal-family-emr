@@ -1,6 +1,6 @@
 # HolyFHIR Personal EMR
 
-HolyFHIR is a private, local health-record app for people who want to keep a personal copy of their medical information.
+HolyFHIR is a private, local offline-first health-record app for people who want to keep a personal copy of their medical information.
 
 It is meant to help you organize things like patients, medications, allergies, conditions, documents, visits, and imported FHIR records from Epic's MyChart. The app runs on your computer and does not require a cloud account.
 
