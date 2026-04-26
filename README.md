@@ -19,6 +19,12 @@ HolyFHIR is early software. It is not a certified medical record system and shou
 
 Please treat it like a personal organizer for medical records, not as a replacement for your doctor, patient portal, pharmacy records, or official chart.
 
+HolyFHIR is not medical advice, not a medical device, and not intended for diagnosis, treatment, emergencies, clinical decision support, or medication safety checking. Imported data may be incomplete or incorrect, so always verify important information against official sources.
+
+You are responsible for protecting your local device, password, recovery key, backups, database files, and exported records. If you use HolyFHIR with anyone else's health information, or in any professional or regulated setting, you are responsible for understanding and meeting any applicable privacy, security, consent, retention, licensing, and compliance obligations.
+
+See [DISCLAIMER.md](DISCLAIMER.md) for the full disclaimer.
+
 ## License
 
 HolyFHIR Personal EMR is licensed under the MIT License. See [LICENSE](LICENSE).
