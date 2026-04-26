@@ -13,6 +13,10 @@ It is meant to help you organize things like patients, medications, allergies, c
 - You can chart numeric observations, such as blood pressure, weight, glucose, or lab values.
 - You should still keep the original records from your doctor, hospital, pharmacy, or lab.
 
+## Latest Release
+
+Download the latest Windows installer from the [GitHub Releases page](https://github.com/michaelbdavidson7/personal-emr/releases/latest).
+
 ## A Friendly Warning
 
 HolyFHIR is early software. It is not a certified medical record system and should not be your only copy of important health information.
@@ -41,7 +45,7 @@ This software is provided as-is, without warranty of any kind.
 
 If someone sent you a HolyFHIR installer:
 
-1. Download the Windows setup `.exe`.
+1. Download the Windows setup `.exe` from the [latest release](https://github.com/michaelbdavidson7/personal-emr/releases/latest).
 2. Run the installer.
 3. Open **HolyFHIR Personal EMR**.
 4. Create your first system user.
