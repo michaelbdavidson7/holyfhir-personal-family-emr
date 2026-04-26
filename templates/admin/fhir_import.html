@@ -1,9 +1,106 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
+<style>
+  .fhir-attach-card {
+    background: #ffffff;
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 18px 0;
+  }
+
+  .fhir-attach-header {
+    align-items: start;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .fhir-attach-title {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .fhir-attach-subtitle {
+    color: #6c757d;
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  .fhir-attach-actions {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .fhir-attach-actions .btn {
+    align-items: center;
+    border-radius: 6px;
+    display: inline-flex;
+    font-weight: 600;
+    min-height: 38px;
+    padding: 7px 14px;
+    white-space: nowrap;
+  }
+
+  .fhir-attach-actions .btn-outline-secondary {
+    background: #ffffff;
+    border-color: #adb5bd;
+    color: #495057;
+  }
+
+  .fhir-attach-actions .btn-outline-secondary:hover {
+    background: #f1f3f5;
+    border-color: #868e96;
+    color: #212529;
+  }
+
+  .fhir-attach-controls {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+  }
+
+  .fhir-attach-controls select {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .fhir-attach-controls .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .fhir-attach-header,
+    .fhir-attach-actions,
+    .fhir-attach-controls {
+      display: block;
+    }
+
+    .fhir-attach-actions {
+      margin-top: 12px;
+    }
+
+    .fhir-attach-actions .btn + .btn {
+      margin-top: 8px;
+    }
+
+    .fhir-attach-actions .btn,
+    .fhir-attach-controls .btn {
+      margin-top: 10px;
+      width: 100%;
+    }
+  }
+</style>
+
 <div id="content-main">
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
+    <input type="hidden" name="action" value="import_fhir">
     <fieldset class="module aligned">
       <h2>Import FHIR Data</h2>
       <p>
@@ -12,11 +109,25 @@
         Immunization, Observation (vitals and labs), or Encounter (visits).
       </p>
       {{ form.non_field_errors }}
-      <div class="form-row">
+      <div class="form-row fhir-attach-card">
         {{ form.patient.errors }}
-        {{ form.patient.label_tag }}
-        {{ form.patient }}
-        <div class="help">{{ form.patient.help_text }}</div>
+        <div class="fhir-attach-header">
+          <div>
+            <label class="fhir-attach-title" for="{{ form.patient.id_for_label }}">Attach to patient</label>
+            <p class="fhir-attach-subtitle">{{ form.patient.help_text }}</p>
+          </div>
+          {% if can_add_patient %}
+            <div class="fhir-attach-actions">
+              <a class="btn btn-outline-secondary" href="{{ patient_add_url }}">Full patient form</a>
+              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add-patient-modal">
+                Add new patient
+              </button>
+            </div>
+          {% endif %}
+        </div>
+        <div class="fhir-attach-controls">
+          {{ form.patient }}
+        </div>
       </div>
       <div class="form-row">
         {{ form.fhir_file.errors }}
@@ -35,5 +146,57 @@
       <input type="submit" value="Import FHIR data" class="default">
     </div>
   </form>
+
+  {% if can_add_patient %}
+    <div class="modal fade" id="add-patient-modal" tabindex="-1" aria-labelledby="add-patient-modal-title" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_patient">
+            <div class="modal-header">
+              <h2 class="modal-title h5" id="add-patient-modal-title">Add Patient</h2>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>Create a patient profile, then attach the FHIR import to that patient.</p>
+              {{ patient_form.non_field_errors }}
+              <div class="mb-3">
+                {{ patient_form.first_name.errors }}
+                {{ patient_form.first_name.label_tag }}
+                {{ patient_form.first_name }}
+              </div>
+              <div class="mb-3">
+                {{ patient_form.last_name.errors }}
+                {{ patient_form.last_name.label_tag }}
+                {{ patient_form.last_name }}
+              </div>
+              <div class="mb-3">
+                {{ patient_form.date_of_birth.errors }}
+                {{ patient_form.date_of_birth.label_tag }}
+                {{ patient_form.date_of_birth }}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <a class="btn btn-outline-secondary me-auto" href="{{ patient_add_url }}">Open full patient form page</a>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success">Add patient</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endif %}
 </div>
+
+{% if show_patient_modal %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var modalElement = document.getElementById("add-patient-modal");
+      if (modalElement && window.bootstrap && window.bootstrap.Modal) {
+        window.bootstrap.Modal.getOrCreateInstance(modalElement).show();
+      }
+    });
+  </script>
+{% endif %}
 {% endblock %}

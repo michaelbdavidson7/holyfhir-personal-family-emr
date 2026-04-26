@@ -3,8 +3,10 @@ from datetime import date
 from io import BytesIO
 from zipfile import ZipFile
 
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.urls import reverse
 
 from clinical.models import Condition, Medication, Observation
 from patients.models import PatientProfile
@@ -255,3 +257,28 @@ class FHIRImportTests(TestCase):
         self.assertEqual(result.created, 2)
         self.assertEqual(PatientProfile.objects.count(), 1)
         self.assertEqual(Condition.objects.count(), 1)
+
+    def test_import_page_can_quick_add_patient(self):
+        User = get_user_model()
+        user = User.objects.create_superuser(
+            username="owner",
+            email="owner@example.test",
+            password="correct-password",
+        )
+        self.client.force_login(user)
+
+        response = self.client.post(
+            reverse("fhir_import"),
+            {
+                "action": "create_patient",
+                "first_name": "Ada",
+                "last_name": "Lovelace",
+                "date_of_birth": "1815-12-10",
+            },
+            follow=True,
+        )
+
+        patient = PatientProfile.objects.get(first_name="Ada", last_name="Lovelace")
+        self.assertRedirects(response, f"{reverse('fhir_import')}?patient={patient.pk}")
+        self.assertEqual(patient.date_of_birth, date(1815, 12, 10))
+        self.assertEqual(response.context["form"].initial["patient"], str(patient.pk))

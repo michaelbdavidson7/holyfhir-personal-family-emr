@@ -3,13 +3,36 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from .forms import FHIRImportForm
+from .forms import FHIRImportForm, QuickPatientCreateForm
 from .importer import import_fhir_payloads
 
 
 @staff_member_required
 def import_fhir_data(request):
+    can_add_patient = request.user.has_perm("patients.add_patientprofile")
+
     if request.method == "POST":
+        if request.POST.get("action") == "create_patient":
+            patient_form = QuickPatientCreateForm(request.POST)
+            if not can_add_patient:
+                messages.error(request, "You do not have permission to add patients.")
+            elif patient_form.is_valid():
+                patient = patient_form.save()
+                messages.success(request, f"Patient added: {patient}.")
+                return redirect(f"{reverse('fhir_import')}?patient={patient.pk}")
+            form = FHIRImportForm()
+            return render(
+                request,
+                "admin/fhir_import.html",
+                {
+                    "form": form,
+                    "patient_form": patient_form,
+                    "can_add_patient": can_add_patient,
+                    "patient_add_url": reverse("admin:patients_patientprofile_add"),
+                    "show_patient_modal": True,
+                },
+            )
+
         form = FHIRImportForm(request.POST, request.FILES)
         if form.is_valid():
             result = import_fhir_payloads(
@@ -28,7 +51,19 @@ def import_fhir_data(request):
                 ),
             )
             return redirect(reverse("admin:fhir_fhirresourcesnapshot_changelist"))
+        patient_form = QuickPatientCreateForm()
     else:
-        form = FHIRImportForm()
+        form = FHIRImportForm(initial={"patient": request.GET.get("patient") or None})
+        patient_form = QuickPatientCreateForm()
 
-    return render(request, "admin/fhir_import.html", {"form": form})
+    return render(
+        request,
+        "admin/fhir_import.html",
+        {
+            "form": form,
+            "patient_form": patient_form,
+            "can_add_patient": can_add_patient,
+            "patient_add_url": reverse("admin:patients_patientprofile_add"),
+            "show_patient_modal": False,
+        },
+    )

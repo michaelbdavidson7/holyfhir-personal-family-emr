@@ -14,6 +14,8 @@ class FHIRImportForm(forms.Form):
         label="Attach to patient",
         queryset=PatientProfile.objects.order_by("last_name", "first_name", "id"),
         required=False,
+        empty_label="Select a Patient",
+        widget=forms.Select(attrs={"class": "form-select"}),
         help_text="Choose an existing profile to attach this import to. Leave blank to create or update from the FHIR Patient resource.",
     )
     fhir_file = forms.FileField(
@@ -89,3 +91,19 @@ class FHIRImportForm(forms.Form):
         if not payloads:
             raise forms.ValidationError("ZIP file did not contain any FHIR JSON or NDJSON files.")
         return payloads
+
+
+class QuickPatientCreateForm(forms.ModelForm):
+    class Meta:
+        model = PatientProfile
+        fields = ("first_name", "last_name", "date_of_birth")
+        labels = {
+            "first_name": "First name",
+            "last_name": "Last name",
+            "date_of_birth": "Date of birth",
+        }
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "date_of_birth": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+        }
