@@ -9,6 +9,7 @@ db.sqlite3
 *.bak
 *.backup
 *.dump
+backups/
 
 # Media uploads and local storage
 media/
