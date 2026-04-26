@@ -69,8 +69,8 @@ Useful files in that folder:
 - Allergies
 - Medications
 - Immunizations
-- Observations, such as vitals and labs
-- Encounters, such as office visits or hospital visits
+- Vitals and lab results
+- Visits, such as office visits or hospital stays
 - Clinical documents, such as PDFs and reports
 - Imported FHIR resources
 
@@ -106,22 +106,22 @@ Currently mapped resources:
 
 HolyFHIR also keeps a raw copy of each imported FHIR resource for traceability.
 
-## Observation Charts
+## Health Trends
 
 Open:
 
 ```text
-Clinical Items for Patients > Observation Charts
+Health Records > Health Trends
 ```
 
 The chart page lets you:
 
 - choose a patient
-- pick up to 6 numeric observations
+- pick up to 6 numeric vitals, labs, or other measurements
 - choose a date range
 - view a simple offline chart
 
-Only numeric observations can be charted. Text-only notes are intentionally skipped.
+Only numeric measurements can be charted. Text-only notes are intentionally skipped.
 
 ## Passwords And Recovery Keys
 

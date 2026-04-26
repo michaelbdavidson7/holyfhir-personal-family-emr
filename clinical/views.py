@@ -55,7 +55,7 @@ def observation_charts(request):
 
     context = {
         **admin.site.each_context(request),
-        "title": "Observation Charts",
+        "title": "Health Trends",
         "patients": patients,
         "selected_patient_id": str(patient_id),
         "available_names": available_names,

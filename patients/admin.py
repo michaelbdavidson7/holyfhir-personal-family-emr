@@ -171,8 +171,8 @@ class PatientProfileAdmin(admin.ModelAdmin):
             self._related_record_link(obj, "Allergies", "clinical_allergy", obj.allergies.count()),
             self._related_record_link(obj, "Medications", "clinical_medication", obj.medications.count()),
             self._related_record_link(obj, "Immunizations", "clinical_immunization", obj.immunizations.count()),
-            self._related_record_link(obj, "Observations", "clinical_observation", obj.observations.count()),
-            self._related_record_link(obj, "Encounters", "clinical_encounter", obj.encounters.count()),
+            self._related_record_link(obj, "Vitals & Labs", "clinical_observation", obj.observations.count()),
+            self._related_record_link(obj, "Visits", "clinical_encounter", obj.encounters.count()),
             self._related_record_link(obj, "Documents", "documents_clinicaldocument", obj.documents.count()),
             self._related_record_link(obj, "FHIR snapshots", "fhir_fhirresourcesnapshot", obj.fhir_snapshots.count()),
         ]

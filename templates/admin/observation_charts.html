@@ -81,9 +81,9 @@
   <div class="container-fluid">
     <div class="row mb-3">
       <div class="col-12">
-        <h1 class="h3 mb-2">Observation Charts</h1>
+        <h1 class="h3 mb-2">Health Trends</h1>
         <p class="text-muted mb-0">
-          Trend numeric observations over time. Calendar-only medical dates stay stored as dates; this chart uses observation timestamps.
+          Chart vitals, lab results, and other numeric measurements over time. Calendar-only medical dates stay stored as dates; this chart uses measurement timestamps.
         </p>
       </div>
     </div>
@@ -104,7 +104,7 @@
           </div>
 
           <div>
-            <label for="names">Observations</label>
+            <label for="names">Vitals, labs, or measurements</label>
             <select id="names" name="names" class="form-control observation-name-list" multiple>
               {% for name in available_names %}
                 <option value="{{ name }}" {% if name in selected_names %}selected{% endif %}>{{ name }}</option>
@@ -133,7 +133,7 @@
     {% if chart_series %}
       <div class="card card-outline card-info mb-3">
         <div class="card-body">
-          <div id="observation-chart" class="chart-shell" aria-label="Observation trend chart"></div>
+          <div id="observation-chart" class="chart-shell" aria-label="Health trend chart"></div>
           <div id="observation-chart-legend" class="chart-legend"></div>
         </div>
       </div>
@@ -143,7 +143,7 @@
           <table class="table table-striped mb-0">
             <thead>
               <tr>
-                <th>Observation</th>
+                <th>Measurement</th>
                 <th>When</th>
                 <th>Value</th>
                 <th>Patient</th>
@@ -168,11 +168,11 @@
       </div>
     {% else %}
       <div class="chart-empty">
-        <h2 class="h5">No chartable observations yet</h2>
+        <h2 class="h5">No chartable measurements yet</h2>
         <p class="text-muted">
-          Add observations with a numeric value and an observation time, then return here to chart them.
+          Add vitals, lab results, or other measurements with a numeric value and time, then return here to chart them.
         </p>
-        <a href="{{ observation_add_url }}" class="btn btn-primary">Add observation</a>
+        <a href="{{ observation_add_url }}" class="btn btn-primary">Add measurement</a>
       </div>
     {% endif %}
   </div>

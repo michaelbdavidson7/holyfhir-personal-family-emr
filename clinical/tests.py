@@ -47,7 +47,7 @@ class ObservationChartTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Observation Charts")
+        self.assertContains(response, "Health Trends")
         self.assertContains(response, "Systolic blood pressure")
         self.assertContains(response, "122.0")
         self.assertNotContains(response, "not numeric")
@@ -58,5 +58,5 @@ class ObservationChartTests(TestCase):
         response = self.client.get(reverse("observation_charts"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No chartable observations yet")
+        self.assertContains(response, "No chartable measurements yet")
         self.assertContains(response, reverse("admin:clinical_observation_add"))

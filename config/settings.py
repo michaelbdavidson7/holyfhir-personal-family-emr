@@ -215,7 +215,7 @@ JAZZMIN_SETTINGS = {
             "permissions": ["patients.add_patientprofile"],
         }],
         "clinical": [{
-            "name": "Observation Charts",
+            "name": "Health Trends",
             "url": "observation_charts",
             "icon": "fas fa-chart-area",
             "permissions": ["clinical.view_observation"],

@@ -90,6 +90,10 @@ class Observation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Vitals & Lab Result"
+        verbose_name_plural = "Vitals & Labs"
+
 
 class Encounter(models.Model):
     patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="encounters")
@@ -104,3 +108,7 @@ class Encounter(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Visit"
+        verbose_name_plural = "Visits"
