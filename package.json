@@ -2,6 +2,7 @@
   "name": "holyfhir-personal-emr",
   "version": "0.1.1",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "desktop:dev": "tauri dev",

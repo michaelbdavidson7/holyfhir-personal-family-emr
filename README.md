@@ -19,6 +19,12 @@ HolyFHIR is early software. It is not a certified medical record system and shou
 
 Please treat it like a personal organizer for medical records, not as a replacement for your doctor, patient portal, pharmacy records, or official chart.
 
+## License
+
+HolyFHIR Personal EMR is licensed under the MIT License. See [LICENSE](LICENSE).
+
+This software is provided as-is, without warranty of any kind.
+
 ## For Friends Testing The Windows App
 
 If someone sent you a HolyFHIR installer:
