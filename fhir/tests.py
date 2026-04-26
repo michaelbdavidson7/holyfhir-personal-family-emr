@@ -1,9 +1,13 @@
 import json
+import tempfile
 from datetime import date
 from io import BytesIO
+from pathlib import Path
+from unittest.mock import Mock, patch
 from zipfile import ZipFile
 
 from django.contrib.auth import get_user_model
+from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
@@ -11,6 +15,7 @@ from django.urls import reverse
 from clinical.models import Condition, Medication, Observation
 from patients.models import PatientProfile
 
+from .backups import create_pre_import_database_backup, list_fhir_import_database_backups
 from .forms import FHIRImportForm
 from .importer import import_fhir_json, import_fhir_payloads, loads_fhir_documents, loads_fhir_json
 from .models import FHIRLink, FHIRResourceSnapshot
@@ -297,3 +302,91 @@ class FHIRImportTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("available_apps", response.context)
         self.assertContains(response, "jazzy-navigation")
+
+    def test_pre_import_backup_copies_database_file(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "holyfhir.encrypted.sqlite3"
+            database_path.write_bytes(b"encrypted database bytes")
+            fake_connections = {"default": Mock()}
+
+            with patch("fhir.backups.settings.DATABASES", {"default": {"NAME": str(database_path)}}):
+                with patch("fhir.backups.connections", fake_connections):
+                    backup_path = create_pre_import_database_backup()
+
+            self.assertIsNotNone(backup_path)
+            self.assertTrue(backup_path.exists())
+            self.assertEqual(backup_path.read_bytes(), b"encrypted database bytes")
+            self.assertEqual(backup_path.parent, database_path.parent / "backups" / "fhir-imports")
+            self.assertIn(".pre-fhir-import.", backup_path.name)
+            fake_connections["default"].close.assert_called_once()
+
+    def test_lists_fhir_import_backups_newest_first(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "holyfhir.encrypted.sqlite3"
+            database_path.write_bytes(b"live")
+            backup_dir = Path(temp_dir) / "backups" / "fhir-imports"
+            backup_dir.mkdir(parents=True)
+            older = backup_dir / "holyfhir.encrypted.pre-fhir-import.20260426-120000.sqlite3"
+            newer = backup_dir / "holyfhir.encrypted.pre-fhir-import.20260426-130000.sqlite3"
+            ignored = backup_dir / "notes.txt"
+            older.write_bytes(b"older")
+            newer.write_bytes(b"newer")
+            ignored.write_text("not a backup")
+
+            with patch("fhir.backups.settings.DATABASES", {"default": {"NAME": str(database_path)}}):
+                backups = list_fhir_import_database_backups()
+
+            self.assertEqual([backup.name for backup in backups], [newer.name, older.name])
+            self.assertEqual(backups[0].size_bytes, 5)
+
+    def test_import_page_creates_pre_import_backup(self):
+        User = get_user_model()
+        user = User.objects.create_superuser(
+            username="owner",
+            email="owner@example.test",
+            password="correct-password",
+        )
+        self.client.force_login(user)
+        payload = {
+            "resourceType": "Patient",
+            "id": "pat-1",
+            "name": [{"family": "Rivera", "given": ["Maya"]}],
+        }
+
+        with patch("fhir.views.create_pre_import_database_backup", return_value=Path("backup.sqlite3")) as backup:
+            response = self.client.post(
+                reverse("fhir_import"),
+                {"action": "import_fhir", "fhir_json": json.dumps(payload)},
+                follow=True,
+            )
+
+        self.assertEqual(response.status_code, 200)
+        backup.assert_called_once()
+        self.assertEqual(PatientProfile.objects.filter(first_name="Maya", last_name="Rivera").count(), 1)
+        messages = [str(message) for message in get_messages(response.wsgi_request)]
+        self.assertTrue(any("Pre-import database backup created: backup.sqlite3" in message for message in messages))
+
+    def test_import_page_stops_if_pre_import_backup_fails(self):
+        User = get_user_model()
+        user = User.objects.create_superuser(
+            username="owner",
+            email="owner@example.test",
+            password="correct-password",
+        )
+        self.client.force_login(user)
+        payload = {
+            "resourceType": "Patient",
+            "id": "pat-1",
+            "name": [{"family": "Rivera", "given": ["Maya"]}],
+        }
+
+        with patch("fhir.views.create_pre_import_database_backup", side_effect=OSError("disk is full")):
+            response = self.client.post(
+                reverse("fhir_import"),
+                {"action": "import_fhir", "fhir_json": json.dumps(payload)},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(PatientProfile.objects.filter(first_name="Maya", last_name="Rivera").count(), 0)
+        messages = [str(message) for message in get_messages(response.wsgi_request)]
+        self.assertTrue(any("database backup failed" in message for message in messages))

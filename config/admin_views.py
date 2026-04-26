@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from fhir.backups import database_path, fhir_import_backup_dir, list_fhir_import_database_backups
 from patients.models import RecoveryCredential
 from patients.recovery import generate_recovery_key, hash_recovery_key
 from system_settings.models import SystemSettings
@@ -58,6 +59,12 @@ def settings_hub(request):
             "url": reverse("admin:patients_recoverycredential_changelist"),
             "icon": "fas fa-key",
         },
+        {
+            "title": "Backups",
+            "description": "Find FHIR pre-import database backups and review the manual restore steps.",
+            "url": reverse("admin_backups"),
+            "icon": "fas fa-archive",
+        },
     ]
 
     context = {
@@ -68,6 +75,17 @@ def settings_hub(request):
         "recovery_key_action_url": reverse("admin_recovery_key_generate"),
     }
     return render(request, "admin/settings_hub.html", context)
+
+
+def backups_hub(request):
+    context = {
+        **admin.site.each_context(request),
+        "title": "Backups",
+        "database_path": database_path(),
+        "backup_dir": fhir_import_backup_dir(),
+        "backups": list_fhir_import_database_backups(),
+    }
+    return render(request, "admin/backups_hub.html", context)
 
 
 def recovery_key_generate(request):

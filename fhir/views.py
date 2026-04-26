@@ -3,6 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
+from .backups import create_pre_import_database_backup
 from .forms import FHIRImportForm, QuickPatientCreateForm
 from .importer import import_fhir_payloads
 
@@ -38,6 +39,25 @@ def import_fhir_data(request):
 
         form = FHIRImportForm(request.POST, request.FILES)
         if form.is_valid():
+            try:
+                backup_path = create_pre_import_database_backup()
+            except OSError as error:
+                messages.error(request, f"FHIR import was not started because the database backup failed: {error}")
+                patient_form = QuickPatientCreateForm()
+                return render(
+                    request,
+                    "admin/fhir_import.html",
+                    {
+                        **base_context,
+                        "title": "Import FHIR Data",
+                        "form": form,
+                        "patient_form": patient_form,
+                        "can_add_patient": can_add_patient,
+                        "patient_add_url": reverse("admin:patients_patientprofile_add"),
+                        "show_patient_modal": False,
+                    },
+                )
+
             result = import_fhir_payloads(
                 form.cleaned_data["payloads"],
                 target_patient=form.cleaned_data.get("patient"),
@@ -53,6 +73,8 @@ def import_fhir_data(request):
                     f"{result.unsupported} unsupported resources skipped."
                 ),
             )
+            if backup_path:
+                messages.info(request, f"Pre-import database backup created: {backup_path}")
             return redirect(reverse("admin:fhir_fhirresourcesnapshot_changelist"))
         patient_form = QuickPatientCreateForm()
     else:

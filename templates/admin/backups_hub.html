@@ -1,0 +1,103 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="content">
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="card card-outline card-info">
+          <div class="card-body">
+            <h1 class="h3 mb-2">Backups</h1>
+            <p class="text-muted mb-0">
+              HolyFHIR creates a database backup before each FHIR import. Restore is manual for now so the app never replaces an open database while Django is running.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-7 col-12">
+        <div class="card card-outline card-primary">
+          <div class="card-header">
+            <h2 class="card-title">FHIR Import Backups</h2>
+          </div>
+          <div class="card-body p-0">
+            {% if backups %}
+              <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th>Backup file</th>
+                      <th>Created</th>
+                      <th>Size</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for backup in backups %}
+                      <tr>
+                        <td>
+                          <code>{{ backup.name }}</code>
+                          <div class="small text-muted">{{ backup.path }}</div>
+                        </td>
+                        <td>{{ backup.created_at }}</td>
+                        <td>{{ backup.size_bytes|filesizeformat }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="p-3">
+                <p class="text-muted mb-0">No FHIR import backups were found yet.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 col-12">
+        <div class="card card-outline card-warning">
+          <div class="card-header">
+            <h2 class="card-title">Manual Restore</h2>
+          </div>
+          <div class="card-body">
+            <p>
+              Restore only while HolyFHIR is closed. The backup is encrypted with the same local key in <code>.env</code>, so keep the matching <code>.env</code> file with the restored database.
+            </p>
+
+            <ol>
+              <li>Close HolyFHIR completely.</li>
+              <li>Open the app data folder shown below.</li>
+              <li>Rename the current live database to keep a last-chance copy.</li>
+              <li>Copy the backup file you want from the backups folder.</li>
+              <li>Rename the copied backup to the live database filename.</li>
+              <li>Reopen HolyFHIR.</li>
+            </ol>
+
+            <dl class="mb-0">
+              <dt>Live database</dt>
+              <dd><code>{{ database_path|default:"Not available" }}</code></dd>
+
+              <dt>Backups folder</dt>
+              <dd><code>{{ backup_dir|default:"Not available" }}</code></dd>
+            </dl>
+          </div>
+        </div>
+
+        <div class="card card-outline card-secondary">
+          <div class="card-body">
+            <h2 class="h5">Example</h2>
+            <p class="mb-2">Rename the live database:</p>
+            <pre class="mb-3"><code>holyfhir.encrypted.sqlite3
+holyfhir.encrypted.sqlite3.before-restore</code></pre>
+            <p class="mb-2">Then copy a backup into the app data folder and rename it:</p>
+            <pre class="mb-0"><code>holyfhir.encrypted.pre-fhir-import.20260426-120000.sqlite3
+holyfhir.encrypted.sqlite3</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
