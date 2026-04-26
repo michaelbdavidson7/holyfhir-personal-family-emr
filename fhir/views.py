@@ -1,4 +1,4 @@
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -10,6 +10,7 @@ from .importer import import_fhir_payloads
 @staff_member_required
 def import_fhir_data(request):
     can_add_patient = request.user.has_perm("patients.add_patientprofile")
+    base_context = admin.site.each_context(request)
 
     if request.method == "POST":
         if request.POST.get("action") == "create_patient":
@@ -25,6 +26,8 @@ def import_fhir_data(request):
                 request,
                 "admin/fhir_import.html",
                 {
+                    **base_context,
+                    "title": "Import FHIR Data",
                     "form": form,
                     "patient_form": patient_form,
                     "can_add_patient": can_add_patient,
@@ -60,6 +63,8 @@ def import_fhir_data(request):
         request,
         "admin/fhir_import.html",
         {
+            **base_context,
+            "title": "Import FHIR Data",
             "form": form,
             "patient_form": patient_form,
             "can_add_patient": can_add_patient,

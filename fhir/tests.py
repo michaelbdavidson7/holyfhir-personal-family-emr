@@ -282,3 +282,18 @@ class FHIRImportTests(TestCase):
         self.assertRedirects(response, f"{reverse('fhir_import')}?patient={patient.pk}")
         self.assertEqual(patient.date_of_birth, date(1815, 12, 10))
         self.assertEqual(response.context["form"].initial["patient"], str(patient.pk))
+
+    def test_import_page_includes_admin_sidebar_context(self):
+        User = get_user_model()
+        user = User.objects.create_superuser(
+            username="owner",
+            email="owner@example.test",
+            password="correct-password",
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("fhir_import"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("available_apps", response.context)
+        self.assertContains(response, "jazzy-navigation")
