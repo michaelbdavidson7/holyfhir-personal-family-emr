@@ -1,4 +1,4 @@
-# HolyFHIR Personal EMR
+# HolyFHIR Personal Family EMR
 
 HolyFHIR is a private, local offline-first health-record app for people who want to keep a personal copy of their medical information.
 
