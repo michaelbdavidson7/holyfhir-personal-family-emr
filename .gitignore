@@ -1,24 +1,79 @@
-# database
+# Local databases and backups
 db.sqlite3
 *.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.bak
+*.backup
+*.dump
 
-# media uploads (VERY IMPORTANT for your app)
+# Media uploads and local storage
 media/
 storage/
+uploads/
+user-data/
+app-data/
 
-# python
+# Health record imports, exports, and generated bundles
+imports/
+exports/
+fhir-imports/
+fhir-exports/
+*.ndjson
+*.fhir.json
+*requested-record*.zip
+*Requested Record*.zip
+*.phr
+
+# Logs and diagnostics
+logs/
+*.log
+*.log.*
+holyfhir-desktop.log
+
+# Secrets, keys, and local environment
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*recovery*key*
+*recovery*.txt
+
+# Python
 __pycache__/
 *.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# environment
-.env
+# Local environments and dependencies
 .venv/
 venv/
 node_modules/
 npm-debug.log*
+
+# Build and packaged app output
 desktop-backend/build/
 desktop-backend/dist/
+src-tauri/target/
+src-tauri/gen/
+dist/
+build/
+*.msi
+*.exe
+*.dmg
+*.AppImage
 
-# mac/windows junk
+# OS/editor junk
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

@@ -25,6 +25,12 @@ You are responsible for protecting your local device, password, recovery key, ba
 
 See [DISCLAIMER.md](DISCLAIMER.md) for the full disclaimer.
 
+## Security And Contributions
+
+Please report security issues privately and do not post real health information, secrets, database files, portal exports, or logs from actual use. See [SECURITY.md](SECURITY.md).
+
+Contributions are welcome, but sample data, test fixtures, screenshots, and bug reports must use synthetic data only. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 HolyFHIR Personal EMR is licensed under the MIT License. See [LICENSE](LICENSE).
