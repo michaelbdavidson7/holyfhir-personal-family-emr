@@ -1,6 +1,7 @@
 FROM busybox:stable-musl
 
-COPY index.html /www/index.html
+# copy all files to the image
+COPY . /www/
 
 USER 65534:65534
 EXPOSE 8080
