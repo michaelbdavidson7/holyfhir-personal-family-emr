@@ -15,14 +15,19 @@ from django.test import TestCase
 from django.urls import reverse
 
 from clinical.models import (
+    CarePlan,
     CareTeam,
     CareTeamParticipant,
     Condition,
+    Encounter,
     Location,
     Medication,
     Observation,
     Organization,
     Practitioner,
+    Procedure,
+    ProcedurePerformer,
+    Specimen,
 )
 from documents.models import ClinicalDocument
 from patients.models import PatientProfile
@@ -461,6 +466,165 @@ class FHIRImportTests(TestCase):
                     django_object_id=document.id,
                 ).exists()
             )
+
+    def test_imports_care_plan_procedure_and_specimen_relationships(self):
+        payload = {
+            "resourceType": "Bundle",
+            "entry": [
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "id": "pat-1",
+                        "name": [{"family": "Rivera", "given": ["Maya"]}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Practitioner",
+                        "id": "prac-1",
+                        "name": [{"text": "Dr. Ada Lovelace"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Organization",
+                        "id": "org-1",
+                        "name": "Example Health",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Condition",
+                        "id": "cond-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "code": {"text": "Wrist fracture"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Encounter",
+                        "id": "enc-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "status": "finished",
+                        "type": [{"text": "Office visit"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "CareTeam",
+                        "id": "team-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "name": "Orthopedic care team",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Observation",
+                        "id": "obs-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "specimen": {"reference": "Specimen/spec-1"},
+                        "code": {"text": "Culture result"},
+                        "valueString": "No growth",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Procedure",
+                        "id": "proc-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "encounter": {"reference": "Encounter/enc-1"},
+                        "basedOn": [{"reference": "CarePlan/plan-1"}],
+                        "status": "completed",
+                        "code": {"text": "Bone immobilization"},
+                        "performedDateTime": "2024-01-02T10:30:00Z",
+                        "reasonReference": [{"reference": "Condition/cond-1"}],
+                        "performer": [
+                            {
+                                "function": {"text": "Surgeon"},
+                                "actor": {"reference": "Practitioner/prac-1", "display": "Dr. Ada Lovelace"},
+                                "onBehalfOf": {"reference": "Organization/org-1", "display": "Example Health"},
+                            }
+                        ],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "CarePlan",
+                        "id": "plan-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "status": "active",
+                        "intent": "plan",
+                        "title": "Fracture recovery plan",
+                        "category": [{"text": "Orthopedics"}],
+                        "period": {"start": "2024-01-01", "end": "2024-02-01"},
+                        "addresses": [{"reference": "Condition/cond-1"}],
+                        "careTeam": [{"reference": "CareTeam/team-1"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Specimen",
+                        "id": "parent-spec",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "status": "available",
+                        "type": {"text": "Parent specimen"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Specimen",
+                        "id": "spec-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "status": "available",
+                        "type": {"text": "Blood specimen"},
+                        "accessionIdentifier": {"value": "A-123"},
+                        "receivedTime": "2024-01-02T11:00:00Z",
+                        "collection": {
+                            "collectedDateTime": "2024-01-02T10:45:00Z",
+                            "method": {"text": "Venipuncture"},
+                            "bodySite": {"text": "Left arm"},
+                            "collector": {"display": "Lab Tech"},
+                        },
+                        "parent": [{"reference": "Specimen/parent-spec"}],
+                    }
+                },
+            ],
+        }
+
+        result = import_fhir_json(payload)
+
+        self.assertEqual(result.errors, [])
+        self.assertEqual(CarePlan.objects.count(), 1)
+        self.assertEqual(Procedure.objects.count(), 1)
+        self.assertEqual(Specimen.objects.count(), 2)
+
+        care_plan = CarePlan.objects.get()
+        condition = Condition.objects.get()
+        care_team = CareTeam.objects.get()
+        self.assertEqual(care_plan.title, "Fracture recovery plan")
+        self.assertEqual(care_plan.conditions.get(), condition)
+        self.assertEqual(care_plan.care_teams.get(), care_team)
+
+        procedure = Procedure.objects.get()
+        self.assertEqual(procedure.encounter, Encounter.objects.get())
+        self.assertEqual(procedure.care_plans.get(), care_plan)
+        self.assertEqual(procedure.conditions.get(), condition)
+        self.assertEqual(procedure.performer_links.count(), 1)
+
+        performer = ProcedurePerformer.objects.get()
+        self.assertEqual(performer.role, "Surgeon")
+        self.assertEqual(performer.practitioner, Practitioner.objects.get())
+        self.assertEqual(performer.organization, Organization.objects.get())
+
+        specimen = Specimen.objects.get(accession_identifier="A-123")
+        self.assertEqual(specimen.specimen_type, "Blood specimen")
+        self.assertEqual(specimen.collection_method, "Venipuncture")
+        self.assertEqual(specimen.parent_specimens.get().specimen_type, "Parent specimen")
+        self.assertEqual(Observation.objects.get().specimen, specimen)
+
+        self.assertTrue(FHIRLink.objects.filter(resource_type="CarePlan", django_model="clinical.CarePlan").exists())
+        self.assertTrue(FHIRLink.objects.filter(resource_type="Procedure", django_model="clinical.Procedure").exists())
+        self.assertTrue(FHIRLink.objects.filter(resource_type="Specimen", django_model="clinical.Specimen").exists())
 
     def test_missing_patient_reference_is_snapshotted_as_invalid(self):
         result = import_fhir_json(

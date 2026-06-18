@@ -1,0 +1,123 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+  .clinical-resource-section {
+    margin-bottom: 24px;
+  }
+
+  .clinical-resource-heading {
+    color: #111827;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+  }
+
+  .clinical-resource-card .card-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 188px;
+  }
+
+  .clinical-resource-header {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    min-width: 0;
+  }
+
+  .clinical-resource-icon {
+    align-items: center;
+    color: #2563eb;
+    display: inline-flex;
+    flex: 0 0 32px;
+    font-size: 1.55rem;
+    justify-content: center;
+    line-height: 1;
+    width: 32px;
+  }
+
+  .clinical-resource-title {
+    color: #111827;
+    font-size: 1.02rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .clinical-resource-description {
+    flex: 1 1 auto;
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+
+  .clinical-resource-footer {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .clinical-resource-count {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 999px;
+    color: #3730a3;
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 5px 10px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 575.98px) {
+    .clinical-resource-card .card-body {
+      min-height: 0;
+    }
+
+    .clinical-resource-footer {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>
+
+<div class="content">
+  <div class="container-fluid">
+    {% for section in directory_sections %}
+      <section class="clinical-resource-section">
+        <h2 class="clinical-resource-heading">{{ section.title }}</h2>
+        <div class="row">
+          {% for card in section.cards %}
+            <div class="col-xl-3 col-lg-4 col-md-6 col-12 mb-3">
+              <div class="card card-outline card-primary h-100 clinical-resource-card">
+                <div class="card-body">
+                  <div class="clinical-resource-header">
+                    <span class="clinical-resource-icon" aria-hidden="true">
+                      <i class="{{ card.icon }}"></i>
+                    </span>
+                    <h3 class="clinical-resource-title">{{ card.title }}</h3>
+                  </div>
+                  <p class="text-muted clinical-resource-description">{{ card.description }}</p>
+                  <div class="clinical-resource-footer">
+                    <span class="clinical-resource-count">
+                      {{ card.count }} {{ card.count_label }}{{ card.count|pluralize }}
+                    </span>
+                    <a href="{{ card.url }}" class="btn btn-primary btn-sm">
+                      Open
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

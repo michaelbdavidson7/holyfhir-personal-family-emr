@@ -11,6 +11,7 @@ from django.utils.dateparse import parse_date, parse_datetime
 
 from clinical.models import (
     Allergy,
+    CarePlan,
     CareTeam,
     CareTeamParticipant,
     Condition,
@@ -21,6 +22,9 @@ from clinical.models import (
     Observation,
     Organization,
     Practitioner,
+    Procedure,
+    ProcedurePerformer,
+    Specimen,
 )
 from documents.models import ClinicalDocument
 from patients.models import PatientProfile
@@ -38,7 +42,10 @@ SUPPORTED_RESOURCE_TYPES = {
     "Observation",
     "Encounter",
     "CareTeam",
+    "CarePlan",
     "DocumentReference",
+    "Procedure",
+    "Specimen",
     "Practitioner",
     "Organization",
     "Location",
@@ -127,7 +134,10 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 "Observation": _import_observation,
                 "Encounter": _import_encounter,
                 "CareTeam": _import_care_team,
+                "CarePlan": _import_care_plan,
                 "DocumentReference": _import_document_reference,
+                "Procedure": _import_procedure,
+                "Specimen": _import_specimen,
                 "Practitioner": _import_practitioner,
                 "Organization": _import_organization,
                 "Location": _import_location,
@@ -136,6 +146,17 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
             _record_import(result, created)
             _snapshot(resource, patient, source, result)
             _link(resource, patient, _model_label(obj), obj.id, "fhir_to_internal")
+
+        for resource in resources:
+            resource_type = resource.get("resourceType")
+            if resource_type == "Observation":
+                _sync_observation_relationships(resource)
+            elif resource_type == "CarePlan":
+                _sync_care_plan_relationships(resource)
+            elif resource_type == "Procedure":
+                _sync_procedure_relationships(resource)
+            elif resource_type == "Specimen":
+                _sync_specimen_relationships(resource)
 
     return result
 
@@ -337,6 +358,9 @@ def _import_observation(resource, patient):
     obj.notes = _notes(resource)
     created = obj.pk is None
     obj.save()
+    obj.specimen = _reference_as(resource.get("specimen"), Specimen)
+    if obj.specimen_id:
+        obj.save(update_fields=["specimen"])
     return obj, created
 
 
@@ -376,6 +400,25 @@ def _import_care_team(resource, patient):
     return obj, created
 
 
+def _import_care_plan(resource, patient):
+    obj = _object_for_resource(resource, "clinical.CarePlan") or CarePlan(patient=patient)
+    period = resource.get("period") or {}
+    obj.patient = patient
+    obj.title = resource.get("title") or _codeable_text(_first(resource.get("category"))) or "Care plan"
+    obj.status = resource.get("status") or ""
+    obj.intent = resource.get("intent") or ""
+    obj.category = _codeable_text(_first(resource.get("category"))) or ""
+    obj.description = resource.get("description") or ""
+    obj.start_date = _date(period.get("start"))
+    obj.end_date = _date(period.get("end"))
+    obj.author_display = _display(resource.get("author"))
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_care_plan_relationships(resource, obj)
+    return obj, created
+
+
 def _import_document_reference(resource, patient):
     obj = _object_for_resource(resource, "documents.ClinicalDocument") or ClinicalDocument(patient=patient)
     attachment = _document_reference_attachment(resource)
@@ -395,6 +438,53 @@ def _import_document_reference(resource, patient):
 
     created = obj.pk is None
     obj.save()
+    return obj, created
+
+
+def _import_procedure(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Procedure") or Procedure(patient=patient)
+    performed = resource.get("performedPeriod") or {}
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.name = _codeable_text(resource.get("code")) or "Unknown procedure"
+    obj.status = resource.get("status") or ""
+    obj.category = _codeable_text(resource.get("category")) or ""
+    obj.performed_start = _datetime(
+        resource.get("performedDateTime")
+        or resource.get("performedInstant")
+        or resource.get("performedString")
+        or performed.get("start")
+    )
+    obj.performed_end = _datetime(performed.get("end"))
+    obj.body_site = _codeable_text(_first(resource.get("bodySite"))) or ""
+    obj.outcome = _codeable_text(resource.get("outcome")) or ""
+    obj.reason = _codeable_text(_first(resource.get("reasonCode"))) or ""
+    obj.location_display = _display(resource.get("location"))
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_procedure_relationships(resource, obj)
+    return obj, created
+
+
+def _import_specimen(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Specimen") or Specimen(patient=patient)
+    collection = resource.get("collection") or {}
+    collected_period = collection.get("collectedPeriod") or {}
+    accession = resource.get("accessionIdentifier") or {}
+    obj.patient = patient
+    obj.accession_identifier = accession.get("value") or obj.accession_identifier
+    obj.status = resource.get("status") or ""
+    obj.specimen_type = _codeable_text(resource.get("type")) or "Specimen"
+    obj.received_time = _datetime(resource.get("receivedTime"))
+    obj.collected_datetime = _datetime(collection.get("collectedDateTime") or collected_period.get("start"))
+    obj.collection_method = _codeable_text(collection.get("method")) or ""
+    obj.body_site = _codeable_text(collection.get("bodySite")) or ""
+    obj.collector_display = _display(collection.get("collector"))
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_specimen_relationships(resource, obj)
     return obj, created
 
 
@@ -462,11 +552,15 @@ def _object_for_resource(resource, django_model):
         Medication,
         Immunization,
         Observation,
+        Specimen,
         Encounter,
         CareTeam,
+        CarePlan,
         CareTeamParticipant,
         ClinicalDocument,
         Practitioner,
+        Procedure,
+        ProcedurePerformer,
         Organization,
         Location,
     ):
@@ -483,6 +577,12 @@ def _object_for_reference(reference):
         "Practitioner": "clinical.Practitioner",
         "Organization": "clinical.Organization",
         "Location": "clinical.Location",
+        "Encounter": "clinical.Encounter",
+        "Condition": "clinical.Condition",
+        "CareTeam": "clinical.CareTeam",
+        "CarePlan": "clinical.CarePlan",
+        "Procedure": "clinical.Procedure",
+        "Specimen": "clinical.Specimen",
     }
     django_model = model_by_resource_type.get(resource_type)
     if not django_model:
@@ -516,6 +616,12 @@ def _patient_references(resource, patient):
         f"Patient/{resource_id}": patient,
         f"urn:uuid:{resource_id}": patient,
     }
+
+
+def _reference_as(reference_value, model_class):
+    reference = reference_value.get("reference") if isinstance(reference_value, dict) else reference_value
+    obj = _object_for_reference(reference)
+    return obj if isinstance(obj, model_class) else None
 
 
 def _link(resource, patient, django_model, object_id, direction):
@@ -734,6 +840,106 @@ def _file_extension_for_mime_type(mime_type):
         "application/xml": ".xml",
         "text/xml": ".xml",
     }.get(mime_type, ".bin")
+
+
+def _sync_observation_relationships(resource, observation=None):
+    observation = observation or _object_for_resource(resource, "clinical.Observation")
+    if not observation:
+        return
+    specimen = _reference_as(resource.get("specimen"), Specimen)
+    if specimen and observation.specimen_id != specimen.id:
+        observation.specimen = specimen
+        observation.save(update_fields=["specimen"])
+
+
+def _sync_care_plan_relationships(resource, care_plan=None):
+    care_plan = care_plan or _object_for_resource(resource, "clinical.CarePlan")
+    if not care_plan:
+        return
+
+    conditions = []
+    for reference in resource.get("addresses") or []:
+        condition = _reference_as(reference, Condition)
+        if condition:
+            conditions.append(condition)
+    care_plan.conditions.set(conditions)
+
+    care_teams = []
+    for reference in resource.get("careTeam") or []:
+        care_team = _reference_as(reference, CareTeam)
+        if care_team:
+            care_teams.append(care_team)
+    care_plan.care_teams.set(care_teams)
+
+
+def _sync_procedure_relationships(resource, procedure=None):
+    procedure = procedure or _object_for_resource(resource, "clinical.Procedure")
+    if not procedure:
+        return
+
+    encounter = _reference_as(resource.get("encounter"), Encounter)
+    if encounter and procedure.encounter_id != encounter.id:
+        procedure.encounter = encounter
+        procedure.save(update_fields=["encounter"])
+
+    conditions = []
+    for reference in resource.get("reasonReference") or []:
+        condition = _reference_as(reference, Condition)
+        if condition:
+            conditions.append(condition)
+    procedure.conditions.set(conditions)
+
+    care_plans = []
+    for reference in resource.get("basedOn") or []:
+        care_plan = _reference_as(reference, CarePlan)
+        if care_plan:
+            care_plans.append(care_plan)
+    procedure.care_plans.set(care_plans)
+
+    _sync_procedure_performers(resource, procedure)
+
+
+def _sync_specimen_relationships(resource, specimen=None):
+    specimen = specimen or _object_for_resource(resource, "clinical.Specimen")
+    if not specimen:
+        return
+
+    parent_specimens = []
+    for reference in resource.get("parent") or []:
+        parent_specimen = _reference_as(reference, Specimen)
+        if parent_specimen:
+            parent_specimens.append(parent_specimen)
+    specimen.parent_specimens.set(parent_specimens)
+
+
+def _sync_procedure_performers(resource, procedure):
+    procedure.performer_links.all().delete()
+    for performer in resource.get("performer") or []:
+        actor = performer.get("actor") or {}
+        on_behalf_of = performer.get("onBehalfOf") or {}
+        actor_reference = actor.get("reference") or ""
+        on_behalf_of_reference = on_behalf_of.get("reference") or ""
+
+        performer_link = ProcedurePerformer(
+            procedure=procedure,
+            role=_codeable_text(performer.get("function")) or "",
+            actor_display=_display(actor),
+            actor_reference=actor_reference,
+            on_behalf_of_display=_display(on_behalf_of),
+            on_behalf_of_reference=on_behalf_of_reference,
+        )
+
+        actor_obj = _object_for_reference(actor_reference)
+        if isinstance(actor_obj, Practitioner):
+            performer_link.practitioner = actor_obj
+        elif isinstance(actor_obj, Organization):
+            performer_link.organization = actor_obj
+
+        on_behalf_of_obj = _object_for_reference(on_behalf_of_reference)
+        if isinstance(on_behalf_of_obj, Organization) and not performer_link.organization:
+            performer_link.organization = on_behalf_of_obj
+
+        performer_link.save()
 
 
 def _sync_care_team_participants(resource, care_team):

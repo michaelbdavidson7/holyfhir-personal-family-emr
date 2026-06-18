@@ -5,10 +5,11 @@
 [ ] export quick card for medications, allergies, and conditions 
 [ ] create a full paramedic view
 [ ] add more FHIR resources
-    [ ] Procedure - high priority; patient-facing care history such as surgeries, imaging procedures, treatments, and completed actions
+    [x] CarePlan - care plans with condition/care-team relationships
+    [x] Procedure - high priority; patient-facing care history such as surgeries, imaging procedures, treatments, and completed actions
     [ ] DiagnosticReport - high priority; groups labs/imaging reports and can point to observations, documents, and specimens
     [ ] ServiceRequest - medium-high priority; orders, referrals, and requested services tied to encounters/procedures
-    [ ] Specimen - medium priority; supporting data for labs and diagnostic reports
+    [x] Specimen - medium priority; supporting data for labs and diagnostic reports
     [ ] EpisodeOfCare - medium priority; groups visits/actions into a larger care episode
     [ ] PractitionerRole - medium priority; connects practitioners to organizations, specialties, locations, and roles
     [ ] Device - lower-medium priority; implanted devices, medical equipment, and patient devices
@@ -26,9 +27,9 @@
         [ ] FHIR source: Observation.performer
         [ ] Django shape: likely M2M through a generic-ish participant table or separate optional text/reference fields for now
         [ ] Use case: who was responsible for a lab/vital/result
-    [ ] Observation.specimen -> future Specimen
+    [x] Observation.specimen -> Specimen
         [ ] FHIR source: Observation.specimen
-        [ ] Django shape: Observation.specimen nullable FK once Specimen is supported
+        [x] Django shape: Observation.specimen nullable FK to Specimen
         [ ] Use case: connect lab results to specimen/source material
     [ ] Observation.device -> future Device
         [ ] FHIR source: Observation.device
@@ -162,17 +163,17 @@
         [ ] FHIR source: ServiceRequest.reasonReference
         [ ] Django shape: start with M2M to Condition; expand with generic reference table later
         [ ] Use case: why the order/referral exists
-    [ ] Future Procedure.encounter -> Encounter
+    [x] Procedure.encounter -> Encounter
         [ ] FHIR source: Procedure.encounter
-        [ ] Django shape: Procedure.encounter nullable FK once Procedure is supported
+        [x] Django shape: Procedure.encounter nullable FK
         [ ] Use case: completed actions/procedures performed during a visit
-    [ ] Future Procedure.performers -> Practitioner/Organization
+    [x] Procedure.performers -> Practitioner/Organization
         [ ] FHIR source: Procedure.performer.actor and performer.onBehalfOf
-        [ ] Django shape: through model ProcedurePerformer with role/function
+        [x] Django shape: through model ProcedurePerformer with role/function
         [ ] Use case: who performed the procedure/action
-    [ ] Future Procedure.reason_references -> Condition/Observation/Procedure/DiagnosticReport/DocumentReference
+    [x] Procedure.reason_references -> Condition
         [ ] FHIR source: Procedure.reasonReference
-        [ ] Django shape: start with M2M to Condition; expand later
+        [x] Django shape: M2M to Condition; expand later for Observation/Procedure/DiagnosticReport/DocumentReference
         [ ] Use case: why the procedure/action was done
     [ ] Future PractitionerRole -> Practitioner/Organization/Location
         [ ] FHIR source: PractitionerRole.practitioner, organization, location, specialty

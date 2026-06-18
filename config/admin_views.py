@@ -4,7 +4,21 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from clinical.models import CareTeam, Location, Organization, Practitioner
+from clinical.models import (
+    Allergy,
+    CarePlan,
+    CareTeam,
+    Condition,
+    Encounter,
+    Immunization,
+    Location,
+    Medication,
+    Observation,
+    Organization,
+    Practitioner,
+    Procedure,
+    Specimen,
+)
 from fhir.backups import database_path, fhir_import_backup_dir, list_fhir_import_database_backups
 from patients.models import RecoveryCredential
 from patients.recovery import generate_recovery_key, hash_recovery_key
@@ -166,6 +180,137 @@ def clinical_care_team_directory(request):
         "directory_cards": cards,
     }
     return render(request, "admin/clinical_care_team_directory.html", context)
+
+
+def clinical_resources_directory(request):
+    sections = [
+        {
+            "title": "Patient Records",
+            "cards": [
+                {
+                    "title": "Conditions",
+                    "description": "Problems, diagnoses, and active or historical conditions.",
+                    "url": reverse("admin:clinical_condition_changelist"),
+                    "icon": "fas fa-heartbeat",
+                    "count": Condition.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Allergies",
+                    "description": "Allergies, intolerances, reactions, and severity details.",
+                    "url": reverse("admin:clinical_allergy_changelist"),
+                    "icon": "fas fa-exclamation-triangle",
+                    "count": Allergy.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Medications",
+                    "description": "Medication requests, statements, dosage text, and status.",
+                    "url": reverse("admin:clinical_medication_changelist"),
+                    "icon": "fas fa-pills",
+                    "count": Medication.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Immunizations",
+                    "description": "Vaccines, occurrence dates, lot numbers, and performers.",
+                    "url": reverse("admin:clinical_immunization_changelist"),
+                    "icon": "fas fa-syringe",
+                    "count": Immunization.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Vitals & Labs",
+                    "description": "Observations, vital signs, lab values, and specimen links.",
+                    "url": reverse("admin:clinical_observation_changelist"),
+                    "icon": "fas fa-chart-line",
+                    "count": Observation.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Visits & Actions",
+                    "description": "Encounters, visits, facilities, provider text, and summaries.",
+                    "url": reverse("admin:clinical_encounter_changelist"),
+                    "icon": "fas fa-stethoscope",
+                    "count": Encounter.objects.count(),
+                    "count_label": "record",
+                },
+            ],
+        },
+        {
+            "title": "Care Planning",
+            "cards": [
+                {
+                    "title": "Care Teams",
+                    "description": "Patient care-team records and structured participants.",
+                    "url": reverse("admin:clinical_careteam_changelist"),
+                    "icon": "fas fa-user-friends",
+                    "count": CareTeam.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Care Plans",
+                    "description": "Care plans connected to conditions and care teams.",
+                    "url": reverse("admin:clinical_careplan_changelist"),
+                    "icon": "fas fa-clipboard-list",
+                    "count": CarePlan.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Procedures",
+                    "description": "Completed procedures, actions, performers, and reasons.",
+                    "url": reverse("admin:clinical_procedure_changelist"),
+                    "icon": "fas fa-procedures",
+                    "count": Procedure.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Specimens",
+                    "description": "Lab specimens, collection details, and parent specimens.",
+                    "url": reverse("admin:clinical_specimen_changelist"),
+                    "icon": "fas fa-vial",
+                    "count": Specimen.objects.count(),
+                    "count_label": "record",
+                },
+            ],
+        },
+        {
+            "title": "Directory",
+            "cards": [
+                {
+                    "title": "Practitioners",
+                    "description": "Clinicians and other people involved in care.",
+                    "url": reverse("admin:clinical_practitioner_changelist"),
+                    "icon": "fas fa-user-md",
+                    "count": Practitioner.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Organizations",
+                    "description": "Facilities, practices, departments, and care organizations.",
+                    "url": reverse("admin:clinical_organization_changelist"),
+                    "icon": "fas fa-hospital",
+                    "count": Organization.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Locations",
+                    "description": "Clinics, hospitals, rooms, and care sites.",
+                    "url": reverse("admin:clinical_location_changelist"),
+                    "icon": "fas fa-map-marker-alt",
+                    "count": Location.objects.count(),
+                    "count_label": "record",
+                },
+            ],
+        },
+    ]
+
+    context = {
+        **admin.site.each_context(request),
+        "title": "Clinical Resources",
+        "directory_sections": sections,
+    }
+    return render(request, "admin/clinical_resources_directory.html", context)
 
 
 def fhir_interop_hub(request):

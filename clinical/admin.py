@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import (
     Allergy,
+    CarePlan,
     CareTeam,
     CareTeamParticipant,
     Condition,
@@ -11,6 +12,9 @@ from .models import (
     Observation,
     Organization,
     Practitioner,
+    Procedure,
+    ProcedurePerformer,
+    Specimen,
 )
 
 
@@ -55,12 +59,23 @@ class ImmunizationAdmin(admin.ModelAdmin):
 
 @admin.register(Observation)
 class ObservationAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "name", "category", "effective_datetime")
+    list_display = ("id", "patient", "name", "category", "specimen", "effective_datetime")
     list_display_links = ("name",)
     search_fields = ("name", "loinc_code")
     list_filter = ("patient", "category")
     ordering = ("-effective_datetime",)
+    autocomplete_fields = ["patient", "specimen"]
+
+
+@admin.register(Specimen)
+class SpecimenAdmin(admin.ModelAdmin):
+    list_display = ("id", "patient", "specimen_type", "status", "accession_identifier", "collected_datetime")
+    list_display_links = ("specimen_type",)
+    search_fields = ("specimen_type", "accession_identifier", "body_site", "collector_display")
+    list_filter = ("patient", "status", "specimen_type")
+    ordering = ("-collected_datetime", "-received_time")
     autocomplete_fields = ["patient"]
+    filter_horizontal = ("parent_specimens",)
 
 
 @admin.register(Encounter)
@@ -120,6 +135,17 @@ class CareTeamAdmin(admin.ModelAdmin):
     filter_horizontal = ("managing_organizations",)
 
 
+@admin.register(CarePlan)
+class CarePlanAdmin(admin.ModelAdmin):
+    list_display = ("id", "patient", "title", "status", "intent", "start_date")
+    list_display_links = ("title",)
+    search_fields = ("title", "category", "description", "author_display")
+    list_filter = ("patient", "status", "intent", "category")
+    ordering = ("patient", "-start_date", "title")
+    autocomplete_fields = ["patient"]
+    filter_horizontal = ("conditions", "care_teams")
+
+
 @admin.register(Practitioner)
 class PractitionerAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "qualification", "phone", "email", "active", "care_team_count")
@@ -131,6 +157,42 @@ class PractitionerAdmin(admin.ModelAdmin):
     @admin.display(description="Care teams")
     def care_team_count(self, obj):
         return obj.care_team_participations.count()
+
+
+class ProcedurePerformerInline(admin.StackedInline):
+    model = ProcedurePerformer
+    extra = 0
+    fieldsets = (
+        (None, {
+            "fields": (
+                "role",
+                "practitioner",
+                "organization",
+            ),
+        }),
+        ("Source details", {
+            "fields": (
+                "actor_display",
+                "actor_reference",
+                "on_behalf_of_display",
+                "on_behalf_of_reference",
+            ),
+            "classes": ("collapse",),
+        }),
+    )
+    autocomplete_fields = ["practitioner", "organization"]
+
+
+@admin.register(Procedure)
+class ProcedureAdmin(admin.ModelAdmin):
+    inlines = (ProcedurePerformerInline,)
+    list_display = ("id", "patient", "name", "status", "category", "performed_start")
+    list_display_links = ("name",)
+    search_fields = ("name", "category", "reason", "body_site", "outcome")
+    list_filter = ("patient", "status", "category")
+    ordering = ("-performed_start",)
+    autocomplete_fields = ["patient", "encounter"]
+    filter_horizontal = ("care_plans", "conditions")
 
 
 @admin.register(Organization)

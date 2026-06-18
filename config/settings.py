@@ -194,6 +194,9 @@ JAZZMIN_SETTINGS = {
         "clinical.Observation": "fas fa-chart-line",
         "clinical.Encounter": "fas fa-stethoscope",
         "clinical.CareTeam": "fas fa-user-friends",
+        "clinical.CarePlan": "fas fa-clipboard-list",
+        "clinical.Procedure": "fas fa-procedures",
+        "clinical.Specimen": "fas fa-vial",
         "clinical.Practitioner": "fas fa-user-md",
         "clinical.Organization": "fas fa-hospital",
         "clinical.Location": "fas fa-map-marker-alt",
@@ -220,6 +223,11 @@ JAZZMIN_SETTINGS = {
             "permissions": ["patients.add_patientprofile"],
         }],
         "clinical": [{
+            "name": "All Clinical Resources",
+            "url": "clinical_resources_directory",
+            "icon": "fas fa-notes-medical",
+            "permissions": ["clinical.view_condition"],
+        }, {
             "name": "Care Team Info",
             "url": "clinical_care_team_directory",
             "icon": "fas fa-user-friends",
@@ -250,6 +258,9 @@ JAZZMIN_SETTINGS = {
     "hide_models": [
         "patients.RecoveryCredential",
         "clinical.CareTeam",
+        "clinical.CarePlan",
+        "clinical.Procedure",
+        "clinical.Specimen",
         "clinical.Practitioner",
         "clinical.Organization",
         "clinical.Location",

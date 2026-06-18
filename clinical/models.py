@@ -86,6 +86,13 @@ class Observation(models.Model):
     ]
 
     patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="observations")
+    specimen = models.ForeignKey(
+        "Specimen",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="observations",
+    )
     category = models.CharField(max_length=20, choices=OBSERVATION_TYPES, default="other")
     name = models.CharField(max_length=255)
     loinc_code = models.CharField(max_length=30, blank=True)
@@ -108,6 +115,26 @@ class Observation(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Specimen(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="specimens")
+    parent_specimens = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="child_specimens")
+    accession_identifier = models.CharField(max_length=100, blank=True)
+    status = models.CharField(max_length=30, blank=True)
+    specimen_type = models.CharField(max_length=255, blank=True)
+    received_time = models.DateTimeField(null=True, blank=True)
+    collected_datetime = models.DateTimeField(null=True, blank=True)
+    collection_method = models.CharField(max_length=255, blank=True)
+    body_site = models.CharField(max_length=255, blank=True)
+    collector_display = models.CharField(max_length=255, blank=True)
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.specimen_type or self.accession_identifier or f"Specimen #{self.pk}"
 
 
 class Encounter(models.Model):
@@ -157,6 +184,31 @@ class CareTeam(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CarePlan(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="care_plans")
+    title = models.CharField(max_length=255)
+    status = models.CharField(max_length=30, blank=True)
+    intent = models.CharField(max_length=30, blank=True)
+    category = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    author_display = models.CharField(max_length=255, blank=True)
+    notes = models.TextField(blank=True)
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="care_plans")
+    care_teams = models.ManyToManyField(CareTeam, blank=True, related_name="care_plans")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Care Plan"
+        verbose_name_plural = "Care Plans"
+
+    def __str__(self):
+        return self.title
 
 
 class CareTeamParticipant(models.Model):
@@ -216,6 +268,68 @@ class Practitioner(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Procedure(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="procedures")
+    encounter = models.ForeignKey(
+        Encounter,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="procedures",
+    )
+    care_plans = models.ManyToManyField(CarePlan, blank=True, related_name="procedures")
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="procedures")
+    name = models.CharField(max_length=255)
+    status = models.CharField(max_length=30, blank=True)
+    category = models.CharField(max_length=255, blank=True)
+    performed_start = models.DateTimeField(null=True, blank=True)
+    performed_end = models.DateTimeField(null=True, blank=True)
+    body_site = models.CharField(max_length=255, blank=True)
+    outcome = models.CharField(max_length=255, blank=True)
+    reason = models.CharField(max_length=255, blank=True)
+    location_display = models.CharField(max_length=255, blank=True)
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ProcedurePerformer(models.Model):
+    procedure = models.ForeignKey(Procedure, on_delete=models.CASCADE, related_name="performer_links")
+    practitioner = models.ForeignKey(
+        Practitioner,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="procedure_performances",
+    )
+    organization = models.ForeignKey(
+        "Organization",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="procedure_performances",
+    )
+    role = models.CharField(max_length=255, blank=True)
+    actor_display = models.CharField(max_length=255, blank=True)
+    actor_reference = models.CharField(max_length=255, blank=True)
+    on_behalf_of_display = models.CharField(max_length=255, blank=True)
+    on_behalf_of_reference = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        verbose_name = "Procedure Performer"
+        verbose_name_plural = "Procedure Performers"
+
+    def __str__(self):
+        performer = self.practitioner or self.organization or self.actor_display
+        if self.role and performer:
+            return f"{self.role}: {performer}"
+        return str(performer or self.role or f"Performer #{self.pk}")
 
 
 class Organization(models.Model):
