@@ -693,6 +693,257 @@ class DetectedIssue(models.Model):
         return self.code or self.detail or f"Detected Issue #{self.pk}"
 
 
+class Person(models.Model):
+    """FHIR Person: shared demographics and identity links across patient/practitioner/related-person roles."""
+
+    managing_organization = models.ForeignKey(
+        "Organization",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="managed_people",
+        help_text="FHIR managingOrganization: custodian of the person record.",
+    )
+    active = models.BooleanField(default=True, help_text="FHIR active: whether this person record is in active use.")
+    name = models.CharField(max_length=255, blank=True, help_text="FHIR name: name associated with the person.")
+    gender = models.CharField(max_length=30, blank=True, help_text="FHIR gender: administrative gender.")
+    birth_date = models.DateField(null=True, blank=True, help_text="FHIR birthDate: date the person was born.")
+    phone = models.CharField(max_length=30, blank=True, help_text="FHIR telecom: phone contact.")
+    email = models.EmailField(blank=True, help_text="FHIR telecom: email contact.")
+    address = models.TextField(blank=True, help_text="FHIR address: one or more addresses for the person.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this person.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Person"
+        verbose_name_plural = "People"
+
+    def __str__(self):
+        return self.name or f"Person #{self.pk}"
+
+
+class PersonLink(models.Model):
+    """FHIR Person.link: a role-specific resource believed to represent the same actual person."""
+
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="link_records")
+    patient = models.ForeignKey(
+        PatientProfile,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="person_identity_links",
+    )
+    practitioner = models.ForeignKey(
+        "Practitioner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="person_identity_links",
+    )
+    related_person = models.ForeignKey(
+        "RelatedPerson",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="person_identity_links",
+    )
+    linked_person = models.ForeignKey(
+        Person,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="linked_from_person_records",
+    )
+    target_display = models.CharField(max_length=255, blank=True)
+    target_reference = models.CharField(max_length=255, blank=True)
+    assurance = models.CharField(max_length=30, blank=True, help_text="FHIR assurance: level1, level2, level3, or level4.")
+
+    class Meta:
+        verbose_name = "Person Link"
+        verbose_name_plural = "Person Links"
+
+    def __str__(self):
+        target = self.patient or self.practitioner or self.related_person or self.linked_person or self.target_display
+        return f"{self.person} -> {target or self.target_reference or 'linked resource'}"
+
+
+class RelatedPerson(models.Model):
+    """FHIR RelatedPerson: a person involved with a patient but not the direct target of care."""
+
+    person = models.ForeignKey(
+        Person,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="related_person_roles",
+        help_text="Optional shared Person identity for this patient-specific related person role.",
+    )
+    patient = models.ForeignKey(
+        PatientProfile,
+        on_delete=models.CASCADE,
+        related_name="related_people",
+        help_text="FHIR patient: the patient this person is related to.",
+    )
+    active = models.BooleanField(default=True, help_text="FHIR active: whether this related person record is in active use.")
+    name = models.CharField(max_length=255, blank=True, help_text="FHIR name: name associated with the related person.")
+    relationship = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="FHIR relationship: spouse, parent, guardian, caregiver, friend, etc.",
+    )
+    gender = models.CharField(max_length=30, blank=True, help_text="FHIR gender: administrative gender.")
+    birth_date = models.DateField(null=True, blank=True, help_text="FHIR birthDate: date the related person was born.")
+    phone = models.CharField(max_length=30, blank=True, help_text="FHIR telecom: phone contact.")
+    email = models.EmailField(blank=True, help_text="FHIR telecom: email contact.")
+    address = models.TextField(blank=True, help_text="FHIR address: contact or visit address.")
+    language = models.CharField(max_length=255, blank=True, help_text="FHIR communication.language: language used for health communication.")
+    language_preferred = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text="FHIR communication.preferred: whether this language is preferred.",
+    )
+    period_start = models.DateField(null=True, blank=True, help_text="FHIR period.start: when this relationship became valid.")
+    period_end = models.DateField(null=True, blank=True, help_text="FHIR period.end: when this relationship stopped being valid.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this related person.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Related Person"
+        verbose_name_plural = "Related People"
+
+    def __str__(self):
+        parts = [self.name, self.relationship]
+        return " - ".join(part for part in parts if part) or f"Related Person #{self.pk}"
+
+
+class FHIRGroup(models.Model):
+    """FHIR Group: a defined collection of people, practitioners, devices, medications, substances, or groups."""
+
+    managing_organization = models.ForeignKey(
+        "Organization",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="managed_groups",
+        help_text="FHIR managingEntity: organization responsible for the group.",
+    )
+    managing_practitioner = models.ForeignKey(
+        "Practitioner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="managed_groups",
+        help_text="FHIR managingEntity: practitioner responsible for the group.",
+    )
+    managing_role = models.ForeignKey(
+        "PractitionerRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="managed_groups",
+        help_text="FHIR managingEntity: practitioner role responsible for the group.",
+    )
+    managing_related_person = models.ForeignKey(
+        RelatedPerson,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="managed_groups",
+        help_text="FHIR managingEntity: related person responsible for the group.",
+    )
+    active = models.BooleanField(default=True, help_text="FHIR active: whether this group record is in active use.")
+    group_type = models.CharField(max_length=30, blank=True, help_text="FHIR type: person, practitioner, device, etc.")
+    actual = models.BooleanField(default=True, help_text="FHIR actual: actual members vs intended/definitional group.")
+    code = models.CharField(max_length=255, blank=True, help_text="FHIR code: kind of group members.")
+    name = models.CharField(max_length=255, blank=True, help_text="FHIR name: human label for the group.")
+    quantity = models.PositiveIntegerField(null=True, blank=True, help_text="FHIR quantity: number of members.")
+    characteristic_summary = models.TextField(blank=True, help_text="FHIR characteristic: included/excluded member traits.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this group.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Group"
+        verbose_name_plural = "Groups"
+
+    def __str__(self):
+        return self.name or self.code or f"Group #{self.pk}"
+
+
+class FHIRGroupMember(models.Model):
+    """FHIR Group.member: a resource that belongs or belonged to a group."""
+
+    group = models.ForeignKey(FHIRGroup, on_delete=models.CASCADE, related_name="member_links")
+    patient = models.ForeignKey(
+        PatientProfile,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="group_memberships",
+    )
+    practitioner = models.ForeignKey(
+        "Practitioner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="group_memberships",
+    )
+    practitioner_role = models.ForeignKey(
+        "PractitionerRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="group_memberships",
+    )
+    device = models.ForeignKey(
+        "Device",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="group_memberships",
+    )
+    medication = models.ForeignKey(
+        Medication,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="group_memberships",
+    )
+    member_group = models.ForeignKey(
+        FHIRGroup,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="parent_group_memberships",
+    )
+    entity_display = models.CharField(max_length=255, blank=True)
+    entity_reference = models.CharField(max_length=255, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    inactive = models.BooleanField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Group Member"
+        verbose_name_plural = "Group Members"
+
+    def __str__(self):
+        member = (
+            self.patient
+            or self.practitioner
+            or self.practitioner_role
+            or self.device
+            or self.medication
+            or self.member_group
+            or self.entity_display
+        )
+        return str(member or self.entity_reference or f"Group Member #{self.pk}")
+
+
 class PractitionerRole(models.Model):
     practitioner = models.ForeignKey(
         "Practitioner",
@@ -1024,6 +1275,13 @@ class CareTeamParticipant(models.Model):
         blank=True,
         related_name="care_team_participations",
     )
+    related_person = models.ForeignKey(
+        RelatedPerson,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="care_team_participations",
+    )
     role = models.CharField(max_length=255, blank=True)
     member_display = models.CharField(max_length=255, blank=True)
     member_reference = models.CharField(max_length=255, blank=True)
@@ -1037,7 +1295,7 @@ class CareTeamParticipant(models.Model):
         verbose_name_plural = "Care Team Participants"
 
     def __str__(self):
-        participant = self.practitioner or self.organization or self.location or self.member_display
+        participant = self.practitioner or self.organization or self.location or self.related_person or self.member_display
         if self.role and participant:
             return f"{self.role}: {participant}"
         return str(participant or self.role or f"Participant #{self.pk}")

@@ -209,14 +209,14 @@ body.app-patients.model-patientprofile.change-form .card-body {
 }
 
 body.app-patients.model-patientprofile.change-form
-    :is(.field-patient_overview, .field-latest_observations, .field-latest_visits)
+    :is(.field-patient_overview, .field-related_people_summary, .field-latest_observations, .field-latest_visits)
     > .row
     > label {
     display: none !important;
 }
 
 body.app-patients.model-patientprofile.change-form
-    :is(.field-patient_overview, .field-latest_observations, .field-latest_visits)
+    :is(.field-patient_overview, .field-related_people_summary, .field-latest_observations, .field-latest_visits)
     > .row
     > div {
     flex: 0 0 100% !important;
@@ -225,7 +225,7 @@ body.app-patients.model-patientprofile.change-form
 }
 
 body.app-patients.model-patientprofile.change-form
-    :is(.field-patient_overview, .field-latest_observations, .field-latest_visits)
+    :is(.field-patient_overview, .field-related_people_summary, .field-latest_observations, .field-latest_visits)
     .readonly {
     background: transparent !important;
     border: 0 !important;

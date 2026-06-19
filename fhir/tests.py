@@ -29,15 +29,20 @@ from clinical.models import (
     EpisodeOfCare,
     FamilyMemberHistory,
     FamilyMemberHistoryCondition,
+    FHIRGroup,
+    FHIRGroupMember,
     Immunization,
     Location,
     Medication,
     Observation,
     Organization,
+    Person,
+    PersonLink,
     Practitioner,
     PractitionerRole,
     Procedure,
     ProcedurePerformer,
+    RelatedPerson,
     ServiceRequest,
     Specimen,
 )
@@ -1280,8 +1285,182 @@ class FHIRImportTests(TestCase):
             self.assertEqual(detected_issue.implicated_diagnostic_reports.get(), diagnostic_report)
             self.assertEqual(detected_issue.implicated_conditions.get(), Condition.objects.get())
             self.assertEqual(detected_issue.evidence_observations.get(), Observation.objects.get())
-            self.assertEqual(detected_issue.evidence_diagnostic_reports.get(), diagnostic_report)
-            self.assertIn("Reviewed by clinician", detected_issue.mitigation_summary)
+        self.assertEqual(detected_issue.evidence_diagnostic_reports.get(), diagnostic_report)
+        self.assertIn("Reviewed by clinician", detected_issue.mitigation_summary)
+
+    def test_imports_related_person(self):
+        result = import_fhir_json(
+            {
+                "resourceType": "Bundle",
+                "type": "collection",
+                "entry": [
+                    {
+                        "resource": {
+                            "resourceType": "Patient",
+                            "id": "pat-1",
+                            "name": [{"family": "Rivera", "given": ["Maya"]}],
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "RelatedPerson",
+                            "id": "rp-1",
+                            "patient": {"reference": "Patient/pat-1"},
+                            "active": True,
+                            "relationship": [{"text": "Guardian"}, {"text": "Emergency contact"}],
+                            "name": [{"family": "Rivera", "given": ["Alex"]}],
+                            "telecom": [
+                                {"system": "phone", "value": "555-1212"},
+                                {"system": "email", "value": "alex@example.test"},
+                            ],
+                            "gender": "other",
+                            "birthDate": "1980-04-05",
+                            "address": [{"line": ["100 Main St"], "city": "Boston", "state": "MA"}],
+                            "period": {"start": "2020-01-01"},
+                            "communication": [
+                                {
+                                    "language": {"text": "English"},
+                                    "preferred": True,
+                                }
+                            ],
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "CareTeam",
+                            "id": "team-1",
+                            "subject": {"reference": "Patient/pat-1"},
+                            "status": "active",
+                            "name": "Home support",
+                            "participant": [
+                                {
+                                    "role": [{"text": "Caregiver"}],
+                                    "member": {"reference": "RelatedPerson/rp-1"},
+                                }
+                            ],
+                        }
+                    },
+                ],
+            }
+        )
+
+        self.assertEqual(result.errors, [])
+        related_person = RelatedPerson.objects.get()
+        self.assertEqual(related_person.patient, PatientProfile.objects.get())
+        self.assertEqual(related_person.name, "Alex Rivera")
+        self.assertEqual(related_person.relationship, "Guardian, Emergency contact")
+        self.assertEqual(related_person.phone, "555-1212")
+        self.assertEqual(related_person.email, "alex@example.test")
+        self.assertEqual(related_person.language, "English")
+        self.assertTrue(related_person.language_preferred)
+        self.assertIsNotNone(related_person.person)
+        self.assertEqual(related_person.person.name, "Alex Rivera")
+        self.assertEqual(PersonLink.objects.get(related_person=related_person).person, related_person.person)
+        self.assertEqual(CareTeamParticipant.objects.get().related_person, related_person)
+
+    def test_imports_person_and_group(self):
+        result = import_fhir_json(
+            {
+                "resourceType": "Bundle",
+                "type": "collection",
+                "entry": [
+                    {
+                        "resource": {
+                            "resourceType": "Patient",
+                            "id": "pat-1",
+                            "name": [{"family": "Rivera", "given": ["Maya"]}],
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "Organization",
+                            "id": "org-1",
+                            "name": "Example Registry",
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "Practitioner",
+                            "id": "prac-1",
+                            "name": [{"family": "Nguyen", "given": ["Ari"]}],
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "RelatedPerson",
+                            "id": "rp-1",
+                            "patient": {"reference": "Patient/pat-1"},
+                            "relationship": [{"text": "Guardian"}],
+                            "name": [{"family": "Rivera", "given": ["Alex"]}],
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "Device",
+                            "id": "device-1",
+                            "patient": {"reference": "Patient/pat-1"},
+                            "type": {"text": "Monitor"},
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "Person",
+                            "id": "person-1",
+                            "name": [{"family": "Rivera", "given": ["Alex"]}],
+                            "telecom": [{"system": "phone", "value": "555-1212"}],
+                            "gender": "other",
+                            "birthDate": "1980-04-05",
+                            "managingOrganization": {"reference": "Organization/org-1"},
+                            "link": [
+                                {"target": {"reference": "RelatedPerson/rp-1"}, "assurance": "level3"},
+                                {"target": {"reference": "Practitioner/prac-1"}, "assurance": "level1"},
+                            ],
+                        }
+                    },
+                    {
+                        "resource": {
+                            "resourceType": "Group",
+                            "id": "group-1",
+                            "active": True,
+                            "type": "person",
+                            "actual": True,
+                            "code": {"text": "Household"},
+                            "name": "Rivera household",
+                            "quantity": 2,
+                            "managingEntity": {"reference": "RelatedPerson/rp-1"},
+                            "characteristic": [
+                                {
+                                    "code": {"text": "Lives together"},
+                                    "valueBoolean": True,
+                                    "exclude": False,
+                                }
+                            ],
+                            "member": [
+                                {"entity": {"reference": "Patient/pat-1"}},
+                                {"entity": {"reference": "Device/device-1"}, "inactive": False},
+                            ],
+                        }
+                    },
+                ],
+            }
+        )
+
+        self.assertEqual(result.errors, [])
+        person = Person.objects.get(name="Alex Rivera")
+        related_person = RelatedPerson.objects.get()
+        self.assertEqual(related_person.person, person)
+        self.assertEqual(person.managing_organization, Organization.objects.get())
+        self.assertEqual(person.link_records.count(), 2)
+        self.assertEqual(PersonLink.objects.get(related_person=related_person).assurance, "level3")
+        self.assertEqual(PersonLink.objects.get(practitioner=Practitioner.objects.get()).assurance, "level1")
+
+        group = FHIRGroup.objects.get()
+        self.assertEqual(group.name, "Rivera household")
+        self.assertEqual(group.managing_related_person, related_person)
+        self.assertIn("Lives together", group.characteristic_summary)
+        self.assertEqual(group.member_links.count(), 2)
+        self.assertEqual(FHIRGroupMember.objects.get(patient=PatientProfile.objects.get()).group, group)
+        self.assertEqual(FHIRGroupMember.objects.get(device=Device.objects.get()).group, group)
 
     def test_missing_patient_reference_is_snapshotted_as_invalid(self):
         result = import_fhir_json(

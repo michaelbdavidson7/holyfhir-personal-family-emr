@@ -243,6 +243,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
 
     readonly_fields = (
         "patient_overview",
+        "related_people_summary",
         "latest_observations",
         "latest_visits",
         "created",
@@ -291,6 +292,9 @@ class PatientProfileAdmin(admin.ModelAdmin):
                 "emergency_contact_relationship",
             )
         }),
+        ("Related People", {
+            "fields": ("related_people_summary",)
+        }),
         ("Recent Vitals & Labs", {
             "fields": ("latest_observations",)
         }),
@@ -324,6 +328,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
             self._overview_stat_card(obj, "Vitals & Labs", "clinical_observation", obj.observations.count()),
             self._overview_stat_card(obj, "Visits & Actions", "clinical_encounter", obj.encounters.count()),
             self._overview_stat_card(obj, "Care Team", "clinical_careteam", obj.care_teams.count()),
+            self._overview_stat_card(obj, "Related People", "clinical_relatedperson", obj.related_people.count()),
             self._overview_stat_card(obj, "Documents", "documents_clinicaldocument", obj.documents.count()),
         ]
 
@@ -342,6 +347,51 @@ class PatientProfileAdmin(admin.ModelAdmin):
                 demographics,
             ),
             format_html_join("", "{}", ((stat,) for stat in stats)),
+        )
+
+    @admin.display(description="")
+    def related_people_summary(self, obj):
+        if not obj or not obj.pk:
+            return "Save this patient before reviewing related people."
+
+        related_people = obj.related_people.order_by("name", "relationship", "id")[:8]
+        add_url = reverse("admin:clinical_relatedperson_add")
+        if not related_people:
+            return format_html(
+                '<div class="patient-empty-state">No related people yet. <a class="btn btn-primary btn-sm" href="{}?patient={}">Add related person</a></div>',
+                add_url,
+                obj.pk,
+            )
+
+        rows = []
+        for person in related_people:
+            contact = " / ".join(part for part in [person.phone, person.email] if part) or "-"
+            rows.append((
+                person.name or "-",
+                person.relationship or "-",
+                contact,
+                "Active" if person.active else "Inactive",
+                reverse("admin:clinical_relatedperson_change", args=[person.pk]),
+            ))
+
+        list_url = reverse("admin:clinical_relatedperson_changelist")
+        return format_html(
+            '<div class="patient-compact-table">'
+            '<table><thead><tr><th>Name</th><th>Relationship</th><th>Contact</th><th>Status</th><th></th></tr></thead>'
+            '<tbody>{}</tbody></table>'
+            '<div class="patient-table-actions">'
+            '<a class="btn btn-primary btn-sm" href="{}?patient__id__exact={}">Open all</a>'
+            '<a class="btn btn-outline-primary btn-sm" href="{}?patient={}">Add related person</a>'
+            '</div></div>',
+            format_html_join(
+                "",
+                '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td><a class="btn btn-primary btn-sm" href="{}">Open</a></td></tr>',
+                rows,
+            ),
+            list_url,
+            obj.pk,
+            add_url,
+            obj.pk,
         )
 
     @admin.display(description="")

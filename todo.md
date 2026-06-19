@@ -50,9 +50,9 @@
     [ ] List - FHIR lists/groupings of clinical resources
     [ ] Composition - structured clinical documents; may map to ClinicalDocument or document sections
     [ ] DocumentManifest - document package/index; link to ClinicalDocument/DocumentReference
-    [ ] RelatedPerson - caregivers/family/proxies related to patient
-    [ ] Person - cross-resource person identity; probably snapshot/generic unless identity reconciliation is needed
-    [ ] Group - patient/care cohorts; likely snapshot/generic for personal EMR
+    [x] RelatedPerson - caregivers/family/proxies related to patient
+    [x] Person - cross-resource person identity; links Patient/Practitioner/RelatedPerson/Person records
+    [x] Group - patient/care cohorts; stores managing entity, characteristics, and members
     [ ] HealthcareService - services offered by organizations/locations
     [ ] Endpoint - technical service endpoints; likely directory/interop support
     [ ] OrganizationAffiliation - relationships between organizations and services

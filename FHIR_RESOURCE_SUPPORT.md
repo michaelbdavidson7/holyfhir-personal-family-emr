@@ -25,6 +25,7 @@ Status legend:
 - `Encounter` -> `clinical.Encounter`
 - `EpisodeOfCare` -> `clinical.EpisodeOfCare`
 - `FamilyMemberHistory` -> `clinical.FamilyMemberHistory`
+- `Group` -> `clinical.FHIRGroup`
 - `Immunization` -> `clinical.Immunization`
 - `Location` -> `clinical.Location`
 - `MedicationRequest` -> `clinical.Medication`
@@ -32,9 +33,11 @@ Status legend:
 - `Observation` -> `clinical.Observation`
 - `Organization` -> `clinical.Organization`
 - `Patient` -> `patients.PatientProfile`
+- `Person` -> `clinical.Person`
 - `Practitioner` -> `clinical.Practitioner`
 - `PractitionerRole` -> `clinical.PractitionerRole`
 - `Procedure` -> `clinical.Procedure`
+- `RelatedPerson` -> `clinical.RelatedPerson`
 - `ServiceRequest` -> `clinical.ServiceRequest`
 - `Specimen` -> `clinical.Specimen`
 
@@ -104,9 +107,9 @@ Status legend:
 | `Patient` | First-class | Maps to `PatientProfile`. |
 | `Practitioner` | First-class | Directory resource. |
 | `PractitionerRole` | First-class | Links practitioner, organization, specialty, and locations. |
-| `RelatedPerson` | Planned | Caregivers, family, proxies. |
-| `Person` | Snapshot candidate | Identity reconciliation; not currently a personal EMR priority. |
-| `Group` | Snapshot candidate | Cohorts/groups. |
+| `RelatedPerson` | First-class | Caregivers, family, proxies, and other patient-related people. |
+| `Person` | First-class | Identity reconciliation across Patient, Practitioner, RelatedPerson, and Person records. |
+| `Group` | First-class | Cohorts/groups with managing entity, characteristics, and member links. |
 
 ### Entities #1
 

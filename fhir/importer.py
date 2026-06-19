@@ -25,15 +25,20 @@ from clinical.models import (
     EpisodeOfCare,
     FamilyMemberHistory,
     FamilyMemberHistoryCondition,
+    FHIRGroup,
+    FHIRGroupMember,
     Immunization,
     Location,
     Medication,
     Observation,
     Organization,
+    Person,
+    PersonLink,
     Practitioner,
     PractitionerRole,
     Procedure,
     ProcedurePerformer,
+    RelatedPerson,
     ServiceRequest,
     Specimen,
 )
@@ -62,16 +67,23 @@ SUPPORTED_RESOURCE_TYPES = {
     "Device",
     "DocumentReference",
     "EpisodeOfCare",
+    "Group",
     "PractitionerRole",
+    "Person",
     "Procedure",
+    "RelatedPerson",
     "ServiceRequest",
     "Specimen",
     "Practitioner",
     "Organization",
     "Location",
+    "Group",
+    "Person",
 }
 
 PATIENTLESS_RESOURCE_TYPES = {
+    "Group",
+    "Person",
     "Practitioner",
     "PractitionerRole",
     "Organization",
@@ -121,6 +133,8 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 continue
 
             importer = {
+                "Group": _import_group,
+                "Person": _import_person,
                 "Practitioner": _import_practitioner,
                 "PractitionerRole": _import_practitioner_role,
                 "Organization": _import_organization,
@@ -181,6 +195,7 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 "EpisodeOfCare": _import_episode_of_care,
                 "PractitionerRole": _import_practitioner_role,
                 "Procedure": _import_procedure,
+                "RelatedPerson": _import_related_person,
                 "ServiceRequest": _import_service_request,
                 "Specimen": _import_specimen,
                 "Practitioner": _import_practitioner,
@@ -204,8 +219,12 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 _sync_diagnostic_report_relationships(resource)
             elif resource_type == "FamilyMemberHistory":
                 _sync_family_member_history_relationships(resource)
+            elif resource_type == "Group":
+                _sync_group_relationships(resource)
             elif resource_type == "Observation":
                 _sync_observation_relationships(resource)
+            elif resource_type == "Person":
+                _sync_person_relationships(resource)
             elif resource_type == "CarePlan":
                 _sync_care_plan_relationships(resource)
             elif resource_type == "DocumentReference":
@@ -770,6 +789,70 @@ def _import_practitioner_role(resource, patient=None):
     return obj, created
 
 
+def _import_person(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.Person") or Person()
+    obj.managing_organization = _reference_as(resource.get("managingOrganization"), Organization)
+    obj.active = bool(resource.get("active", True))
+    obj.name = _human_name(resource) or ""
+    obj.gender = resource.get("gender") or ""
+    obj.birth_date = _date(resource.get("birthDate"))
+    obj.phone = _telecom(resource, "phone")
+    obj.email = _telecom(resource, "email")
+    obj.address = _address_text(_first(resource.get("address")) or {})
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_person_relationships(resource, obj)
+    return obj, created
+
+
+def _import_related_person(resource, patient):
+    obj = _object_for_resource(resource, "clinical.RelatedPerson") or RelatedPerson(patient=patient)
+    period = resource.get("period") or {}
+    communication = _first(resource.get("communication")) or {}
+
+    obj.patient = patient
+    obj.active = bool(resource.get("active", True))
+    obj.name = _human_name(resource) or ""
+    obj.relationship = ", ".join(
+        text for text in (_codeable_text(value) for value in resource.get("relationship") or []) if text
+    )
+    obj.gender = resource.get("gender") or ""
+    obj.birth_date = _date(resource.get("birthDate"))
+    obj.phone = _telecom(resource, "phone")
+    obj.email = _telecom(resource, "email")
+    obj.address = _address_text(_first(resource.get("address")) or {})
+    obj.language = _codeable_text(communication.get("language")) or ""
+    obj.language_preferred = communication.get("preferred") if "preferred" in communication else None
+    obj.period_start = _date(period.get("start"))
+    obj.period_end = _date(period.get("end"))
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _ensure_person_for_related_person(obj)
+    return obj, created
+
+
+def _import_group(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.FHIRGroup") or FHIRGroup()
+    obj.managing_organization = _reference_as(resource.get("managingEntity"), Organization)
+    obj.managing_practitioner = _reference_as(resource.get("managingEntity"), Practitioner)
+    obj.managing_role = _reference_as(resource.get("managingEntity"), PractitionerRole)
+    obj.managing_related_person = _reference_as(resource.get("managingEntity"), RelatedPerson)
+    obj.active = bool(resource.get("active", True))
+    obj.group_type = resource.get("type") or ""
+    obj.actual = bool(resource.get("actual", True))
+    obj.code = _codeable_text(resource.get("code")) or ""
+    obj.name = resource.get("name") or ""
+    obj.quantity = resource.get("quantity")
+    obj.characteristic_summary = _group_characteristic_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_group_relationships(resource, obj)
+    return obj, created
+
+
 def _import_practitioner(resource, patient=None):
     obj = _object_for_resource(resource, "clinical.Practitioner") or Practitioner()
     obj.name = _human_name(resource) or "Unknown practitioner"
@@ -838,6 +921,8 @@ def _object_for_resource(resource, django_model):
         DiagnosticReport,
         FamilyMemberHistory,
         FamilyMemberHistoryCondition,
+        FHIRGroup,
+        FHIRGroupMember,
         Medication,
         Immunization,
         Observation,
@@ -849,10 +934,13 @@ def _object_for_resource(resource, django_model):
         CarePlan,
         CareTeamParticipant,
         ClinicalDocument,
+        Person,
+        PersonLink,
         Practitioner,
         PractitionerRole,
         Procedure,
         ProcedurePerformer,
+        RelatedPerson,
         ServiceRequest,
         Organization,
         Location,
@@ -880,14 +968,18 @@ def _object_for_reference(reference):
         "DetectedIssue": "clinical.DetectedIssue",
         "DiagnosticReport": "clinical.DiagnosticReport",
         "FamilyMemberHistory": "clinical.FamilyMemberHistory",
+        "Group": "clinical.FHIRGroup",
         "Immunization": "clinical.Immunization",
+        "Medication": "clinical.Medication",
         "MedicationRequest": "clinical.Medication",
         "MedicationStatement": "clinical.Medication",
         "Observation": "clinical.Observation",
+        "Person": "clinical.Person",
         "CareTeam": "clinical.CareTeam",
         "CarePlan": "clinical.CarePlan",
         "Device": "clinical.Device",
         "Procedure": "clinical.Procedure",
+        "RelatedPerson": "clinical.RelatedPerson",
         "ServiceRequest": "clinical.ServiceRequest",
         "Specimen": "clinical.Specimen",
         "DocumentReference": "documents.ClinicalDocument",
@@ -1197,6 +1289,56 @@ def _range_text(value):
     low = _age_text(value.get("low"))
     high = _age_text(value.get("high"))
     return " - ".join(part for part in [low, high] if part)
+
+
+def _ensure_person_for_related_person(related_person):
+    person = related_person.person or Person()
+    person.active = related_person.active
+    person.name = related_person.name or person.name
+    person.gender = related_person.gender or person.gender
+    person.birth_date = related_person.birth_date or person.birth_date
+    person.phone = related_person.phone or person.phone
+    person.email = related_person.email or person.email
+    person.address = related_person.address or person.address
+    person.notes = person.notes or "Created from RelatedPerson."
+    person.save()
+
+    if related_person.person_id != person.id:
+        related_person.person = person
+        related_person.save(update_fields=["person"])
+
+    PersonLink.objects.get_or_create(
+        person=person,
+        related_person=related_person,
+        defaults={
+            "target_display": str(related_person),
+            "target_reference": f"RelatedPerson/{related_person.pk}",
+        },
+    )
+    return person
+
+
+def _group_characteristic_summary(resource):
+    lines = []
+    for characteristic in resource.get("characteristic") or []:
+        value = (
+            _codeable_text(characteristic.get("valueCodeableConcept"))
+            or str(characteristic.get("valueBoolean") if "valueBoolean" in characteristic else "")
+            or _age_text(characteristic.get("valueQuantity"))
+            or _range_text(characteristic.get("valueRange"))
+            or _display(characteristic.get("valueReference"))
+        )
+        period = _range_text(characteristic.get("period"))
+        parts = [
+            "Exclude" if characteristic.get("exclude") else "Include",
+            _codeable_text(characteristic.get("code")),
+            value,
+            period,
+        ]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
 
 
 def _adverse_event_suspect_summary(resource):
@@ -1589,6 +1731,92 @@ def _sync_detected_issue_relationships(resource, detected_issue=None):
     )
 
 
+def _sync_person_relationships(resource, person=None):
+    person = person or _object_for_resource(resource, "clinical.Person")
+    if not person:
+        return
+
+    managing_organization = _reference_as(resource.get("managingOrganization"), Organization)
+    if managing_organization and person.managing_organization_id != managing_organization.id:
+        person.managing_organization = managing_organization
+        person.save(update_fields=["managing_organization"])
+
+    person.link_records.all().delete()
+    for link in resource.get("link") or []:
+        target = link.get("target") or {}
+        target_reference = target.get("reference") or ""
+        target_obj = _object_for_reference(target_reference)
+        person_link = PersonLink(
+            person=person,
+            target_display=_display(target),
+            target_reference=target_reference,
+            assurance=link.get("assurance") or "",
+        )
+        if isinstance(target_obj, PatientProfile):
+            person_link.patient = target_obj
+        elif isinstance(target_obj, Practitioner):
+            person_link.practitioner = target_obj
+        elif isinstance(target_obj, RelatedPerson):
+            old_person = target_obj.person if target_obj.person_id and target_obj.person_id != person.id else None
+            person_link.related_person = target_obj
+            if target_obj.person_id != person.id:
+                target_obj.person = person
+                target_obj.save(update_fields=["person"])
+            if old_person and old_person.notes == "Created from RelatedPerson." and not old_person.related_person_roles.exists():
+                old_person.delete()
+        elif isinstance(target_obj, Person):
+            person_link.linked_person = target_obj
+        person_link.save()
+
+
+def _sync_group_relationships(resource, group=None):
+    group = group or _object_for_resource(resource, "clinical.FHIRGroup")
+    if not group:
+        return
+
+    managing_entity = resource.get("managingEntity")
+    changed = []
+    for field, value in [
+        ("managing_organization", _reference_as(managing_entity, Organization)),
+        ("managing_practitioner", _reference_as(managing_entity, Practitioner)),
+        ("managing_role", _reference_as(managing_entity, PractitionerRole)),
+        ("managing_related_person", _reference_as(managing_entity, RelatedPerson)),
+    ]:
+        if value and getattr(group, f"{field}_id") != value.id:
+            setattr(group, field, value)
+            changed.append(field)
+    if changed:
+        group.save(update_fields=changed)
+
+    group.member_links.all().delete()
+    for member in resource.get("member") or []:
+        entity = member.get("entity") or {}
+        entity_reference = entity.get("reference") or ""
+        period = member.get("period") or {}
+        member_obj = _object_for_reference(entity_reference)
+        member_link = FHIRGroupMember(
+            group=group,
+            entity_display=_display(entity),
+            entity_reference=entity_reference,
+            start_date=_date(period.get("start")),
+            end_date=_date(period.get("end")),
+            inactive=member.get("inactive") if "inactive" in member else None,
+        )
+        if isinstance(member_obj, PatientProfile):
+            member_link.patient = member_obj
+        elif isinstance(member_obj, Practitioner):
+            member_link.practitioner = member_obj
+        elif isinstance(member_obj, PractitionerRole):
+            member_link.practitioner_role = member_obj
+        elif isinstance(member_obj, Device):
+            member_link.device = member_obj
+        elif isinstance(member_obj, Medication):
+            member_link.medication = member_obj
+        elif isinstance(member_obj, FHIRGroup):
+            member_link.member_group = member_obj
+        member_link.save()
+
+
 def _sync_document_reference_relationships(resource, document=None):
     document = document or _object_for_resource(resource, "documents.ClinicalDocument")
     if not document:
@@ -1893,6 +2121,8 @@ def _sync_care_team_participants(resource, care_team):
             participant_link.organization = member_obj
         elif isinstance(member_obj, Location):
             participant_link.location = member_obj
+        elif isinstance(member_obj, RelatedPerson):
+            participant_link.related_person = member_obj
 
         on_behalf_of_obj = _object_for_reference(on_behalf_of_reference)
         if isinstance(on_behalf_of_obj, Organization) and not participant_link.organization:

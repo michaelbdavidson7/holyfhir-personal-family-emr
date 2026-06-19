@@ -17,15 +17,20 @@ from .models import (
     EpisodeOfCare,
     FamilyMemberHistory,
     FamilyMemberHistoryCondition,
+    FHIRGroup,
+    FHIRGroupMember,
     Immunization,
     Location,
     Medication,
     Observation,
     Organization,
+    Person,
+    PersonLink,
     Practitioner,
     PractitionerRole,
     Procedure,
     ProcedurePerformer,
+    RelatedPerson,
     ServiceRequest,
     Specimen,
 )
@@ -132,6 +137,100 @@ class DetectedIssueAdmin(admin.ModelAdmin):
         return obj.code or obj.detail or f"Detected Issue #{obj.pk}"
 
 
+class PersonLinkInline(admin.StackedInline):
+    model = PersonLink
+    fk_name = "person"
+    extra = 0
+    fields = (
+        "patient",
+        "practitioner",
+        "related_person",
+        "linked_person",
+        "assurance",
+        "target_display",
+        "target_reference",
+    )
+    autocomplete_fields = ["patient", "practitioner", "related_person", "linked_person"]
+
+
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    inlines = (PersonLinkInline,)
+    list_display = ("id", "person_label", "gender", "birth_date", "phone", "email", "managing_organization", "active")
+    list_display_links = ("person_label",)
+    search_fields = ("name", "phone", "email", "address", "notes")
+    list_filter = ("active", "gender", "managing_organization")
+    ordering = ("name",)
+    autocomplete_fields = ["managing_organization"]
+
+    @admin.display(description="Person", ordering="name")
+    def person_label(self, obj):
+        return obj.name or f"Person #{obj.pk}"
+
+
+@admin.register(RelatedPerson)
+class RelatedPersonAdmin(admin.ModelAdmin):
+    list_display = ("id", "person_label", "person", "patient", "relationship", "phone", "email", "active")
+    list_display_links = ("person_label",)
+    search_fields = ("name", "relationship", "phone", "email", "address", "notes")
+    list_filter = ("patient", "active", "relationship", "gender", "person")
+    ordering = ("patient", "name", "relationship")
+    autocomplete_fields = ["person", "patient"]
+
+    @admin.display(description="Related person", ordering="name")
+    def person_label(self, obj):
+        return obj.name or obj.relationship or f"Related Person #{obj.pk}"
+
+
+class FHIRGroupMemberInline(admin.StackedInline):
+    model = FHIRGroupMember
+    fk_name = "group"
+    extra = 0
+    fieldsets = (
+        (None, {
+            "fields": (
+                "patient",
+                "practitioner",
+                "practitioner_role",
+                "device",
+                "medication",
+                "member_group",
+            ),
+        }),
+        ("Source details", {
+            "fields": (
+                "entity_display",
+                "entity_reference",
+                "start_date",
+                "end_date",
+                "inactive",
+            ),
+            "classes": ("collapse",),
+        }),
+    )
+    autocomplete_fields = ["patient", "practitioner", "practitioner_role", "device", "medication", "member_group"]
+
+
+@admin.register(FHIRGroup)
+class FHIRGroupAdmin(admin.ModelAdmin):
+    inlines = (FHIRGroupMemberInline,)
+    list_display = ("id", "group_label", "group_type", "actual", "quantity", "active")
+    list_display_links = ("group_label",)
+    search_fields = ("name", "code", "characteristic_summary", "notes")
+    list_filter = ("active", "actual", "group_type")
+    ordering = ("name", "code")
+    autocomplete_fields = [
+        "managing_organization",
+        "managing_practitioner",
+        "managing_role",
+        "managing_related_person",
+    ]
+
+    @admin.display(description="Group", ordering="name")
+    def group_label(self, obj):
+        return obj.name or obj.code or f"Group #{obj.pk}"
+
+
 @admin.register(Specimen)
 class SpecimenAdmin(admin.ModelAdmin):
     list_display = ("id", "patient", "specimen_type", "status", "accession_identifier", "collected_datetime")
@@ -172,6 +271,7 @@ class CareTeamParticipantInline(admin.StackedInline):
                 "practitioner",
                 "organization",
                 "location",
+                "related_person",
             ),
         }),
         ("Source details", {
@@ -186,7 +286,7 @@ class CareTeamParticipantInline(admin.StackedInline):
             "classes": ("collapse",),
         }),
     )
-    autocomplete_fields = ["practitioner", "organization", "location"]
+    autocomplete_fields = ["practitioner", "organization", "location", "related_person"]
 
 
 @admin.register(CareTeam)

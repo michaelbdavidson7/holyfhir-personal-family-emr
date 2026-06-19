@@ -24,7 +24,7 @@ from patients.models import LoginLockout
 from patients.forms import RecoveryKeyPasswordResetForm
 from patients.models import PatientProfile, RecoveryCredential
 from patients.recovery import check_recovery_key, generate_recovery_key, hash_recovery_key
-from clinical.models import CareTeam
+from clinical.models import CareTeam, RelatedPerson
 
 
 class DatabaseConfigTests(SimpleTestCase):
@@ -376,3 +376,28 @@ class PatientProfileAdminTests(TestCase):
         self.assertContains(response, "Care Team")
         self.assertContains(response, f"/admin/clinical/careteam/?patient__id__exact={patient.pk}")
         self.assertContains(response, f"/admin/clinical/careteam/add/?patient={patient.pk}")
+
+    def test_patient_profile_shows_related_people_summary(self):
+        User = get_user_model()
+        user = User.objects.create_superuser(
+            username="owner",
+            email="owner@example.test",
+            password="correct-password",
+        )
+        patient = PatientProfile.objects.create(first_name="Maya", last_name="Rivera")
+        related_person = RelatedPerson.objects.create(
+            patient=patient,
+            name="Alex Rivera",
+            relationship="Guardian",
+            phone="555-1212",
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(f"/admin/patients/patientprofile/{patient.pk}/change/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Related People")
+        self.assertContains(response, "Alex Rivera")
+        self.assertContains(response, "Guardian")
+        self.assertContains(response, f"/admin/clinical/relatedperson/?patient__id__exact={patient.pk}")
+        self.assertContains(response, f"/admin/clinical/relatedperson/{related_person.pk}/change/")
