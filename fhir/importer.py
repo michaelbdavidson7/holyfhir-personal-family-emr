@@ -12,6 +12,7 @@ from django.utils.dateparse import parse_date, parse_datetime
 from clinical.models import (
     AdverseEvent,
     Allergy,
+    BodyStructure,
     CarePlan,
     CareTeam,
     CareTeamParticipant,
@@ -20,6 +21,8 @@ from clinical.models import (
     Condition,
     DetectedIssue,
     Device,
+    DeviceRequest,
+    DeviceUseStatement,
     DiagnosticReport,
     Encounter,
     EpisodeOfCare,
@@ -27,9 +30,17 @@ from clinical.models import (
     FamilyMemberHistoryCondition,
     FHIRGroup,
     FHIRGroupMember,
+    FHIRList,
+    Flag,
+    Goal,
     Immunization,
+    ImmunizationRecommendation,
     Location,
+    MedicationAdministration,
+    MedicationCatalog,
+    MedicationDispense,
     Medication,
+    NutritionOrder,
     Observation,
     Organization,
     Person,
@@ -39,8 +50,12 @@ from clinical.models import (
     Procedure,
     ProcedurePerformer,
     RelatedPerson,
+    RiskAssessment,
     ServiceRequest,
     Specimen,
+    Communication,
+    CommunicationRequest,
+    QuestionnaireResponse,
 )
 from documents.models import ClinicalDocument
 from patients.models import PatientProfile
@@ -53,25 +68,40 @@ SUPPORTED_RESOURCE_TYPES = {
     "AdverseEvent",
     "Condition",
     "AllergyIntolerance",
+    "BodyStructure",
     "ClinicalImpression",
     "DetectedIssue",
     "DiagnosticReport",
     "FamilyMemberHistory",
+    "Flag",
+    "List",
     "MedicationStatement",
     "MedicationRequest",
+    "Medication",
+    "MedicationAdministration",
+    "MedicationDispense",
     "Immunization",
+    "ImmunizationRecommendation",
+    "NutritionOrder",
     "Observation",
     "Encounter",
     "CareTeam",
     "CarePlan",
+    "Communication",
+    "CommunicationRequest",
     "Device",
+    "DeviceRequest",
+    "DeviceUseStatement",
     "DocumentReference",
     "EpisodeOfCare",
     "Group",
+    "Goal",
     "PractitionerRole",
     "Person",
     "Procedure",
+    "QuestionnaireResponse",
     "RelatedPerson",
+    "RiskAssessment",
     "ServiceRequest",
     "Specimen",
     "Practitioner",
@@ -83,6 +113,7 @@ SUPPORTED_RESOURCE_TYPES = {
 
 PATIENTLESS_RESOURCE_TYPES = {
     "Group",
+    "Medication",
     "Person",
     "Practitioner",
     "PractitionerRole",
@@ -134,6 +165,7 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
 
             importer = {
                 "Group": _import_group,
+                "Medication": _import_medication_catalog,
                 "Person": _import_person,
                 "Practitioner": _import_practitioner,
                 "PractitionerRole": _import_practitioner_role,
@@ -179,23 +211,37 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 "Condition": _import_condition,
                 "AdverseEvent": _import_adverse_event,
                 "AllergyIntolerance": _import_allergy,
+                "BodyStructure": _import_body_structure,
                 "ClinicalImpression": _import_clinical_impression,
                 "DetectedIssue": _import_detected_issue,
+                "DeviceRequest": _import_device_request,
+                "DeviceUseStatement": _import_device_use_statement,
                 "DiagnosticReport": _import_diagnostic_report,
                 "FamilyMemberHistory": _import_family_member_history,
+                "Flag": _import_flag,
+                "List": _import_fhir_list,
+                "MedicationAdministration": _import_medication_administration,
+                "MedicationDispense": _import_medication_dispense,
                 "MedicationStatement": _import_medication_statement,
                 "MedicationRequest": _import_medication_request,
                 "Immunization": _import_immunization,
+                "ImmunizationRecommendation": _import_immunization_recommendation,
+                "NutritionOrder": _import_nutrition_order,
                 "Observation": _import_observation,
                 "Encounter": _import_encounter,
                 "CareTeam": _import_care_team,
                 "CarePlan": _import_care_plan,
+                "Communication": _import_communication,
+                "CommunicationRequest": _import_communication_request,
                 "Device": _import_device,
                 "DocumentReference": _import_document_reference,
                 "EpisodeOfCare": _import_episode_of_care,
+                "Goal": _import_goal,
                 "PractitionerRole": _import_practitioner_role,
                 "Procedure": _import_procedure,
+                "QuestionnaireResponse": _import_questionnaire_response,
                 "RelatedPerson": _import_related_person,
+                "RiskAssessment": _import_risk_assessment,
                 "ServiceRequest": _import_service_request,
                 "Specimen": _import_specimen,
                 "Practitioner": _import_practitioner,
@@ -211,20 +257,44 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
             resource_type = resource.get("resourceType")
             if resource_type == "AdverseEvent":
                 _sync_adverse_event_relationships(resource)
+            elif resource_type == "BodyStructure":
+                pass
             elif resource_type == "ClinicalImpression":
                 _sync_clinical_impression_relationships(resource)
             elif resource_type == "DetectedIssue":
                 _sync_detected_issue_relationships(resource)
+            elif resource_type == "DeviceRequest":
+                _sync_device_request_relationships(resource)
+            elif resource_type == "DeviceUseStatement":
+                _sync_device_use_statement_relationships(resource)
             elif resource_type == "DiagnosticReport":
                 _sync_diagnostic_report_relationships(resource)
             elif resource_type == "FamilyMemberHistory":
                 _sync_family_member_history_relationships(resource)
+            elif resource_type == "Flag":
+                _sync_flag_relationships(resource)
             elif resource_type == "Group":
                 _sync_group_relationships(resource)
+            elif resource_type == "List":
+                _sync_fhir_list_relationships(resource)
+            elif resource_type == "MedicationAdministration":
+                _sync_medication_administration_relationships(resource)
+            elif resource_type == "MedicationDispense":
+                _sync_medication_dispense_relationships(resource)
             elif resource_type == "Observation":
                 _sync_observation_relationships(resource)
+            elif resource_type == "Communication":
+                _sync_communication_relationships(resource)
+            elif resource_type == "CommunicationRequest":
+                _sync_communication_request_relationships(resource)
             elif resource_type == "Person":
                 _sync_person_relationships(resource)
+            elif resource_type == "ImmunizationRecommendation":
+                _sync_immunization_recommendation_relationships(resource)
+            elif resource_type == "Goal":
+                _sync_goal_relationships(resource)
+            elif resource_type == "QuestionnaireResponse":
+                _sync_questionnaire_response_relationships(resource)
             elif resource_type == "CarePlan":
                 _sync_care_plan_relationships(resource)
             elif resource_type == "DocumentReference":
@@ -239,6 +309,8 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 _sync_procedure_relationships(resource)
             elif resource_type == "ServiceRequest":
                 _sync_service_request_relationships(resource)
+            elif resource_type == "RiskAssessment":
+                _sync_risk_assessment_relationships(resource)
             elif resource_type == "Specimen":
                 _sync_specimen_relationships(resource)
 
@@ -361,6 +433,23 @@ def _import_condition(resource, patient):
     return obj, created
 
 
+def _import_body_structure(resource, patient):
+    obj = _object_for_resource(resource, "clinical.BodyStructure") or BodyStructure(patient=patient)
+    obj.patient = patient
+    obj.active = bool(resource.get("active", True))
+    obj.morphology = _codeable_text(resource.get("morphology")) or ""
+    obj.location = _codeable_text(resource.get("location")) or ""
+    obj.location_qualifier = ", ".join(
+        text for text in (_codeable_text(value) for value in resource.get("locationQualifier") or []) if text
+    )
+    obj.description = resource.get("description") or ""
+    obj.image_summary = "\n".join(_display(image) or str(image) for image in resource.get("image") or [])
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
 def _import_adverse_event(resource, patient):
     obj = _object_for_resource(resource, "clinical.AdverseEvent") or AdverseEvent(patient=patient)
     obj.patient = patient
@@ -461,6 +550,71 @@ def _import_medication_request(resource, patient):
     return obj, created
 
 
+def _import_medication_catalog(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.MedicationCatalog") or MedicationCatalog()
+    batch = resource.get("batch") or {}
+    obj.manufacturer = _reference_as(resource.get("manufacturer"), Organization)
+    obj.name = _codeable_text(resource.get("code")) or "Medication"
+    obj.code = _coding_code(resource.get("code"), "") or obj.code
+    obj.status = resource.get("status") or ""
+    obj.form = _codeable_text(resource.get("form")) or ""
+    obj.amount = _ratio_text(resource.get("amount"))
+    obj.ingredient_summary = _medication_ingredient_summary(resource)
+    obj.batch_lot_number = batch.get("lotNumber") or ""
+    obj.batch_expiration_date = _date(batch.get("expirationDate"))
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_medication_administration(resource, patient):
+    obj = _object_for_resource(resource, "clinical.MedicationAdministration") or MedicationAdministration(patient=patient)
+    effective_period = resource.get("effectivePeriod") or {}
+    dosage = resource.get("dosage") or {}
+    dose = dosage.get("dose") or {}
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("context"), Encounter)
+    obj.medication = _reference_as(resource.get("medicationReference"), Medication)
+    obj.medication_catalog = _reference_as(resource.get("medicationReference"), MedicationCatalog)
+    obj.status = resource.get("status") or ""
+    obj.medication_text = _codeable_text(resource.get("medicationCodeableConcept")) or _display(resource.get("medicationReference"))
+    obj.effective_start = _datetime(resource.get("effectiveDateTime") or effective_period.get("start"))
+    obj.effective_end = _datetime(effective_period.get("end"))
+    obj.dosage_text = dosage.get("text") or ""
+    obj.route = _codeable_text(dosage.get("route")) or ""
+    obj.dose_value = _decimal(dose.get("value"))
+    obj.dose_unit = dose.get("unit") or dose.get("code") or ""
+    obj.performer_practitioner = _reference_as(((_first(resource.get("performer")) or {}).get("actor")), Practitioner)
+    obj.performer_role = _reference_as(((_first(resource.get("performer")) or {}).get("actor")), PractitionerRole)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_medication_administration_relationships(resource, obj)
+    return obj, created
+
+
+def _import_medication_dispense(resource, patient):
+    obj = _object_for_resource(resource, "clinical.MedicationDispense") or MedicationDispense(patient=patient)
+    obj.patient = patient
+    obj.medication = _reference_as(resource.get("medicationReference"), Medication)
+    obj.medication_catalog = _reference_as(resource.get("medicationReference"), MedicationCatalog)
+    obj.performer_practitioner = _reference_as(((_first(resource.get("performer")) or {}).get("actor")), Practitioner)
+    obj.performer_organization = _reference_as(((_first(resource.get("performer")) or {}).get("actor")), Organization)
+    obj.status = resource.get("status") or ""
+    obj.medication_text = _codeable_text(resource.get("medicationCodeableConcept")) or _display(resource.get("medicationReference"))
+    obj.quantity = _age_text(resource.get("quantity"))
+    obj.days_supply = _age_text(resource.get("daysSupply"))
+    obj.when_prepared = _datetime(resource.get("whenPrepared"))
+    obj.when_handed_over = _datetime(resource.get("whenHandedOver"))
+    obj.dosage_instruction = _dosage_text(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_medication_dispense_relationships(resource, obj)
+    return obj, created
+
+
 def _import_immunization(resource, patient):
     obj = _object_for_resource(resource, "clinical.Immunization") or Immunization(patient=patient)
     obj.patient = patient
@@ -473,6 +627,25 @@ def _import_immunization(resource, patient):
     obj.notes = _notes(resource)
     created = obj.pk is None
     obj.save()
+    return obj, created
+
+
+def _import_immunization_recommendation(resource, patient):
+    obj = _object_for_resource(resource, "clinical.ImmunizationRecommendation") or ImmunizationRecommendation(patient=patient)
+    recommendation = _first(resource.get("recommendation")) or {}
+    obj.patient = patient
+    obj.authority = _reference_as(resource.get("authority"), Organization)
+    obj.date = _datetime(resource.get("date"))
+    obj.vaccine_code = _codeable_text(_first(recommendation.get("vaccineCode"))) or ""
+    obj.target_disease = _codeable_text(recommendation.get("targetDisease")) or ""
+    obj.forecast_status = _codeable_text(recommendation.get("forecastStatus")) or ""
+    obj.forecast_reason = _codeable_text(_first(recommendation.get("forecastReason"))) or ""
+    obj.date_criterion_summary = _immunization_recommendation_date_criteria(resource)
+    obj.recommendation_summary = _immunization_recommendation_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_immunization_recommendation_relationships(resource, obj)
     return obj, created
 
 
@@ -553,6 +726,134 @@ def _import_care_plan(resource, patient):
     return obj, created
 
 
+def _import_nutrition_order(resource, patient):
+    obj = _object_for_resource(resource, "clinical.NutritionOrder") or NutritionOrder(patient=patient)
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.orderer_practitioner = _reference_as(resource.get("orderer"), Practitioner)
+    obj.status = resource.get("status") or ""
+    obj.intent = resource.get("intent") or ""
+    obj.date_time = _datetime(resource.get("dateTime"))
+    obj.allergy_intolerance_summary = "\n".join(_display(ref) for ref in resource.get("allergyIntolerance") or [])
+    obj.food_preference_summary = ", ".join(
+        text for text in (_codeable_text(value) for value in resource.get("foodPreferenceModifier") or []) if text
+    )
+    obj.exclude_food_summary = ", ".join(
+        text for text in (_codeable_text(value) for value in resource.get("excludeFoodModifier") or []) if text
+    )
+    obj.oral_diet_summary = _nutrition_oral_diet_summary(resource)
+    obj.supplement_summary = _nutrition_supplement_summary(resource)
+    obj.enteral_formula_summary = _nutrition_enteral_formula_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_communication(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Communication") or Communication(patient=patient)
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.sender_practitioner = _reference_as(resource.get("sender"), Practitioner)
+    obj.sender_organization = _reference_as(resource.get("sender"), Organization)
+    obj.sender_related_person = _reference_as(resource.get("sender"), RelatedPerson)
+    obj.status = resource.get("status") or ""
+    obj.category = _codeable_text(_first(resource.get("category"))) or ""
+    obj.priority = resource.get("priority") or ""
+    obj.medium = _codeable_text(_first(resource.get("medium"))) or ""
+    obj.topic = _display(resource.get("topic"))
+    obj.sent = _datetime(resource.get("sent"))
+    obj.received = _datetime(resource.get("received"))
+    obj.reason = _codeable_text(_first(resource.get("reasonCode"))) or ""
+    obj.payload_summary = _payload_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_communication_relationships(resource, obj)
+    return obj, created
+
+
+def _import_communication_request(resource, patient):
+    obj = _object_for_resource(resource, "clinical.CommunicationRequest") or CommunicationRequest(patient=patient)
+    occurrence_period = resource.get("occurrencePeriod") or {}
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.requester_practitioner = _reference_as(resource.get("requester"), Practitioner)
+    obj.sender_practitioner = _reference_as(resource.get("sender"), Practitioner)
+    obj.status = resource.get("status") or ""
+    obj.category = _codeable_text(_first(resource.get("category"))) or ""
+    obj.priority = resource.get("priority") or ""
+    obj.medium = _codeable_text(_first(resource.get("medium"))) or ""
+    obj.authored_on = _datetime(resource.get("authoredOn"))
+    obj.occurrence_start = _datetime(resource.get("occurrenceDateTime") or occurrence_period.get("start"))
+    obj.occurrence_end = _datetime(occurrence_period.get("end"))
+    obj.reason = _codeable_text(_first(resource.get("reasonCode"))) or ""
+    obj.payload_summary = _payload_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_communication_request_relationships(resource, obj)
+    return obj, created
+
+
+def _import_flag(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Flag") or Flag(patient=patient)
+    period = resource.get("period") or {}
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.author_practitioner = _reference_as(resource.get("author"), Practitioner)
+    obj.author_organization = _reference_as(resource.get("author"), Organization)
+    obj.status = resource.get("status") or ""
+    obj.category = _codeable_text(_first(resource.get("category"))) or ""
+    obj.code = _codeable_text(resource.get("code")) or "Flag"
+    obj.start_date = _datetime(period.get("start"))
+    obj.end_date = _datetime(period.get("end"))
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_flag_relationships(resource, obj)
+    return obj, created
+
+
+def _import_fhir_list(resource, patient):
+    obj = _object_for_resource(resource, "clinical.FHIRList") or FHIRList(patient=patient)
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.source_practitioner = _reference_as(resource.get("source"), Practitioner)
+    obj.source_organization = _reference_as(resource.get("source"), Organization)
+    obj.status = resource.get("status") or ""
+    obj.mode = resource.get("mode") or ""
+    obj.title = resource.get("title") or ""
+    obj.code = _codeable_text(resource.get("code")) or ""
+    obj.date = _datetime(resource.get("date"))
+    obj.ordered_by = _codeable_text(resource.get("orderedBy")) or ""
+    obj.empty_reason = _codeable_text(resource.get("emptyReason")) or ""
+    obj.entry_summary = _fhir_list_entry_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_fhir_list_relationships(resource, obj)
+    return obj, created
+
+
+def _import_questionnaire_response(resource, patient):
+    obj = _object_for_resource(resource, "clinical.QuestionnaireResponse") or QuestionnaireResponse(patient=patient)
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.author_practitioner = _reference_as(resource.get("author"), Practitioner)
+    obj.source_patient = _reference_as(resource.get("source"), PatientProfile)
+    obj.source_related_person = _reference_as(resource.get("source"), RelatedPerson)
+    obj.status = resource.get("status") or ""
+    obj.questionnaire = resource.get("questionnaire") or ""
+    obj.authored = _datetime(resource.get("authored"))
+    obj.item_summary = _questionnaire_item_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_questionnaire_response_relationships(resource, obj)
+    return obj, created
+
+
 def _import_clinical_impression(resource, patient):
     obj = _object_for_resource(resource, "clinical.ClinicalImpression") or ClinicalImpression(patient=patient)
     effective_period = resource.get("effectivePeriod") or {}
@@ -600,6 +901,29 @@ def _import_diagnostic_report(resource, patient):
     return obj, created
 
 
+def _import_risk_assessment(resource, patient):
+    obj = _object_for_resource(resource, "clinical.RiskAssessment") or RiskAssessment(patient=patient)
+    occurrence_period = resource.get("occurrencePeriod") or {}
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.performer_practitioner = _reference_as(resource.get("performer"), Practitioner)
+    obj.performer_role = _reference_as(resource.get("performer"), PractitionerRole)
+    obj.performer_organization = _reference_as(resource.get("performer"), Organization)
+    obj.performer_device = _reference_as(resource.get("performer"), Device)
+    obj.status = resource.get("status") or ""
+    obj.code = _codeable_text(resource.get("code")) or "Risk assessment"
+    obj.method = _codeable_text(resource.get("method")) or ""
+    obj.occurrence_datetime = _datetime(resource.get("occurrenceDateTime") or occurrence_period.get("start"))
+    obj.authored_on = _datetime(resource.get("authoredOn"))
+    obj.prediction_summary = _risk_prediction_summary(resource)
+    obj.mitigation = resource.get("mitigation") or ""
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_risk_assessment_relationships(resource, obj)
+    return obj, created
+
+
 def _import_detected_issue(resource, patient):
     obj = _object_for_resource(resource, "clinical.DetectedIssue") or DetectedIssue(patient=patient)
     identified_period = resource.get("identifiedPeriod") or {}
@@ -623,6 +947,32 @@ def _import_detected_issue(resource, patient):
     return obj, created
 
 
+def _import_goal(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Goal") or Goal(patient=patient)
+    obj.patient = patient
+    obj.subject_group = _reference_as(resource.get("subject"), FHIRGroup)
+    obj.expressed_by_practitioner = _reference_as(resource.get("expressedBy"), Practitioner)
+    obj.expressed_by_role = _reference_as(resource.get("expressedBy"), PractitionerRole)
+    obj.expressed_by_related_person = _reference_as(resource.get("expressedBy"), RelatedPerson)
+    obj.lifecycle_status = resource.get("lifecycleStatus") or ""
+    obj.achievement_status = _codeable_text(resource.get("achievementStatus")) or ""
+    obj.category = ", ".join(text for text in (_codeable_text(value) for value in resource.get("category") or []) if text)
+    obj.priority = _codeable_text(resource.get("priority")) or ""
+    obj.description = _codeable_text(resource.get("description")) or "Goal"
+    obj.start_date = _date(resource.get("startDate"))
+    obj.status_date = _date(resource.get("statusDate"))
+    obj.status_reason = resource.get("statusReason") or ""
+    obj.target_summary = _goal_target_summary(resource)
+    obj.outcome_summary = ", ".join(
+        text for text in (_codeable_text(value) for value in resource.get("outcomeCode") or []) if text
+    )
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_goal_relationships(resource, obj)
+    return obj, created
+
+
 def _import_device(resource, patient):
     obj = _object_for_resource(resource, "clinical.Device") or Device(patient=patient)
     obj.patient = patient or _reference_as(resource.get("patient"), PatientProfile)
@@ -640,6 +990,52 @@ def _import_device(resource, patient):
     obj.notes = _notes(resource)
     created = obj.pk is None
     obj.save()
+    return obj, created
+
+
+def _import_device_request(resource, patient):
+    obj = _object_for_resource(resource, "clinical.DeviceRequest") or DeviceRequest(patient=patient)
+    occurrence_period = resource.get("occurrencePeriod") or {}
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.requester_practitioner = _reference_as(resource.get("requester"), Practitioner)
+    obj.requester_role = _reference_as(resource.get("requester"), PractitionerRole)
+    obj.status = resource.get("status") or ""
+    obj.intent = resource.get("intent") or ""
+    obj.priority = resource.get("priority") or ""
+    obj.code = (
+        _codeable_text(resource.get("codeCodeableConcept"))
+        or _display(resource.get("codeReference"))
+        or "Device request"
+    )
+    obj.authored_on = _datetime(resource.get("authoredOn"))
+    obj.occurrence_start = _datetime(resource.get("occurrenceDateTime") or occurrence_period.get("start"))
+    obj.occurrence_end = _datetime(occurrence_period.get("end"))
+    obj.reason = _codeable_text(_first(resource.get("reasonCode"))) or ""
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_device_request_relationships(resource, obj)
+    return obj, created
+
+
+def _import_device_use_statement(resource, patient):
+    obj = _object_for_resource(resource, "clinical.DeviceUseStatement") or DeviceUseStatement(patient=patient)
+    timing_period = resource.get("timingPeriod") or {}
+    obj.patient = patient
+    obj.device = _reference_as(resource.get("device"), Device)
+    obj.source_practitioner = _reference_as(resource.get("source"), Practitioner)
+    obj.source_role = _reference_as(resource.get("source"), PractitionerRole)
+    obj.source_related_person = _reference_as(resource.get("source"), RelatedPerson)
+    obj.status = resource.get("status") or ""
+    obj.timing_start = _datetime(resource.get("timingDateTime") or timing_period.get("start"))
+    obj.timing_end = _datetime(timing_period.get("end"))
+    obj.recorded_on = _datetime(resource.get("recordedOn"))
+    obj.body_site = _codeable_text(resource.get("bodySite")) or ""
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    _sync_device_use_statement_relationships(resource, obj)
     return obj, created
 
 
@@ -912,6 +1308,7 @@ def _object_for_resource(resource, django_model):
     app_label, model_name = django_model.split(".")
     for model in (
         PatientProfile,
+        BodyStructure,
         Condition,
         AdverseEvent,
         Allergy,
@@ -919,15 +1316,27 @@ def _object_for_resource(resource, django_model):
         ClinicalImpressionFinding,
         DetectedIssue,
         DiagnosticReport,
+        DeviceRequest,
+        DeviceUseStatement,
         FamilyMemberHistory,
         FamilyMemberHistoryCondition,
         FHIRGroup,
         FHIRGroupMember,
+        FHIRList,
+        Flag,
+        Goal,
         Medication,
+        MedicationAdministration,
+        MedicationCatalog,
+        MedicationDispense,
         Immunization,
+        ImmunizationRecommendation,
+        NutritionOrder,
         Observation,
         Specimen,
         Device,
+        Communication,
+        CommunicationRequest,
         Encounter,
         EpisodeOfCare,
         CareTeam,
@@ -940,7 +1349,9 @@ def _object_for_resource(resource, django_model):
         PractitionerRole,
         Procedure,
         ProcedurePerformer,
+        QuestionnaireResponse,
         RelatedPerson,
+        RiskAssessment,
         ServiceRequest,
         Organization,
         Location,
@@ -962,24 +1373,38 @@ def _object_for_reference(reference):
         "Encounter": "clinical.Encounter",
         "EpisodeOfCare": "clinical.EpisodeOfCare",
         "Condition": "clinical.Condition",
+        "BodyStructure": "clinical.BodyStructure",
         "AdverseEvent": "clinical.AdverseEvent",
         "AllergyIntolerance": "clinical.Allergy",
         "ClinicalImpression": "clinical.ClinicalImpression",
         "DetectedIssue": "clinical.DetectedIssue",
         "DiagnosticReport": "clinical.DiagnosticReport",
+        "DeviceRequest": "clinical.DeviceRequest",
+        "DeviceUseStatement": "clinical.DeviceUseStatement",
         "FamilyMemberHistory": "clinical.FamilyMemberHistory",
+        "Flag": "clinical.Flag",
         "Group": "clinical.FHIRGroup",
+        "Goal": "clinical.Goal",
         "Immunization": "clinical.Immunization",
-        "Medication": "clinical.Medication",
+        "ImmunizationRecommendation": "clinical.ImmunizationRecommendation",
+        "List": "clinical.FHIRList",
+        "Medication": "clinical.MedicationCatalog",
+        "MedicationAdministration": "clinical.MedicationAdministration",
+        "MedicationDispense": "clinical.MedicationDispense",
         "MedicationRequest": "clinical.Medication",
         "MedicationStatement": "clinical.Medication",
+        "NutritionOrder": "clinical.NutritionOrder",
         "Observation": "clinical.Observation",
+        "Communication": "clinical.Communication",
+        "CommunicationRequest": "clinical.CommunicationRequest",
         "Person": "clinical.Person",
         "CareTeam": "clinical.CareTeam",
         "CarePlan": "clinical.CarePlan",
         "Device": "clinical.Device",
         "Procedure": "clinical.Procedure",
+        "QuestionnaireResponse": "clinical.QuestionnaireResponse",
         "RelatedPerson": "clinical.RelatedPerson",
+        "RiskAssessment": "clinical.RiskAssessment",
         "ServiceRequest": "clinical.ServiceRequest",
         "Specimen": "clinical.Specimen",
         "DocumentReference": "documents.ClinicalDocument",
@@ -1137,6 +1562,12 @@ def _codeable_text(value):
     return coding.get("display") or coding.get("code") or ""
 
 
+def _coding_text(value):
+    if not isinstance(value, dict):
+        return ""
+    return value.get("display") or value.get("code") or ""
+
+
 def _coding_code(value, system_fragment):
     if not isinstance(value, dict):
         return ""
@@ -1178,6 +1609,162 @@ def _medication_name(resource):
 def _dosage_text(resource):
     dosage = _first(resource.get("dosage")) or {}
     return dosage.get("text") or ""
+
+
+def _ratio_text(value):
+    if not isinstance(value, dict):
+        return ""
+    numerator = _age_text(value.get("numerator"))
+    denominator = _age_text(value.get("denominator"))
+    return " / ".join(part for part in [numerator, denominator] if part)
+
+
+def _medication_ingredient_summary(resource):
+    lines = []
+    for ingredient in resource.get("ingredient") or []:
+        item = _codeable_text(ingredient.get("itemCodeableConcept")) or _display(ingredient.get("itemReference"))
+        strength = _ratio_text(ingredient.get("strength"))
+        active = "active" if ingredient.get("isActive") else ""
+        line = " / ".join(part for part in [item, strength, active] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _payload_summary(resource):
+    lines = []
+    for payload in resource.get("payload") or []:
+        content = (
+            payload.get("contentString")
+            or _display(payload.get("contentReference"))
+            or _attachment_summary(payload.get("contentAttachment"))
+        )
+        if content:
+            lines.append(content)
+    return "\n".join(lines)
+
+
+def _attachment_summary(attachment):
+    if not isinstance(attachment, dict):
+        return ""
+    return " / ".join(
+        part for part in [attachment.get("title"), attachment.get("contentType"), attachment.get("url")] if part
+    )
+
+
+def _nutrition_oral_diet_summary(resource):
+    oral = resource.get("oralDiet") or {}
+    parts = []
+    parts.extend(_codeable_text(value) for value in oral.get("type") or [])
+    parts.extend(_codeable_text(value) for value in oral.get("texture") or [])
+    parts.extend(_codeable_text(value) for value in oral.get("fluidConsistencyType") or [])
+    instructions = oral.get("instruction")
+    if instructions:
+        parts.append(instructions)
+    return "\n".join(part for part in parts if part)
+
+
+def _nutrition_supplement_summary(resource):
+    lines = []
+    for supplement in resource.get("supplement") or []:
+        parts = [
+            _codeable_text(supplement.get("type")),
+            supplement.get("productName") or "",
+            _age_text(supplement.get("quantity")),
+            supplement.get("instruction") or "",
+        ]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _nutrition_enteral_formula_summary(resource):
+    formula = resource.get("enteralFormula") or {}
+    parts = [
+        _codeable_text(formula.get("baseFormulaType")),
+        formula.get("baseFormulaProductName") or "",
+        _codeable_text(formula.get("additiveType")),
+        formula.get("additiveProductName") or "",
+        _age_text(formula.get("caloricDensity")),
+        _codeable_text(formula.get("routeofAdministration")),
+        formula.get("administrationInstruction") or "",
+    ]
+    return "\n".join(part for part in parts if part)
+
+
+def _fhir_list_entry_summary(resource):
+    lines = []
+    for entry in resource.get("entry") or []:
+        parts = [
+            "deleted" if entry.get("deleted") else "",
+            _display(entry.get("item")),
+            entry.get("date") or "",
+            _codeable_text(entry.get("flag")) or "",
+        ]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _questionnaire_item_summary(resource):
+    lines = []
+
+    def collect_items(items, depth=0):
+        for item in items or []:
+            answers = []
+            for answer in item.get("answer") or []:
+                answer_text = (
+                    answer.get("valueString")
+                    or str(answer.get("valueBoolean") if "valueBoolean" in answer else "")
+                    or str(answer.get("valueInteger") if "valueInteger" in answer else "")
+                    or str(answer.get("valueDecimal") if "valueDecimal" in answer else "")
+                    or answer.get("valueDate")
+                    or answer.get("valueDateTime")
+                    or _coding_text(answer.get("valueCoding"))
+                    or _age_text(answer.get("valueQuantity"))
+                    or _display(answer.get("valueReference"))
+                )
+                if answer_text:
+                    answers.append(answer_text)
+                collect_items(answer.get("item"), depth + 1)
+            question = item.get("text") or item.get("linkId") or ""
+            line = ": ".join(part for part in [question, ", ".join(answers)] if part)
+            if line:
+                lines.append(f"{'  ' * depth}{line}")
+            collect_items(item.get("item"), depth + 1)
+
+    collect_items(resource.get("item"))
+    return "\n".join(lines)
+
+
+def _immunization_recommendation_date_criteria(resource):
+    lines = []
+    for recommendation in resource.get("recommendation") or []:
+        for criterion in recommendation.get("dateCriterion") or []:
+            line = " / ".join(part for part in [_codeable_text(criterion.get("code")), criterion.get("value") or ""] if part)
+            if line:
+                lines.append(line)
+    return "\n".join(lines)
+
+
+def _immunization_recommendation_summary(resource):
+    lines = []
+    for recommendation in resource.get("recommendation") or []:
+        parts = [
+            _codeable_text(_first(recommendation.get("vaccineCode"))),
+            _codeable_text(recommendation.get("targetDisease")),
+            _codeable_text(recommendation.get("forecastStatus")),
+            recommendation.get("description") or "",
+            recommendation.get("series") or "",
+            f"dose {recommendation.get('doseNumberPositiveInt')}" if recommendation.get("doseNumberPositiveInt") else "",
+            f"series dose {recommendation.get('seriesDosesPositiveInt')}" if recommendation.get("seriesDosesPositiveInt") else "",
+        ]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
 
 
 def _care_team_participants(resource):
@@ -1341,6 +1928,62 @@ def _group_characteristic_summary(resource):
     return "\n".join(lines)
 
 
+def _value_text(prefix, value):
+    if value is None:
+        return ""
+    if isinstance(value, dict):
+        return (
+            _codeable_text(value)
+            or _age_text(value)
+            or _range_text(value)
+            or _display(value)
+            or str(value.get("value") or "")
+        )
+    return str(value)
+
+
+def _goal_target_summary(resource):
+    lines = []
+    for target in resource.get("target") or []:
+        detail = (
+            _value_text("detail", target.get("detailQuantity"))
+            or _value_text("detail", target.get("detailRange"))
+            or _codeable_text(target.get("detailCodeableConcept"))
+            or str(target.get("detailString") or "")
+            or _value_text("detail", target.get("detailRatio"))
+            or (str(target.get("detailBoolean")) if "detailBoolean" in target else "")
+            or (str(target.get("detailInteger")) if "detailInteger" in target else "")
+        )
+        due = target.get("dueDate") or _age_text(target.get("dueDuration"))
+        parts = [_codeable_text(target.get("measure")), detail, due]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _risk_prediction_summary(resource):
+    lines = []
+    for prediction in resource.get("prediction") or []:
+        probability = (
+            _value_text("probability", prediction.get("probabilityDecimal"))
+            or _value_text("probability", prediction.get("probabilityRange"))
+        )
+        when = _range_text(prediction.get("whenPeriod")) or _age_text(prediction.get("whenRange"))
+        parts = [
+            _codeable_text(prediction.get("outcome")),
+            probability,
+            _codeable_text(prediction.get("qualitativeRisk")),
+            _value_text("relativeRisk", prediction.get("relativeRisk")),
+            when,
+            prediction.get("rationale") or "",
+        ]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
 def _adverse_event_suspect_summary(resource):
     lines = []
     for suspect in resource.get("suspectEntity") or []:
@@ -1438,6 +2081,157 @@ def _sync_diagnostic_report_presented_documents(resource, diagnostic_report):
         document.save()
         documents.append(document)
     diagnostic_report.presented_documents.set(documents)
+
+
+def _sync_medication_administration_relationships(resource, medication_administration=None):
+    medication_administration = medication_administration or _object_for_resource(resource, "clinical.MedicationAdministration")
+    if not medication_administration:
+        return
+    changed = []
+    for field, value in [
+        ("encounter", _reference_as(resource.get("context"), Encounter)),
+        ("medication", _reference_as(resource.get("medicationReference"), Medication)),
+        ("medication_catalog", _reference_as(resource.get("medicationReference"), MedicationCatalog)),
+    ]:
+        if value and getattr(medication_administration, f"{field}_id") != value.id:
+            setattr(medication_administration, field, value)
+            changed.append(field)
+    if changed:
+        medication_administration.save(update_fields=changed)
+
+    medication_administration.service_requests.set(
+        [obj for obj in (_reference_as(resource.get("request"), ServiceRequest),) if obj]
+    )
+    medication_administration.reason_conditions.set(
+        [obj for obj in (_reference_as(ref, Condition) for ref in resource.get("reasonReference") or []) if obj]
+    )
+
+
+def _sync_medication_dispense_relationships(resource, medication_dispense=None):
+    medication_dispense = medication_dispense or _object_for_resource(resource, "clinical.MedicationDispense")
+    if not medication_dispense:
+        return
+    changed = []
+    for field, value in [
+        ("medication", _reference_as(resource.get("medicationReference"), Medication)),
+        ("medication_catalog", _reference_as(resource.get("medicationReference"), MedicationCatalog)),
+    ]:
+        if value and getattr(medication_dispense, f"{field}_id") != value.id:
+            setattr(medication_dispense, field, value)
+            changed.append(field)
+    if changed:
+        medication_dispense.save(update_fields=changed)
+
+    medication_dispense.authorizing_requests.set(
+        [obj for obj in (_reference_as(ref, ServiceRequest) for ref in resource.get("authorizingPrescription") or []) if obj]
+    )
+
+
+def _sync_communication_relationships(resource, communication=None):
+    communication = communication or _object_for_resource(resource, "clinical.Communication")
+    if not communication:
+        return
+    changed = []
+    for field, value in [
+        ("encounter", _reference_as(resource.get("encounter"), Encounter)),
+        ("sender_practitioner", _reference_as(resource.get("sender"), Practitioner)),
+        ("sender_organization", _reference_as(resource.get("sender"), Organization)),
+        ("sender_related_person", _reference_as(resource.get("sender"), RelatedPerson)),
+    ]:
+        if value and getattr(communication, f"{field}_id") != value.id:
+            setattr(communication, field, value)
+            changed.append(field)
+    if changed:
+        communication.save(update_fields=changed)
+
+    recipients = resource.get("recipient") or []
+    communication.recipients_practitioners.set([obj for obj in (_reference_as(ref, Practitioner) for ref in recipients) if obj])
+    communication.recipients_organizations.set([obj for obj in (_reference_as(ref, Organization) for ref in recipients) if obj])
+    communication.recipients_related_people.set([obj for obj in (_reference_as(ref, RelatedPerson) for ref in recipients) if obj])
+    communication.in_response_to.set(
+        [obj for obj in (_reference_as(ref, Communication) for ref in resource.get("inResponseTo") or []) if obj]
+    )
+
+
+def _sync_communication_request_relationships(resource, communication_request=None):
+    communication_request = communication_request or _object_for_resource(resource, "clinical.CommunicationRequest")
+    if not communication_request:
+        return
+    recipients = resource.get("recipient") or []
+    communication_request.recipients_practitioners.set(
+        [obj for obj in (_reference_as(ref, Practitioner) for ref in recipients) if obj]
+    )
+    communication_request.recipients_related_people.set(
+        [obj for obj in (_reference_as(ref, RelatedPerson) for ref in recipients) if obj]
+    )
+    communication_request.based_on_service_requests.set(
+        [obj for obj in (_reference_as(ref, ServiceRequest) for ref in resource.get("basedOn") or []) if obj]
+    )
+    communication_request.replaces.set(
+        [obj for obj in (_reference_as(ref, CommunicationRequest) for ref in resource.get("replaces") or []) if obj]
+    )
+
+
+def _sync_flag_relationships(resource, flag=None):
+    flag = flag or _object_for_resource(resource, "clinical.Flag")
+    if not flag:
+        return
+    changed = []
+    for field, value in [
+        ("encounter", _reference_as(resource.get("encounter"), Encounter)),
+        ("author_practitioner", _reference_as(resource.get("author"), Practitioner)),
+        ("author_organization", _reference_as(resource.get("author"), Organization)),
+    ]:
+        if value and getattr(flag, f"{field}_id") != value.id:
+            setattr(flag, field, value)
+            changed.append(field)
+    if changed:
+        flag.save(update_fields=changed)
+
+
+def _sync_fhir_list_relationships(resource, fhir_list=None):
+    fhir_list = fhir_list or _object_for_resource(resource, "clinical.FHIRList")
+    if not fhir_list:
+        return
+    entries = [entry.get("item") for entry in resource.get("entry") or [] if entry.get("item")]
+    fhir_list.conditions.set([obj for obj in (_reference_as(ref, Condition) for ref in entries) if obj])
+    fhir_list.observations.set([obj for obj in (_reference_as(ref, Observation) for ref in entries) if obj])
+    fhir_list.medications.set([obj for obj in (_reference_as(ref, Medication) for ref in entries) if obj])
+    fhir_list.procedures.set([obj for obj in (_reference_as(ref, Procedure) for ref in entries) if obj])
+    fhir_list.diagnostic_reports.set([obj for obj in (_reference_as(ref, DiagnosticReport) for ref in entries) if obj])
+    fhir_list.documents.set([obj for obj in (_reference_as(ref, ClinicalDocument) for ref in entries) if obj])
+
+
+def _sync_questionnaire_response_relationships(resource, questionnaire_response=None):
+    questionnaire_response = questionnaire_response or _object_for_resource(resource, "clinical.QuestionnaireResponse")
+    if not questionnaire_response:
+        return
+    questionnaire_response.based_on_service_requests.set(
+        [obj for obj in (_reference_as(ref, ServiceRequest) for ref in resource.get("basedOn") or []) if obj]
+    )
+    part_of = resource.get("partOf") or []
+    questionnaire_response.part_of_observations.set([obj for obj in (_reference_as(ref, Observation) for ref in part_of) if obj])
+    questionnaire_response.part_of_procedures.set([obj for obj in (_reference_as(ref, Procedure) for ref in part_of) if obj])
+
+
+def _sync_immunization_recommendation_relationships(resource, immunization_recommendation=None):
+    immunization_recommendation = immunization_recommendation or _object_for_resource(
+        resource,
+        "clinical.ImmunizationRecommendation",
+    )
+    if not immunization_recommendation:
+        return
+    recommendation = _first(resource.get("recommendation")) or {}
+    supporting = recommendation.get("supportingPatientInformation") or []
+    immunization_recommendation.supporting_immunizations.set(
+        [obj for obj in (_reference_as(ref, Immunization) for ref in recommendation.get("supportingImmunization") or []) if obj]
+    )
+    immunization_recommendation.supporting_observations.set(
+        [obj for obj in (_reference_as(ref, Observation) for ref in supporting) if obj]
+    )
+    immunization_recommendation.supporting_diagnostic_reports.set(
+        [obj for obj in (_reference_as(ref, DiagnosticReport) for ref in supporting) if obj]
+    )
 
 
 def _detected_issue_evidence_summary(resource):
@@ -1815,6 +2609,138 @@ def _sync_group_relationships(resource, group=None):
         elif isinstance(member_obj, FHIRGroup):
             member_link.member_group = member_obj
         member_link.save()
+
+
+def _sync_risk_assessment_relationships(resource, risk_assessment=None):
+    risk_assessment = risk_assessment or _object_for_resource(resource, "clinical.RiskAssessment")
+    if not risk_assessment:
+        return
+
+    changed = []
+    for field, value in [
+        ("encounter", _reference_as(resource.get("encounter"), Encounter)),
+        ("performer_practitioner", _reference_as(resource.get("performer"), Practitioner)),
+        ("performer_role", _reference_as(resource.get("performer"), PractitionerRole)),
+        ("performer_organization", _reference_as(resource.get("performer"), Organization)),
+        ("performer_device", _reference_as(resource.get("performer"), Device)),
+    ]:
+        if value and getattr(risk_assessment, f"{field}_id") != value.id:
+            setattr(risk_assessment, field, value)
+            changed.append(field)
+    if changed:
+        risk_assessment.save(update_fields=changed)
+
+    basis = resource.get("basis") or []
+    risk_assessment.conditions.set([obj for obj in (_reference_as(ref, Condition) for ref in basis) if obj])
+    risk_assessment.observations.set([obj for obj in (_reference_as(ref, Observation) for ref in basis) if obj])
+    risk_assessment.diagnostic_reports.set([obj for obj in (_reference_as(ref, DiagnosticReport) for ref in basis) if obj])
+
+
+def _sync_goal_relationships(resource, goal=None):
+    goal = goal or _object_for_resource(resource, "clinical.Goal")
+    if not goal:
+        return
+
+    changed = []
+    for field, value in [
+        ("subject_group", _reference_as(resource.get("subject"), FHIRGroup)),
+        ("expressed_by_practitioner", _reference_as(resource.get("expressedBy"), Practitioner)),
+        ("expressed_by_role", _reference_as(resource.get("expressedBy"), PractitionerRole)),
+        ("expressed_by_related_person", _reference_as(resource.get("expressedBy"), RelatedPerson)),
+    ]:
+        if value and getattr(goal, f"{field}_id") != value.id:
+            setattr(goal, field, value)
+            changed.append(field)
+    if changed:
+        goal.save(update_fields=changed)
+
+    addresses = resource.get("addresses") or []
+    goal.addresses_conditions.set([obj for obj in (_reference_as(ref, Condition) for ref in addresses) if obj])
+    goal.addresses_observations.set([obj for obj in (_reference_as(ref, Observation) for ref in addresses) if obj])
+    goal.addresses_medications.set([obj for obj in (_reference_as(ref, Medication) for ref in addresses) if obj])
+    goal.addresses_service_requests.set([obj for obj in (_reference_as(ref, ServiceRequest) for ref in addresses) if obj])
+    goal.addresses_risk_assessments.set([obj for obj in (_reference_as(ref, RiskAssessment) for ref in addresses) if obj])
+    goal.outcome_observations.set(
+        [obj for obj in (_reference_as(ref, Observation) for ref in resource.get("outcomeReference") or []) if obj]
+    )
+
+
+def _sync_device_request_relationships(resource, device_request=None):
+    device_request = device_request or _object_for_resource(resource, "clinical.DeviceRequest")
+    if not device_request:
+        return
+
+    changed = []
+    for field, value in [
+        ("encounter", _reference_as(resource.get("encounter"), Encounter)),
+        ("requester_practitioner", _reference_as(resource.get("requester"), Practitioner)),
+        ("requester_role", _reference_as(resource.get("requester"), PractitionerRole)),
+    ]:
+        if value and getattr(device_request, f"{field}_id") != value.id:
+            setattr(device_request, field, value)
+            changed.append(field)
+    if changed:
+        device_request.save(update_fields=changed)
+
+    code_refs = [resource.get("codeReference")] if resource.get("codeReference") else []
+    device_request.devices.set([obj for obj in (_reference_as(ref, Device) for ref in code_refs) if obj])
+    based_on = resource.get("basedOn") or []
+    device_request.care_plans.set([obj for obj in (_reference_as(ref, CarePlan) for ref in based_on) if obj])
+    device_request.service_requests.set([obj for obj in (_reference_as(ref, ServiceRequest) for ref in based_on) if obj])
+    device_request.replaces.set([obj for obj in (_reference_as(ref, DeviceRequest) for ref in resource.get("replaces") or []) if obj])
+
+    reason_refs = resource.get("reasonReference") or []
+    device_request.conditions.set([obj for obj in (_reference_as(ref, Condition) for ref in reason_refs) if obj])
+    device_request.observations.set([obj for obj in (_reference_as(ref, Observation) for ref in reason_refs) if obj])
+    device_request.diagnostic_reports.set([obj for obj in (_reference_as(ref, DiagnosticReport) for ref in reason_refs) if obj])
+    device_request.risk_assessments.set([obj for obj in (_reference_as(ref, RiskAssessment) for ref in reason_refs) if obj])
+
+    performers = resource.get("performer") or []
+    device_request.performers_practitioners.set(
+        [obj for obj in (_reference_as(ref, Practitioner) for ref in performers) if obj]
+    )
+    device_request.performers_roles.set(
+        [obj for obj in (_reference_as(ref, PractitionerRole) for ref in performers) if obj]
+    )
+    device_request.performers_organizations.set(
+        [obj for obj in (_reference_as(ref, Organization) for ref in performers) if obj]
+    )
+
+
+def _sync_device_use_statement_relationships(resource, device_use_statement=None):
+    device_use_statement = device_use_statement or _object_for_resource(resource, "clinical.DeviceUseStatement")
+    if not device_use_statement:
+        return
+
+    changed = []
+    for field, value in [
+        ("device", _reference_as(resource.get("device"), Device)),
+        ("source_practitioner", _reference_as(resource.get("source"), Practitioner)),
+        ("source_role", _reference_as(resource.get("source"), PractitionerRole)),
+        ("source_related_person", _reference_as(resource.get("source"), RelatedPerson)),
+    ]:
+        if value and getattr(device_use_statement, f"{field}_id") != value.id:
+            setattr(device_use_statement, field, value)
+            changed.append(field)
+    if changed:
+        device_use_statement.save(update_fields=changed)
+
+    based_on = resource.get("basedOn") or []
+    device_use_statement.based_on_service_requests.set(
+        [obj for obj in (_reference_as(ref, ServiceRequest) for ref in based_on) if obj]
+    )
+    device_use_statement.based_on_device_requests.set(
+        [obj for obj in (_reference_as(ref, DeviceRequest) for ref in based_on) if obj]
+    )
+    reason_refs = resource.get("reasonReference") or []
+    device_use_statement.reason_conditions.set([obj for obj in (_reference_as(ref, Condition) for ref in reason_refs) if obj])
+    device_use_statement.reason_observations.set([obj for obj in (_reference_as(ref, Observation) for ref in reason_refs) if obj])
+    device_use_statement.reason_diagnostic_reports.set(
+        [obj for obj in (_reference_as(ref, DiagnosticReport) for ref in reason_refs) if obj]
+    )
+    device_use_statement.reason_risk_assessments.set(
+        [obj for obj in (_reference_as(ref, RiskAssessment) for ref in reason_refs) if obj]
+    )
 
 
 def _sync_document_reference_relationships(resource, document=None):

@@ -14,22 +14,33 @@ Status legend:
 
 - `AllergyIntolerance` -> `clinical.Allergy`
 - `AdverseEvent` -> `clinical.AdverseEvent`
+- `BodyStructure` -> `clinical.BodyStructure`
 - `CarePlan` -> `clinical.CarePlan`
 - `CareTeam` -> `clinical.CareTeam`
 - `ClinicalImpression` -> `clinical.ClinicalImpression`
 - `Condition` -> `clinical.Condition`
 - `DetectedIssue` -> `clinical.DetectedIssue`
 - `Device` -> `clinical.Device`
+- `DeviceRequest` -> `clinical.DeviceRequest`
+- `DeviceUseStatement` -> `clinical.DeviceUseStatement`
 - `DiagnosticReport` -> `clinical.DiagnosticReport`
 - `DocumentReference` -> `documents.ClinicalDocument`
 - `Encounter` -> `clinical.Encounter`
 - `EpisodeOfCare` -> `clinical.EpisodeOfCare`
 - `FamilyMemberHistory` -> `clinical.FamilyMemberHistory`
+- `Flag` -> `clinical.Flag`
 - `Group` -> `clinical.FHIRGroup`
+- `Goal` -> `clinical.Goal`
 - `Immunization` -> `clinical.Immunization`
+- `ImmunizationRecommendation` -> `clinical.ImmunizationRecommendation`
+- `List` -> `clinical.FHIRList`
 - `Location` -> `clinical.Location`
+- `Medication` -> `clinical.MedicationCatalog`
+- `MedicationAdministration` -> `clinical.MedicationAdministration`
+- `MedicationDispense` -> `clinical.MedicationDispense`
 - `MedicationRequest` -> `clinical.Medication`
 - `MedicationStatement` -> `clinical.Medication`
+- `NutritionOrder` -> `clinical.NutritionOrder`
 - `Observation` -> `clinical.Observation`
 - `Organization` -> `clinical.Organization`
 - `Patient` -> `patients.PatientProfile`
@@ -37,7 +48,9 @@ Status legend:
 - `Practitioner` -> `clinical.Practitioner`
 - `PractitionerRole` -> `clinical.PractitionerRole`
 - `Procedure` -> `clinical.Procedure`
+- `QuestionnaireResponse` -> `clinical.QuestionnaireResponse`
 - `RelatedPerson` -> `clinical.RelatedPerson`
+- `RiskAssessment` -> `clinical.RiskAssessment`
 - `ServiceRequest` -> `clinical.ServiceRequest`
 - `Specimen` -> `clinical.Specimen`
 
@@ -142,8 +155,8 @@ Status legend:
 | `VerificationResult` | Snapshot candidate | Verification metadata. |
 | `Encounter` | First-class | Visit/action record. |
 | `EpisodeOfCare` | First-class | Larger care episode grouping. |
-| `Flag` | Planned | Patient warnings/alerts. |
-| `List` | Planned | FHIR lists/groupings of resources. |
+| `Flag` | First-class | Patient warnings/alerts. |
+| `List` | First-class | FHIR lists/groupings of resources. |
 | `Library` | Snapshot candidate | Knowledge artifact. |
 
 ## Clinical
@@ -168,9 +181,9 @@ Status legend:
 | `Media` | Planned | Clinical images/photos/media. |
 | `DiagnosticReport` | First-class | Diagnostic reports with encounter, requests, specimens, observations, performers, interpreters, and presented forms. |
 | `Specimen` | First-class | Lab specimen details. |
-| `BodyStructure` | Planned | Anatomical/body-site detail. |
+| `BodyStructure` | First-class | Anatomical/body-site detail. |
 | `ImagingStudy` | Planned | Imaging study/series/instance data. |
-| `QuestionnaireResponse` | Planned | Patient-entered forms and assessments. |
+| `QuestionnaireResponse` | First-class | Patient-entered forms and assessments. |
 | `MolecularSequence` | Snapshot candidate | Genomics; first-class only if genomics UI is planned. |
 
 ### Medications
@@ -178,14 +191,14 @@ Status legend:
 | Resource | Status | Notes |
 | --- | --- | --- |
 | `MedicationRequest` | First-class | Currently maps into local `Medication`. |
-| `MedicationAdministration` | Planned | Administered medication event. |
-| `MedicationDispense` | Planned | Pharmacy/supply dispense event. |
+| `MedicationAdministration` | First-class | Administered medication event. |
+| `MedicationDispense` | First-class | Pharmacy/supply dispense event. |
 | `MedicationStatement` | First-class | Currently maps into local `Medication`. |
-| `Medication` | Planned | Standalone medication catalog/details; separate from requests/statements. |
+| `Medication` | First-class | Standalone medication catalog/details; maps to `MedicationCatalog`, separate from requests/statements. |
 | `MedicationKnowledge` | Planned | Drug knowledge/catalog metadata; probably snapshot/generic first. |
 | `Immunization` | First-class | Vaccination records. |
 | `ImmunizationEvaluation` | Planned | Immunization validity/status evaluation. |
-| `ImmunizationRecommendation` | Planned | Vaccine forecast/recommendations. |
+| `ImmunizationRecommendation` | First-class | Vaccine forecast/recommendations. |
 
 ### Care Provision
 
@@ -193,21 +206,21 @@ Status legend:
 | --- | --- | --- |
 | `CarePlan` | First-class | Care plans with conditions/care teams. |
 | `CareTeam` | First-class | Care teams and participants. |
-| `Goal` | Planned | Patient/care goals. |
+| `Goal` | First-class | Patient/care goals with addressed concerns, targets, and outcomes. |
 | `ServiceRequest` | First-class | Orders/referrals/requested services. |
-| `NutritionOrder` | Planned | Dietary/oral/enteral/supplement orders. |
+| `NutritionOrder` | First-class | Dietary/oral/enteral/supplement orders. |
 | `VisionPrescription` | Planned | Vision prescription details. |
-| `RiskAssessment` | Planned | Risk predictions/probabilities. |
+| `RiskAssessment` | First-class | Risk predictions/probabilities with basis records and mitigation. |
 | `RequestGroup` | Planned | Grouped/conditional requests and plans. |
 
 ### Request & Response
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `Communication` | Planned | Care communications/messages. |
-| `CommunicationRequest` | Planned | Requested communication. |
-| `DeviceRequest` | Planned | Device orders/requests. |
-| `DeviceUseStatement` | Planned | Patient/device usage history. |
+| `Communication` | First-class | Care communications/messages. |
+| `CommunicationRequest` | First-class | Requested communication. |
+| `DeviceRequest` | First-class | Device orders/requests with reasons, performers, and timing. |
+| `DeviceUseStatement` | First-class | Patient/device usage history. |
 | `GuidanceResponse` | Planned | Decision-support response. |
 | `SupplyRequest` | Planned | Supply request. |
 | `SupplyDelivery` | Planned | Supply delivery event. |

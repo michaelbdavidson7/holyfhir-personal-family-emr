@@ -3,14 +3,19 @@ from patients.models import PatientProfile
 
 
 class Condition(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="conditions")
-    name = models.CharField(max_length=255)
-    icd10_code = models.CharField(max_length=20, blank=True)
-    snomed_code = models.CharField(max_length=30, blank=True)
-    clinical_status = models.CharField(max_length=30, blank=True)  # active, resolved, inactive
-    onset_date = models.DateField(null=True, blank=True)
-    abatement_date = models.DateField(null=True, blank=True)
-    notes = models.TextField(blank=True)
+    patient = models.ForeignKey(
+        PatientProfile,
+        on_delete=models.CASCADE,
+        related_name="conditions",
+        help_text="FHIR subject: patient who has, had, or may have this condition.",
+    )
+    name = models.CharField(max_length=255, help_text="FHIR code: problem, diagnosis, or condition name.")
+    icd10_code = models.CharField(max_length=20, blank=True, help_text="FHIR code.coding: ICD-10 diagnosis code when present.")
+    snomed_code = models.CharField(max_length=30, blank=True, help_text="FHIR code.coding: SNOMED CT concept code when present.")
+    clinical_status = models.CharField(max_length=30, blank=True, help_text="FHIR clinicalStatus: active, recurrence, relapse, inactive, remission, or resolved.")
+    onset_date = models.DateField(null=True, blank=True, help_text="FHIR onset[x]: estimated or known start date.")
+    abatement_date = models.DateField(null=True, blank=True, help_text="FHIR abatement[x]: estimated or known resolution/end date.")
+    notes = models.TextField(blank=True, help_text="FHIR note: comments or clinical context for the condition.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -20,15 +25,15 @@ class Condition(models.Model):
 
 
 class Allergy(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="allergies")
-    substance = models.CharField(max_length=255)
-    rxnorm_code = models.CharField(max_length=30, blank=True)
-    snomed_code = models.CharField(max_length=30, blank=True)
-    category = models.CharField(max_length=50, blank=True)  # food, medication, environment
-    criticality = models.CharField(max_length=20, blank=True)  # low, high, unable-to-assess
-    reaction = models.CharField(max_length=255, blank=True)
-    severity = models.CharField(max_length=20, blank=True)  # mild, moderate, severe
-    notes = models.TextField(blank=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="allergies", help_text="FHIR patient: person who has the allergy or intolerance.")
+    substance = models.CharField(max_length=255, help_text="FHIR code: substance, product, or class that causes the reaction.")
+    rxnorm_code = models.CharField(max_length=30, blank=True, help_text="FHIR code.coding: RxNorm code for medication allergies.")
+    snomed_code = models.CharField(max_length=30, blank=True, help_text="FHIR code.coding: SNOMED CT code when present.")
+    category = models.CharField(max_length=50, blank=True, help_text="FHIR category: food, medication, environment, or biologic.")
+    criticality = models.CharField(max_length=20, blank=True, help_text="FHIR criticality: estimate of potential clinical harm.")
+    reaction = models.CharField(max_length=255, blank=True, help_text="FHIR reaction.manifestation: observed or reported reaction.")
+    severity = models.CharField(max_length=20, blank=True, help_text="FHIR reaction.severity: mild, moderate, or severe.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional allergy/intolerance comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,18 +46,18 @@ class Allergy(models.Model):
 
 
 class Medication(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="medications")
-    name = models.CharField(max_length=255)
-    rxnorm_code = models.CharField(max_length=30, blank=True)
-    dosage_text = models.CharField(max_length=255, blank=True)
-    route = models.CharField(max_length=100, blank=True)
-    frequency = models.CharField(max_length=100, blank=True)
-    status = models.CharField(max_length=30, blank=True)  # active, stopped, completed
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    prescriber = models.CharField(max_length=255, blank=True)
-    indication = models.CharField(max_length=255, blank=True)
-    notes = models.TextField(blank=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="medications", help_text="FHIR subject/patient: person taking or prescribed the medication.")
+    name = models.CharField(max_length=255, help_text="FHIR medication[x]: medication name or coded concept.")
+    rxnorm_code = models.CharField(max_length=30, blank=True, help_text="FHIR medicationCodeableConcept.coding: RxNorm code when present.")
+    dosage_text = models.CharField(max_length=255, blank=True, help_text="FHIR dosage.text: patient-facing or prescriber dosage instructions.")
+    route = models.CharField(max_length=100, blank=True, help_text="FHIR dosage.route: how the medication is taken or given.")
+    frequency = models.CharField(max_length=100, blank=True, help_text="FHIR dosage.timing: when or how often the medication is taken.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, completed, stopped, intended, entered-in-error, etc.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR effectivePeriod.start/authoredOn: start or authored date when known.")
+    end_date = models.DateField(null=True, blank=True, help_text="FHIR effectivePeriod.end: end date when known.")
+    prescriber = models.CharField(max_length=255, blank=True, help_text="FHIR requester/informationSource: prescriber or reporting source display.")
+    indication = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode/reasonReference: reason or condition being treated.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional medication comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -62,14 +67,14 @@ class Medication(models.Model):
 
 
 class Immunization(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="immunizations")
-    vaccine_name = models.CharField(max_length=255)
-    cvx_code = models.CharField(max_length=20, blank=True)
-    occurrence_date = models.DateField(null=True, blank=True)
-    lot_number = models.CharField(max_length=100, blank=True)
-    manufacturer = models.CharField(max_length=255, blank=True)
-    performer = models.CharField(max_length=255, blank=True)
-    notes = models.TextField(blank=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="immunizations", help_text="FHIR patient: person who received the vaccine.")
+    vaccine_name = models.CharField(max_length=255, help_text="FHIR vaccineCode: vaccine product administered.")
+    cvx_code = models.CharField(max_length=20, blank=True, help_text="FHIR vaccineCode.coding: CVX vaccine code when present.")
+    occurrence_date = models.DateField(null=True, blank=True, help_text="FHIR occurrence[x]: when the vaccine was administered.")
+    lot_number = models.CharField(max_length=100, blank=True, help_text="FHIR lotNumber: vaccine lot identifier.")
+    manufacturer = models.CharField(max_length=255, blank=True, help_text="FHIR manufacturer: vaccine manufacturer display.")
+    performer = models.CharField(max_length=255, blank=True, help_text="FHIR performer.actor: person or organization that administered or recorded the immunization.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional immunization comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -85,13 +90,14 @@ class Observation(models.Model):
         ("other", "Other"),
     ]
 
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="observations")
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="observations", help_text="FHIR subject: patient the observation is about.")
     specimen = models.ForeignKey(
         "Specimen",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="observations",
+        help_text="FHIR specimen: specimen used for this observation or lab result.",
     )
     device = models.ForeignKey(
         "Device",
@@ -99,19 +105,20 @@ class Observation(models.Model):
         null=True,
         blank=True,
         related_name="observations",
+        help_text="FHIR device: device that generated or was used for this observation.",
     )
-    category = models.CharField(max_length=20, choices=OBSERVATION_TYPES, default="other")
-    name = models.CharField(max_length=255)
-    loinc_code = models.CharField(max_length=30, blank=True)
+    category = models.CharField(max_length=20, choices=OBSERVATION_TYPES, default="other", help_text="FHIR category: vital sign, laboratory, survey, exam, or other grouping.")
+    name = models.CharField(max_length=255, help_text="FHIR code: observation name or test performed.")
+    loinc_code = models.CharField(max_length=30, blank=True, help_text="FHIR code.coding: LOINC code when present.")
 
-    value_string = models.CharField(max_length=255, blank=True)
-    value_quantity = models.DecimalField(max_digits=12, decimal_places=3, null=True, blank=True)
-    unit = models.CharField(max_length=50, blank=True)
+    value_string = models.CharField(max_length=255, blank=True, help_text="FHIR valueString/valueCodeableConcept: textual result value.")
+    value_quantity = models.DecimalField(max_digits=12, decimal_places=3, null=True, blank=True, help_text="FHIR valueQuantity.value: numeric result value.")
+    unit = models.CharField(max_length=50, blank=True, help_text="FHIR valueQuantity.unit/code: unit for numeric result values.")
 
-    effective_datetime = models.DateTimeField(null=True, blank=True)
-    interpretation = models.CharField(max_length=50, blank=True)  # high, low, normal
-    reference_range = models.CharField(max_length=255, blank=True)
-    notes = models.TextField(blank=True)
+    effective_datetime = models.DateTimeField(null=True, blank=True, help_text="FHIR effective[x]: clinically relevant time for the observation.")
+    interpretation = models.CharField(max_length=50, blank=True, help_text="FHIR interpretation: high, low, normal, abnormal, etc.")
+    reference_range = models.CharField(max_length=255, blank=True, help_text="FHIR referenceRange: expected or normal range.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional observation comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -125,17 +132,17 @@ class Observation(models.Model):
 
 
 class Specimen(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="specimens")
-    parent_specimens = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="child_specimens")
-    accession_identifier = models.CharField(max_length=100, blank=True)
-    status = models.CharField(max_length=30, blank=True)
-    specimen_type = models.CharField(max_length=255, blank=True)
-    received_time = models.DateTimeField(null=True, blank=True)
-    collected_datetime = models.DateTimeField(null=True, blank=True)
-    collection_method = models.CharField(max_length=255, blank=True)
-    body_site = models.CharField(max_length=255, blank=True)
-    collector_display = models.CharField(max_length=255, blank=True)
-    notes = models.TextField(blank=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="specimens", help_text="FHIR subject: patient or source the specimen was collected from.")
+    parent_specimens = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="child_specimens", help_text="FHIR parent: parent specimens from which this specimen was derived.")
+    accession_identifier = models.CharField(max_length=100, blank=True, help_text="FHIR accessionIdentifier: identifier assigned by lab or specimen processor.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: available, unavailable, unsatisfactory, or entered-in-error.")
+    specimen_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: kind of specimen, such as blood, urine, or tissue.")
+    received_time = models.DateTimeField(null=True, blank=True, help_text="FHIR receivedTime: when the specimen was received for processing.")
+    collected_datetime = models.DateTimeField(null=True, blank=True, help_text="FHIR collection.collected[x]: when the specimen was collected.")
+    collection_method = models.CharField(max_length=255, blank=True, help_text="FHIR collection.method: how the specimen was collected.")
+    body_site = models.CharField(max_length=255, blank=True, help_text="FHIR collection.bodySite: anatomical source of specimen.")
+    collector_display = models.CharField(max_length=255, blank=True, help_text="FHIR collection.collector: person or organization that collected the specimen.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional specimen comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -145,16 +152,16 @@ class Specimen(models.Model):
 
 
 class Encounter(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="encounters")
-    episodes_of_care = models.ManyToManyField("EpisodeOfCare", blank=True, related_name="encounters")
-    encounter_type = models.CharField(max_length=100, blank=True)  # office visit, ED, inpatient
-    status = models.CharField(max_length=30, blank=True)
-    start_time = models.DateTimeField(null=True, blank=True)
-    end_time = models.DateTimeField(null=True, blank=True)
-    provider_name = models.CharField(max_length=255, blank=True)
-    facility_name = models.CharField(max_length=255, blank=True)
-    reason = models.CharField(max_length=255, blank=True)
-    summary = models.TextField(blank=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="encounters", help_text="FHIR subject: patient present or involved in the encounter.")
+    episodes_of_care = models.ManyToManyField("EpisodeOfCare", blank=True, related_name="encounters", help_text="FHIR episodeOfCare: broader care episodes this encounter belongs to.")
+    encounter_type = models.CharField(max_length=100, blank=True, help_text="FHIR class/type: setting or kind of encounter, such as office, ED, inpatient.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: planned, arrived, in-progress, finished, cancelled, etc.")
+    start_time = models.DateTimeField(null=True, blank=True, help_text="FHIR period.start: encounter start time.")
+    end_time = models.DateTimeField(null=True, blank=True, help_text="FHIR period.end: encounter end time.")
+    provider_name = models.CharField(max_length=255, blank=True, help_text="FHIR participant.individual: provider or participant display.")
+    facility_name = models.CharField(max_length=255, blank=True, help_text="FHIR location.location: facility or location display.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode/reasonReference: reason for the encounter.")
+    summary = models.TextField(blank=True, help_text="FHIR text/note: encounter summary or imported narrative.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -174,6 +181,7 @@ class Device(models.Model):
         related_name="devices",
         null=True,
         blank=True,
+        help_text="FHIR patient: patient associated with the device when applicable.",
     )
     owner = models.ForeignKey(
         "Organization",
@@ -181,6 +189,7 @@ class Device(models.Model):
         null=True,
         blank=True,
         related_name="devices",
+        help_text="FHIR owner: organization responsible for the device.",
     )
     location = models.ForeignKey(
         "Location",
@@ -188,17 +197,18 @@ class Device(models.Model):
         null=True,
         blank=True,
         related_name="devices",
+        help_text="FHIR location: where the device is found or used.",
     )
-    display_name = models.CharField(max_length=255)
-    device_type = models.CharField(max_length=255, blank=True)
-    status = models.CharField(max_length=30, blank=True)
-    manufacturer = models.CharField(max_length=255, blank=True)
-    model_number = models.CharField(max_length=255, blank=True)
-    serial_number = models.CharField(max_length=255, blank=True)
-    lot_number = models.CharField(max_length=255, blank=True)
-    distinct_identifier = models.CharField(max_length=255, blank=True)
-    udi_carrier = models.TextField(blank=True)
-    notes = models.TextField(blank=True)
+    display_name = models.CharField(max_length=255, help_text="FHIR deviceName/type: human-readable device name.")
+    device_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: kind or category of device.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, inactive, entered-in-error, or unknown.")
+    manufacturer = models.CharField(max_length=255, blank=True, help_text="FHIR manufacturer: device manufacturer.")
+    model_number = models.CharField(max_length=255, blank=True, help_text="FHIR modelNumber: manufacturer's model number.")
+    serial_number = models.CharField(max_length=255, blank=True, help_text="FHIR serialNumber: device serial number.")
+    lot_number = models.CharField(max_length=255, blank=True, help_text="FHIR lotNumber: manufacturing lot number.")
+    distinct_identifier = models.CharField(max_length=255, blank=True, help_text="FHIR distinctIdentifier: distinct fixed device identifier.")
+    udi_carrier = models.TextField(blank=True, help_text="FHIR udiCarrier: unique device identifier carrier details.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional device comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -208,20 +218,21 @@ class Device(models.Model):
 
 
 class CareTeam(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="care_teams")
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="care_teams", help_text="FHIR subject: patient whose care team this is.")
     managing_organizations = models.ManyToManyField(
         "Organization",
         blank=True,
         related_name="managed_care_teams",
+        help_text="FHIR managingOrganization: organization responsible for the care team.",
     )
-    name = models.CharField(max_length=255)
-    status = models.CharField(max_length=30, blank=True)
-    category = models.CharField(max_length=255, blank=True)
-    participants = models.TextField(blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    reason = models.CharField(max_length=255, blank=True)
-    notes = models.TextField(blank=True)
+    name = models.CharField(max_length=255, help_text="FHIR name: human-readable care team name.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: proposed, active, suspended, inactive, or entered-in-error.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: type of team, such as condition-specific or long-term care.")
+    participants = models.TextField(blank=True, help_text="FHIR participant: imported participant summary when structured links are not available.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR period.start: when team responsibility started.")
+    end_date = models.DateField(null=True, blank=True, help_text="FHIR period.end: when team responsibility ended.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode/reasonReference: why the care team exists.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional care team comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -235,18 +246,18 @@ class CareTeam(models.Model):
 
 
 class CarePlan(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="care_plans")
-    title = models.CharField(max_length=255)
-    status = models.CharField(max_length=30, blank=True)
-    intent = models.CharField(max_length=30, blank=True)
-    category = models.CharField(max_length=255, blank=True)
-    description = models.TextField(blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    author_display = models.CharField(max_length=255, blank=True)
-    notes = models.TextField(blank=True)
-    conditions = models.ManyToManyField(Condition, blank=True, related_name="care_plans")
-    care_teams = models.ManyToManyField(CareTeam, blank=True, related_name="care_plans")
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="care_plans", help_text="FHIR subject: patient the care plan is for.")
+    title = models.CharField(max_length=255, help_text="FHIR title: human-friendly name for the care plan.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: draft, active, on-hold, revoked, completed, etc.")
+    intent = models.CharField(max_length=30, blank=True, help_text="FHIR intent: proposal, plan, order, option, etc.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: type or grouping of care plan.")
+    description = models.TextField(blank=True, help_text="FHIR description: summary of the plan's scope and purpose.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR period.start: when the plan starts.")
+    end_date = models.DateField(null=True, blank=True, help_text="FHIR period.end: when the plan ends.")
+    author_display = models.CharField(max_length=255, blank=True, help_text="FHIR author: person or organization responsible for the plan.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional care plan comments.")
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="care_plans", help_text="FHIR addresses: conditions or concerns addressed by the plan.")
+    care_teams = models.ManyToManyField(CareTeam, blank=True, related_name="care_plans", help_text="FHIR careTeam: teams involved in carrying out the plan.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -727,13 +738,14 @@ class Person(models.Model):
 class PersonLink(models.Model):
     """FHIR Person.link: a role-specific resource believed to represent the same actual person."""
 
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="link_records")
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="link_records", help_text="FHIR Person.link owner: shared Person identity record.")
     patient = models.ForeignKey(
         PatientProfile,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="person_identity_links",
+        help_text="FHIR link.target: Patient resource believed to represent the same actual person.",
     )
     practitioner = models.ForeignKey(
         "Practitioner",
@@ -741,6 +753,7 @@ class PersonLink(models.Model):
         null=True,
         blank=True,
         related_name="person_identity_links",
+        help_text="FHIR link.target: Practitioner resource believed to represent the same actual person.",
     )
     related_person = models.ForeignKey(
         "RelatedPerson",
@@ -748,6 +761,7 @@ class PersonLink(models.Model):
         null=True,
         blank=True,
         related_name="person_identity_links",
+        help_text="FHIR link.target: RelatedPerson resource believed to represent the same actual person.",
     )
     linked_person = models.ForeignKey(
         Person,
@@ -755,9 +769,10 @@ class PersonLink(models.Model):
         null=True,
         blank=True,
         related_name="linked_from_person_records",
+        help_text="FHIR link.target: another Person resource linked to this identity record.",
     )
-    target_display = models.CharField(max_length=255, blank=True)
-    target_reference = models.CharField(max_length=255, blank=True)
+    target_display = models.CharField(max_length=255, blank=True, help_text="FHIR link.target.display: imported display text for unresolved targets.")
+    target_reference = models.CharField(max_length=255, blank=True, help_text="FHIR link.target.reference: original FHIR reference string.")
     assurance = models.CharField(max_length=30, blank=True, help_text="FHIR assurance: level1, level2, level3, or level4.")
 
     class Meta:
@@ -878,13 +893,14 @@ class FHIRGroup(models.Model):
 class FHIRGroupMember(models.Model):
     """FHIR Group.member: a resource that belongs or belonged to a group."""
 
-    group = models.ForeignKey(FHIRGroup, on_delete=models.CASCADE, related_name="member_links")
+    group = models.ForeignKey(FHIRGroup, on_delete=models.CASCADE, related_name="member_links", help_text="FHIR Group.member owner: group this member belongs to.")
     patient = models.ForeignKey(
         PatientProfile,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="group_memberships",
+        help_text="FHIR member.entity: patient member.",
     )
     practitioner = models.ForeignKey(
         "Practitioner",
@@ -892,6 +908,7 @@ class FHIRGroupMember(models.Model):
         null=True,
         blank=True,
         related_name="group_memberships",
+        help_text="FHIR member.entity: practitioner member.",
     )
     practitioner_role = models.ForeignKey(
         "PractitionerRole",
@@ -899,6 +916,7 @@ class FHIRGroupMember(models.Model):
         null=True,
         blank=True,
         related_name="group_memberships",
+        help_text="FHIR member.entity: practitioner role member.",
     )
     device = models.ForeignKey(
         "Device",
@@ -906,6 +924,7 @@ class FHIRGroupMember(models.Model):
         null=True,
         blank=True,
         related_name="group_memberships",
+        help_text="FHIR member.entity: device member.",
     )
     medication = models.ForeignKey(
         Medication,
@@ -913,6 +932,7 @@ class FHIRGroupMember(models.Model):
         null=True,
         blank=True,
         related_name="group_memberships",
+        help_text="FHIR member.entity: medication member.",
     )
     member_group = models.ForeignKey(
         FHIRGroup,
@@ -920,12 +940,13 @@ class FHIRGroupMember(models.Model):
         null=True,
         blank=True,
         related_name="parent_group_memberships",
+        help_text="FHIR member.entity: nested group member.",
     )
-    entity_display = models.CharField(max_length=255, blank=True)
-    entity_reference = models.CharField(max_length=255, blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    inactive = models.BooleanField(null=True, blank=True)
+    entity_display = models.CharField(max_length=255, blank=True, help_text="FHIR member.entity.display: imported display text for unresolved members.")
+    entity_reference = models.CharField(max_length=255, blank=True, help_text="FHIR member.entity.reference: original FHIR reference string.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR member.period.start: when group membership started.")
+    end_date = models.DateField(null=True, blank=True, help_text="FHIR member.period.end: when group membership ended.")
+    inactive = models.BooleanField(null=True, blank=True, help_text="FHIR member.inactive: whether this member is inactive in the group.")
 
     class Meta:
         verbose_name = "Group Member"
@@ -944,6 +965,587 @@ class FHIRGroupMember(models.Model):
         return str(member or self.entity_reference or f"Group Member #{self.pk}")
 
 
+class BodyStructure(models.Model):
+    """FHIR BodyStructure: anatomical location or structure relevant to care."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="body_structures", help_text="FHIR patient: patient this anatomical structure belongs to.")
+    active = models.BooleanField(default=True, help_text="FHIR active: whether this body structure record is in active use.")
+    morphology = models.CharField(max_length=255, blank=True, help_text="FHIR morphology: kind of structure or abnormality, such as tumor, wound, or surgical site.")
+    location = models.CharField(max_length=255, blank=True, help_text="FHIR location: body site or anatomical location.")
+    location_qualifier = models.CharField(max_length=255, blank=True, help_text="FHIR locationQualifier: laterality or relative location details.")
+    description = models.TextField(blank=True, help_text="FHIR description: text description of the body structure.")
+    image_summary = models.TextField(blank=True, help_text="FHIR image: summary of attached body-site images.")
+    notes = models.TextField(blank=True, help_text="Additional imported body structure notes.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Body Structure"
+        verbose_name_plural = "Body Structures"
+
+    def __str__(self):
+        return self.description or self.location or self.morphology or f"Body Structure #{self.pk}"
+
+
+class RiskAssessment(models.Model):
+    """FHIR RiskAssessment: quantified or qualitative risk estimate for a patient."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="risk_assessments", help_text="FHIR subject: patient or group whose risk is assessed.")
+    encounter = models.ForeignKey(
+        "Encounter",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="risk_assessments",
+        help_text="FHIR encounter: visit or encounter associated with the assessment.",
+    )
+    performer_practitioner = models.ForeignKey(
+        "Practitioner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="performed_risk_assessments",
+        help_text="FHIR performer: practitioner who performed the assessment.",
+    )
+    performer_role = models.ForeignKey(
+        "PractitionerRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="performed_risk_assessments",
+        help_text="FHIR performer: practitioner role that performed the assessment.",
+    )
+    performer_organization = models.ForeignKey(
+        "Organization",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="performed_risk_assessments",
+        help_text="FHIR performer: organization that performed the assessment.",
+    )
+    performer_device = models.ForeignKey(
+        "Device",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="performed_risk_assessments",
+        help_text="FHIR performer: device or system that performed the assessment.",
+    )
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="risk_assessments", help_text="FHIR basis: conditions used as evidence for the risk estimate.")
+    observations = models.ManyToManyField(Observation, blank=True, related_name="risk_assessments", help_text="FHIR basis: observations used as evidence for the risk estimate.")
+    diagnostic_reports = models.ManyToManyField(DiagnosticReport, blank=True, related_name="risk_assessments", help_text="FHIR basis: diagnostic reports used as evidence for the risk estimate.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: registered, preliminary, final, amended, or entered-in-error.")
+    code = models.CharField(max_length=255, blank=True, help_text="FHIR code: type of risk being assessed.")
+    method = models.CharField(max_length=255, blank=True, help_text="FHIR method: evaluation mechanism or algorithm used.")
+    occurrence_datetime = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrence[x]: when the assessment was performed.")
+    authored_on = models.DateTimeField(null=True, blank=True, help_text="FHIR authoredOn: when the assessment was recorded.")
+    prediction_summary = models.TextField(blank=True, help_text="FHIR prediction: outcome, probability, qualitative risk, timing, and rationale.")
+    mitigation = models.TextField(blank=True, help_text="FHIR mitigation: how the risk may be reduced.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional risk assessment comments.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Risk Assessment"
+        verbose_name_plural = "Risk Assessments"
+
+    def __str__(self):
+        return self.code or self.prediction_summary or f"Risk Assessment #{self.pk}"
+
+
+class Goal(models.Model):
+    """FHIR Goal: intended objective for patient, group, or care."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="goals", help_text="FHIR subject: patient this goal is for.")
+    subject_group = models.ForeignKey(
+        FHIRGroup,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="goals",
+        help_text="FHIR subject: group this goal is for, when not patient-specific.",
+    )
+    expressed_by_practitioner = models.ForeignKey(
+        "Practitioner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="expressed_goals",
+        help_text="FHIR expressedBy: practitioner who expressed or proposed the goal.",
+    )
+    expressed_by_role = models.ForeignKey(
+        "PractitionerRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="expressed_goals",
+        help_text="FHIR expressedBy: practitioner role that expressed or proposed the goal.",
+    )
+    expressed_by_related_person = models.ForeignKey(
+        RelatedPerson,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="expressed_goals",
+        help_text="FHIR expressedBy: related person who expressed or proposed the goal.",
+    )
+    addresses_conditions = models.ManyToManyField(Condition, blank=True, related_name="goals", help_text="FHIR addresses: conditions this goal addresses.")
+    addresses_observations = models.ManyToManyField(Observation, blank=True, related_name="goals", help_text="FHIR addresses: observations this goal addresses.")
+    addresses_medications = models.ManyToManyField(Medication, blank=True, related_name="goals", help_text="FHIR addresses: medications this goal addresses.")
+    addresses_service_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="goals", help_text="FHIR addresses: service requests this goal addresses.")
+    addresses_risk_assessments = models.ManyToManyField(RiskAssessment, blank=True, related_name="goals", help_text="FHIR addresses: risk assessments this goal addresses.")
+    outcome_observations = models.ManyToManyField(Observation, blank=True, related_name="goal_outcomes", help_text="FHIR outcomeReference: observations documenting goal outcome.")
+    lifecycle_status = models.CharField(max_length=30, blank=True, help_text="FHIR lifecycleStatus: proposed, planned, accepted, active, on-hold, completed, cancelled, etc.")
+    achievement_status = models.CharField(max_length=255, blank=True, help_text="FHIR achievementStatus: in-progress, improving, worsening, achieved, not-achieved, etc.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: dietary, safety, behavioral, nursing, physiotherapy, etc.")
+    priority = models.CharField(max_length=255, blank=True, help_text="FHIR priority: mutually agreed importance of achieving the goal.")
+    description = models.CharField(max_length=255, help_text="FHIR description: desired objective or outcome.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR start[x]: when pursuit of the goal begins.")
+    status_date = models.DateField(null=True, blank=True, help_text="FHIR statusDate: when the current status was established.")
+    status_reason = models.TextField(blank=True, help_text="FHIR statusReason: reason for current lifecycle status.")
+    target_summary = models.TextField(blank=True, help_text="FHIR target: target measure, detail, and due date/duration.")
+    outcome_summary = models.TextField(blank=True, help_text="FHIR outcomeCode: coded outcome achieved or observed.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional goal comments.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Goal"
+        verbose_name_plural = "Goals"
+
+    def __str__(self):
+        return self.description
+
+
+class DeviceRequest(models.Model):
+    """FHIR DeviceRequest: request/order for a device or device-related service."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="device_requests", help_text="FHIR subject: patient who needs or is prescribed the device.")
+    encounter = models.ForeignKey(
+        "Encounter",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="device_requests",
+        help_text="FHIR encounter: visit or encounter where the device was requested.",
+    )
+    requester_practitioner = models.ForeignKey(
+        "Practitioner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="requested_devices",
+        help_text="FHIR requester: practitioner who initiated the device request.",
+    )
+    requester_role = models.ForeignKey(
+        "PractitionerRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="requested_devices",
+        help_text="FHIR requester: practitioner role that initiated the device request.",
+    )
+    devices = models.ManyToManyField("Device", blank=True, related_name="device_requests", help_text="FHIR codeReference: specific device being requested.")
+    care_plans = models.ManyToManyField("CarePlan", blank=True, related_name="device_requests", help_text="FHIR basedOn: care plans this request fulfills or follows.")
+    service_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="device_requests", help_text="FHIR basedOn: service requests this device request is based on.")
+    replaces = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="replacement_device_requests", help_text="FHIR replaces: prior device requests replaced by this request.")
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="device_requests", help_text="FHIR reasonReference: conditions supporting the request.")
+    observations = models.ManyToManyField(Observation, blank=True, related_name="device_requests", help_text="FHIR reasonReference: observations supporting the request.")
+    diagnostic_reports = models.ManyToManyField(DiagnosticReport, blank=True, related_name="device_requests", help_text="FHIR reasonReference: diagnostic reports supporting the request.")
+    risk_assessments = models.ManyToManyField(RiskAssessment, blank=True, related_name="device_requests", help_text="FHIR reasonReference: risk assessments supporting the request.")
+    performers_practitioners = models.ManyToManyField(
+        "Practitioner",
+        blank=True,
+        related_name="device_request_performances",
+        help_text="FHIR performer: practitioners asked to fulfill the request.",
+    )
+    performers_roles = models.ManyToManyField(
+        "PractitionerRole",
+        blank=True,
+        related_name="device_request_performances",
+        help_text="FHIR performer: practitioner roles asked to fulfill the request.",
+    )
+    performers_organizations = models.ManyToManyField(
+        "Organization",
+        blank=True,
+        related_name="device_request_performances",
+        help_text="FHIR performer: organizations asked to fulfill the request.",
+    )
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: draft, active, on-hold, revoked, completed, entered-in-error, or unknown.")
+    intent = models.CharField(max_length=30, blank=True, help_text="FHIR intent: proposal, plan, directive, order, original-order, etc.")
+    priority = models.CharField(max_length=30, blank=True, help_text="FHIR priority: routine, urgent, asap, or stat.")
+    code = models.CharField(max_length=255, help_text="FHIR code[x]: requested device, device type, or coded device request.")
+    authored_on = models.DateTimeField(null=True, blank=True, help_text="FHIR authoredOn: when the request was created.")
+    occurrence_start = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrence[x]: requested start or occurrence time.")
+    occurrence_end = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrencePeriod.end: requested end time when a period is used.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode: coded reason for the device request.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional request comments.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Device Request"
+        verbose_name_plural = "Device Requests"
+
+    def __str__(self):
+        return self.code
+
+
+class DeviceUseStatement(models.Model):
+    """FHIR DeviceUseStatement: record that a patient uses or used a device."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="device_use_statements", help_text="FHIR subject: patient who uses or used the device.")
+    device = models.ForeignKey(
+        "Device",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="use_statements",
+        help_text="FHIR device: device being used.",
+    )
+    source_practitioner = models.ForeignKey(
+        "Practitioner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="device_use_statements",
+        help_text="FHIR source: practitioner who provided the statement.",
+    )
+    source_role = models.ForeignKey(
+        "PractitionerRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="device_use_statements",
+        help_text="FHIR source: practitioner role that provided the statement.",
+    )
+    source_related_person = models.ForeignKey(
+        RelatedPerson,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="device_use_statements",
+        help_text="FHIR source: related person who provided the statement.",
+    )
+    based_on_service_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="device_use_statements", help_text="FHIR basedOn: service requests this use statement fulfills or follows.")
+    based_on_device_requests = models.ManyToManyField(DeviceRequest, blank=True, related_name="device_use_statements", help_text="FHIR basedOn: device requests this use statement fulfills or follows.")
+    reason_conditions = models.ManyToManyField(Condition, blank=True, related_name="device_use_statements", help_text="FHIR reasonReference: conditions supporting device use.")
+    reason_observations = models.ManyToManyField(Observation, blank=True, related_name="device_use_statements", help_text="FHIR reasonReference: observations supporting device use.")
+    reason_diagnostic_reports = models.ManyToManyField(DiagnosticReport, blank=True, related_name="device_use_statements", help_text="FHIR reasonReference: diagnostic reports supporting device use.")
+    reason_risk_assessments = models.ManyToManyField(RiskAssessment, blank=True, related_name="device_use_statements", help_text="FHIR reasonReference: risk assessments supporting device use.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, completed, entered-in-error, intended, stopped, or on-hold.")
+    timing_start = models.DateTimeField(null=True, blank=True, help_text="FHIR timing[x]: when device use started or occurred.")
+    timing_end = models.DateTimeField(null=True, blank=True, help_text="FHIR timingPeriod.end: when device use ended.")
+    recorded_on = models.DateTimeField(null=True, blank=True, help_text="FHIR recordedOn: when the statement was recorded.")
+    body_site = models.CharField(max_length=255, blank=True, help_text="FHIR bodySite: anatomical location where the device is used.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional device use comments.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Device Use Statement"
+        verbose_name_plural = "Device Use Statements"
+
+    def __str__(self):
+        return str(self.device or f"Device Use Statement #{self.pk}")
+
+
+class MedicationCatalog(models.Model):
+    """FHIR Medication: medication definition/catalog details used by orders, statements, dispenses, and administrations."""
+
+    manufacturer = models.ForeignKey(
+        "Organization",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="manufactured_medications",
+        help_text="FHIR manufacturer: organization that manufactures the medication product.",
+    )
+    name = models.CharField(max_length=255, help_text="FHIR code: medication name or coded medication concept.")
+    code = models.CharField(max_length=255, blank=True, help_text="FHIR code.coding: source code such as RxNorm, SNOMED CT, or local formulary code.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, inactive, or entered-in-error.")
+    form = models.CharField(max_length=255, blank=True, help_text="FHIR form: powder, tablet, capsule, solution, etc.")
+    amount = models.CharField(max_length=255, blank=True, help_text="FHIR amount: amount of drug in the package.")
+    ingredient_summary = models.TextField(blank=True, help_text="FHIR ingredient: active/inactive ingredients and strengths.")
+    batch_lot_number = models.CharField(max_length=255, blank=True, help_text="FHIR batch.lotNumber: assigned lot number.")
+    batch_expiration_date = models.DateField(null=True, blank=True, help_text="FHIR batch.expirationDate: when this batch expires.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this medication definition.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Medication Catalog Item"
+        verbose_name_plural = "Medication Catalog"
+
+    def __str__(self):
+        return self.name
+
+
+class MedicationAdministration(models.Model):
+    """FHIR MedicationAdministration: record of a medication being administered to a patient."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="medication_administrations", help_text="FHIR subject: patient who received the medication.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="medication_administrations", help_text="FHIR context: encounter associated with the administration.")
+    medication = models.ForeignKey(Medication, on_delete=models.SET_NULL, null=True, blank=True, related_name="administrations", help_text="FHIR medication[x]: patient medication record when resolved locally.")
+    medication_catalog = models.ForeignKey(MedicationCatalog, on_delete=models.SET_NULL, null=True, blank=True, related_name="administrations", help_text="FHIR medicationReference: catalog medication when resolved locally.")
+    service_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="medication_administrations", help_text="FHIR request: medication/service request that authorized the administration.")
+    reason_conditions = models.ManyToManyField(Condition, blank=True, related_name="medication_administrations", help_text="FHIR reasonReference: conditions explaining why medication was administered.")
+    performer_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="medication_administrations", help_text="FHIR performer.actor: practitioner who administered or witnessed administration.")
+    performer_role = models.ForeignKey("PractitionerRole", on_delete=models.SET_NULL, null=True, blank=True, related_name="medication_administrations", help_text="FHIR performer.actor: practitioner role involved in administration.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: in-progress, not-done, on-hold, completed, entered-in-error, stopped, or unknown.")
+    medication_text = models.CharField(max_length=255, blank=True, help_text="FHIR medicationCodeableConcept/display: medication text when not linked.")
+    effective_start = models.DateTimeField(null=True, blank=True, help_text="FHIR effective[x]: when administration started or occurred.")
+    effective_end = models.DateTimeField(null=True, blank=True, help_text="FHIR effectivePeriod.end: when administration ended.")
+    dosage_text = models.TextField(blank=True, help_text="FHIR dosage.text: administration dosage instructions.")
+    route = models.CharField(max_length=255, blank=True, help_text="FHIR dosage.route: route of administration.")
+    dose_value = models.DecimalField(max_digits=12, decimal_places=3, null=True, blank=True, help_text="FHIR dosage.dose.value: amount administered.")
+    dose_unit = models.CharField(max_length=50, blank=True, help_text="FHIR dosage.dose.unit/code: dose unit.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional medication administration comments.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Medication Administration"
+        verbose_name_plural = "Medication Administrations"
+
+    def __str__(self):
+        return self.medication_text or str(self.medication or self.medication_catalog or f"Medication Administration #{self.pk}")
+
+
+class MedicationDispense(models.Model):
+    """FHIR MedicationDispense: record that medication was supplied or dispensed to a patient."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="medication_dispenses", help_text="FHIR subject: patient receiving the dispensed medication.")
+    medication = models.ForeignKey(Medication, on_delete=models.SET_NULL, null=True, blank=True, related_name="dispenses", help_text="FHIR medication[x]: patient medication record when resolved locally.")
+    medication_catalog = models.ForeignKey(MedicationCatalog, on_delete=models.SET_NULL, null=True, blank=True, related_name="dispenses", help_text="FHIR medicationReference: catalog medication when resolved locally.")
+    authorizing_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="medication_dispenses", help_text="FHIR authorizingPrescription: orders authorizing the dispense.")
+    performer_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="medication_dispenses", help_text="FHIR performer.actor: practitioner involved in dispensing.")
+    performer_organization = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="medication_dispenses", help_text="FHIR performer.actor: organization involved in dispensing.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: preparation, in-progress, cancelled, on-hold, completed, entered-in-error, stopped, or declined.")
+    medication_text = models.CharField(max_length=255, blank=True, help_text="FHIR medicationCodeableConcept/display: medication text when not linked.")
+    quantity = models.CharField(max_length=255, blank=True, help_text="FHIR quantity: amount dispensed.")
+    days_supply = models.CharField(max_length=255, blank=True, help_text="FHIR daysSupply: number of days supplied.")
+    when_prepared = models.DateTimeField(null=True, blank=True, help_text="FHIR whenPrepared: when medication was packaged/prepared.")
+    when_handed_over = models.DateTimeField(null=True, blank=True, help_text="FHIR whenHandedOver: when medication was given to patient or representative.")
+    dosage_instruction = models.TextField(blank=True, help_text="FHIR dosageInstruction: directions for patient use.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional medication dispense comments.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Medication Dispense"
+        verbose_name_plural = "Medication Dispenses"
+
+    def __str__(self):
+        return self.medication_text or str(self.medication or self.medication_catalog or f"Medication Dispense #{self.pk}")
+
+
+class NutritionOrder(models.Model):
+    """FHIR NutritionOrder: diet, supplement, or enteral nutrition order for a patient."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="nutrition_orders", help_text="FHIR patient: patient who needs the nutrition order.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="nutrition_orders", help_text="FHIR encounter: encounter associated with the order.")
+    orderer_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="nutrition_orders", help_text="FHIR orderer: practitioner who requested the order.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: proposed, draft, planned, requested, active, on-hold, completed, cancelled, or entered-in-error.")
+    intent = models.CharField(max_length=30, blank=True, help_text="FHIR intent: proposal, plan, directive, order, etc.")
+    date_time = models.DateTimeField(null=True, blank=True, help_text="FHIR dateTime: when the nutrition order was requested.")
+    allergy_intolerance_summary = models.TextField(blank=True, help_text="FHIR allergyIntolerance: food or substance allergies considered by the order.")
+    food_preference_summary = models.TextField(blank=True, help_text="FHIR foodPreferenceModifier: patient food preferences.")
+    exclude_food_summary = models.TextField(blank=True, help_text="FHIR excludeFoodModifier: foods to exclude.")
+    oral_diet_summary = models.TextField(blank=True, help_text="FHIR oralDiet: diet type, schedule, nutrients, texture, and fluid consistency.")
+    supplement_summary = models.TextField(blank=True, help_text="FHIR supplement: oral nutrition supplements.")
+    enteral_formula_summary = models.TextField(blank=True, help_text="FHIR enteralFormula: tube feeding formula and administration details.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional nutrition order comments.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Nutrition Order"
+        verbose_name_plural = "Nutrition Orders"
+
+    def __str__(self):
+        return self.oral_diet_summary or self.supplement_summary or self.enteral_formula_summary or f"Nutrition Order #{self.pk}"
+
+
+class Communication(models.Model):
+    """FHIR Communication: record of information transmitted from sender to receiver."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="communications", help_text="FHIR subject: patient or group that is the focus of the message.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="communications", help_text="FHIR encounter: encounter associated with the communication.")
+    sender_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="sent_communications", help_text="FHIR sender: practitioner who sent the message.")
+    sender_organization = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="sent_communications", help_text="FHIR sender: organization that sent the message.")
+    sender_related_person = models.ForeignKey(RelatedPerson, on_delete=models.SET_NULL, null=True, blank=True, related_name="sent_communications", help_text="FHIR sender: related person who sent the message.")
+    recipients_practitioners = models.ManyToManyField("Practitioner", blank=True, related_name="received_communications", help_text="FHIR recipient: practitioner recipients.")
+    recipients_organizations = models.ManyToManyField("Organization", blank=True, related_name="received_communications", help_text="FHIR recipient: organization recipients.")
+    recipients_related_people = models.ManyToManyField(RelatedPerson, blank=True, related_name="received_communications", help_text="FHIR recipient: related person recipients.")
+    in_response_to = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="responses", help_text="FHIR inResponseTo: prior communications this replies to.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: preparation, in-progress, not-done, on-hold, stopped, completed, entered-in-error, or unknown.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: alert, notification, reminder, instruction, etc.")
+    priority = models.CharField(max_length=30, blank=True, help_text="FHIR priority: routine, urgent, asap, or stat.")
+    medium = models.CharField(max_length=255, blank=True, help_text="FHIR medium: communication channel such as phone, fax, email, or in person.")
+    topic = models.CharField(max_length=255, blank=True, help_text="FHIR topic: purpose/content description.")
+    sent = models.DateTimeField(null=True, blank=True, help_text="FHIR sent: when the message was sent.")
+    received = models.DateTimeField(null=True, blank=True, help_text="FHIR received: when the message was received.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode: indication for the message.")
+    payload_summary = models.TextField(blank=True, help_text="FHIR payload: message content or attachment/reference summary.")
+    notes = models.TextField(blank=True, help_text="FHIR note: comments about the communication.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.topic or self.payload_summary[:80] or f"Communication #{self.pk}"
+
+
+class CommunicationRequest(models.Model):
+    """FHIR CommunicationRequest: request to convey information to one or more recipients."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="communication_requests", help_text="FHIR subject: patient or group that is the focus of the requested message.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="communication_requests", help_text="FHIR encounter: encounter associated with the request.")
+    requester_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="communication_requests", help_text="FHIR requester: practitioner requesting communication.")
+    sender_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="communication_requests_to_send", help_text="FHIR sender: practitioner expected to send the message.")
+    recipients_practitioners = models.ManyToManyField("Practitioner", blank=True, related_name="communication_requests_to_receive", help_text="FHIR recipient: practitioner recipients.")
+    recipients_related_people = models.ManyToManyField(RelatedPerson, blank=True, related_name="communication_requests_to_receive", help_text="FHIR recipient: related person recipients.")
+    based_on_service_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="communication_requests", help_text="FHIR basedOn: service requests this communication request fulfills.")
+    replaces = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="replacement_communication_requests", help_text="FHIR replaces: communication requests replaced by this one.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: draft, active, on-hold, revoked, completed, entered-in-error, or unknown.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: message category.")
+    priority = models.CharField(max_length=30, blank=True, help_text="FHIR priority: routine, urgent, asap, or stat.")
+    medium = models.CharField(max_length=255, blank=True, help_text="FHIR medium: requested channel such as phone, fax, email, or in person.")
+    authored_on = models.DateTimeField(null=True, blank=True, help_text="FHIR authoredOn: when the request was created.")
+    occurrence_start = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrence[x]: requested communication time or start.")
+    occurrence_end = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrencePeriod.end: requested end time when a period is used.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode: reason for requesting communication.")
+    payload_summary = models.TextField(blank=True, help_text="FHIR payload: requested message content summary.")
+    notes = models.TextField(blank=True, help_text="FHIR note: comments about the communication request.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.payload_summary[:80] or self.category or f"Communication Request #{self.pk}"
+
+
+class Flag(models.Model):
+    """FHIR Flag: warning, alert, or awareness note about a patient or record."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="flags", help_text="FHIR subject: patient this flag applies to.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="flags", help_text="FHIR encounter: encounter this flag applies to, when specific.")
+    author_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="authored_flags", help_text="FHIR author: practitioner who created the flag.")
+    author_organization = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="authored_flags", help_text="FHIR author: organization that created the flag.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, inactive, or entered-in-error.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: clinical, administrative, behavioral, etc.")
+    code = models.CharField(max_length=255, help_text="FHIR code: coded or textual alert/warning.")
+    start_date = models.DateTimeField(null=True, blank=True, help_text="FHIR period.start: when the flag became active.")
+    end_date = models.DateTimeField(null=True, blank=True, help_text="FHIR period.end: when the flag stopped being active.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this flag.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.code
+
+
+class FHIRList(models.Model):
+    """FHIR List: curated or working collection of resources for a patient or workflow."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="fhir_lists", help_text="FHIR subject: patient or group that the list is about.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="fhir_lists", help_text="FHIR encounter: encounter associated with the list.")
+    source_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="authored_fhir_lists", help_text="FHIR source: practitioner responsible for the list.")
+    source_organization = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="authored_fhir_lists", help_text="FHIR source: organization responsible for the list.")
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="fhir_lists", help_text="FHIR entry.item: condition records included in this list.")
+    observations = models.ManyToManyField(Observation, blank=True, related_name="fhir_lists", help_text="FHIR entry.item: observation records included in this list.")
+    medications = models.ManyToManyField(Medication, blank=True, related_name="fhir_lists", help_text="FHIR entry.item: medication request/statement records included in this list.")
+    procedures = models.ManyToManyField("Procedure", blank=True, related_name="fhir_lists", help_text="FHIR entry.item: procedure records included in this list.")
+    diagnostic_reports = models.ManyToManyField(DiagnosticReport, blank=True, related_name="fhir_lists", help_text="FHIR entry.item: diagnostic reports included in this list.")
+    documents = models.ManyToManyField("documents.ClinicalDocument", blank=True, related_name="fhir_lists", help_text="FHIR entry.item: document references included in this list.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: current, retired, or entered-in-error.")
+    mode = models.CharField(max_length=30, blank=True, help_text="FHIR mode: working, snapshot, or changes.")
+    title = models.CharField(max_length=255, blank=True, help_text="FHIR title: human-readable list title.")
+    code = models.CharField(max_length=255, blank=True, help_text="FHIR code: purpose of the list, such as medications, problems, or allergies.")
+    date = models.DateTimeField(null=True, blank=True, help_text="FHIR date: when the list was prepared.")
+    ordered_by = models.CharField(max_length=255, blank=True, help_text="FHIR orderedBy: sort order used for list entries.")
+    empty_reason = models.CharField(max_length=255, blank=True, help_text="FHIR emptyReason: why the list is empty.")
+    entry_summary = models.TextField(blank=True, help_text="FHIR entry: unresolved or textual list entries.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this list.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "FHIR List"
+        verbose_name_plural = "FHIR Lists"
+
+    def __str__(self):
+        return self.title or self.code or f"FHIR List #{self.pk}"
+
+
+class QuestionnaireResponse(models.Model):
+    """FHIR QuestionnaireResponse: answers to a form, assessment, or questionnaire."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="questionnaire_responses", help_text="FHIR subject: patient or other subject the answers are about.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="questionnaire_responses", help_text="FHIR encounter: encounter associated with the response.")
+    author_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="authored_questionnaire_responses", help_text="FHIR author: practitioner who recorded the answers.")
+    source_patient = models.ForeignKey(PatientProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name="sourced_questionnaire_responses", help_text="FHIR source: patient who supplied the answers.")
+    source_related_person = models.ForeignKey(RelatedPerson, on_delete=models.SET_NULL, null=True, blank=True, related_name="sourced_questionnaire_responses", help_text="FHIR source: related person who supplied the answers.")
+    based_on_service_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="questionnaire_responses", help_text="FHIR basedOn: orders or requests this response fulfills.")
+    part_of_observations = models.ManyToManyField(Observation, blank=True, related_name="questionnaire_responses", help_text="FHIR partOf: observations this response is part of.")
+    part_of_procedures = models.ManyToManyField("Procedure", blank=True, related_name="questionnaire_responses", help_text="FHIR partOf: procedures this response is part of.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: in-progress, completed, amended, entered-in-error, or stopped.")
+    questionnaire = models.CharField(max_length=255, blank=True, help_text="FHIR questionnaire: canonical URL or identifier for the form definition.")
+    authored = models.DateTimeField(null=True, blank=True, help_text="FHIR authored: when the answers were gathered.")
+    item_summary = models.TextField(blank=True, help_text="FHIR item: question/answer summary.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this questionnaire response.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Questionnaire Response"
+        verbose_name_plural = "Questionnaire Responses"
+
+    def __str__(self):
+        return self.questionnaire or f"Questionnaire Response #{self.pk}"
+
+
+class ImmunizationRecommendation(models.Model):
+    """FHIR ImmunizationRecommendation: forecast or recommendation for future immunizations."""
+
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="immunization_recommendations", help_text="FHIR patient: patient for whom vaccination is recommended.")
+    authority = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="immunization_recommendations", help_text="FHIR authority: organization responsible for the recommendation.")
+    supporting_immunizations = models.ManyToManyField(Immunization, blank=True, related_name="recommendations", help_text="FHIR recommendation.supportingImmunization: immunizations supporting the recommendation.")
+    supporting_observations = models.ManyToManyField(Observation, blank=True, related_name="immunization_recommendations", help_text="FHIR recommendation.supportingPatientInformation: observations supporting the forecast.")
+    supporting_diagnostic_reports = models.ManyToManyField(DiagnosticReport, blank=True, related_name="immunization_recommendations", help_text="FHIR recommendation.supportingPatientInformation: diagnostic reports supporting the forecast.")
+    date = models.DateTimeField(null=True, blank=True, help_text="FHIR date: when the recommendation was created.")
+    vaccine_code = models.CharField(max_length=255, blank=True, help_text="FHIR recommendation.vaccineCode: vaccine product or type being recommended.")
+    target_disease = models.CharField(max_length=255, blank=True, help_text="FHIR recommendation.targetDisease: disease the recommendation protects against.")
+    forecast_status = models.CharField(max_length=255, blank=True, help_text="FHIR recommendation.forecastStatus: vaccination forecast status.")
+    forecast_reason = models.CharField(max_length=255, blank=True, help_text="FHIR recommendation.forecastReason: reason for the forecast status.")
+    date_criterion_summary = models.TextField(blank=True, help_text="FHIR recommendation.dateCriterion: dates such as earliest, recommended, overdue, or latest.")
+    recommendation_summary = models.TextField(blank=True, help_text="FHIR recommendation: unresolved forecast details and dose series text.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this immunization recommendation.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Immunization Recommendation"
+        verbose_name_plural = "Immunization Recommendations"
+
+    def __str__(self):
+        return self.vaccine_code or self.target_disease or f"Immunization Recommendation #{self.pk}"
+
+
 class PractitionerRole(models.Model):
     practitioner = models.ForeignKey(
         "Practitioner",
@@ -951,6 +1553,7 @@ class PractitionerRole(models.Model):
         null=True,
         blank=True,
         related_name="roles",
+        help_text="FHIR practitioner: practitioner who can perform this role.",
     )
     organization = models.ForeignKey(
         "Organization",
@@ -958,16 +1561,17 @@ class PractitionerRole(models.Model):
         null=True,
         blank=True,
         related_name="practitioner_roles",
+        help_text="FHIR organization: organization where the role applies.",
     )
-    locations = models.ManyToManyField("Location", blank=True, related_name="practitioner_roles")
-    active = models.BooleanField(default=True)
-    role = models.CharField(max_length=255, blank=True)
-    specialty = models.CharField(max_length=255, blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    phone = models.CharField(max_length=30, blank=True)
-    email = models.EmailField(blank=True)
-    notes = models.TextField(blank=True)
+    locations = models.ManyToManyField("Location", blank=True, related_name="practitioner_roles", help_text="FHIR location: locations where this role is available.")
+    active = models.BooleanField(default=True, help_text="FHIR active: whether this role is active.")
+    role = models.CharField(max_length=255, blank=True, help_text="FHIR code: role performed by the practitioner.")
+    specialty = models.CharField(max_length=255, blank=True, help_text="FHIR specialty: specific specialty of the practitioner in this role.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR period.start: when this role became valid.")
+    end_date = models.DateField(null=True, blank=True, help_text="FHIR period.end: when this role stopped being valid.")
+    phone = models.CharField(max_length=30, blank=True, help_text="FHIR telecom: phone contact for this role.")
+    email = models.EmailField(blank=True, help_text="FHIR telecom: email contact for this role.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this practitioner role.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -982,13 +1586,14 @@ class PractitionerRole(models.Model):
 
 
 class ServiceRequest(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="service_requests")
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="service_requests", help_text="FHIR subject: patient the service is requested for.")
     encounter = models.ForeignKey(
         Encounter,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="service_requests",
+        help_text="FHIR encounter: encounter where the request was created.",
     )
     requester_practitioner = models.ForeignKey(
         "Practitioner",
@@ -996,6 +1601,7 @@ class ServiceRequest(models.Model):
         null=True,
         blank=True,
         related_name="requested_services",
+        help_text="FHIR requester: practitioner who requested the service.",
     )
     requester_role = models.ForeignKey(
         PractitionerRole,
@@ -1003,6 +1609,7 @@ class ServiceRequest(models.Model):
         null=True,
         blank=True,
         related_name="requested_services",
+        help_text="FHIR requester: practitioner role that requested the service.",
     )
     requester_organization = models.ForeignKey(
         "Organization",
@@ -1010,6 +1617,7 @@ class ServiceRequest(models.Model):
         null=True,
         blank=True,
         related_name="requested_services",
+        help_text="FHIR requester: organization that requested the service.",
     )
     requester_device = models.ForeignKey(
         Device,
@@ -1017,43 +1625,47 @@ class ServiceRequest(models.Model):
         null=True,
         blank=True,
         related_name="requested_services",
+        help_text="FHIR requester: device or system that requested the service.",
     )
-    care_plans = models.ManyToManyField(CarePlan, blank=True, related_name="service_requests")
-    replaces = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="replacement_requests")
+    care_plans = models.ManyToManyField(CarePlan, blank=True, related_name="service_requests", help_text="FHIR basedOn: care plans this request fulfills or follows.")
+    replaces = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="replacement_requests", help_text="FHIR replaces: service requests replaced by this one.")
     performers_practitioners = models.ManyToManyField(
         "Practitioner",
         blank=True,
         related_name="service_request_performances",
+        help_text="FHIR performer: practitioners asked to perform the service.",
     )
     performers_roles = models.ManyToManyField(
         PractitionerRole,
         blank=True,
         related_name="service_request_performances",
+        help_text="FHIR performer: practitioner roles asked to perform the service.",
     )
     performers_organizations = models.ManyToManyField(
         "Organization",
         blank=True,
         related_name="service_request_performances",
+        help_text="FHIR performer: organizations asked to perform the service.",
     )
-    performers_care_teams = models.ManyToManyField(CareTeam, blank=True, related_name="service_requests")
-    performers_devices = models.ManyToManyField(Device, blank=True, related_name="service_request_performances")
-    locations = models.ManyToManyField("Location", blank=True, related_name="service_requests")
-    conditions = models.ManyToManyField(Condition, blank=True, related_name="service_requests")
-    specimens = models.ManyToManyField(Specimen, blank=True, related_name="service_requests")
-    name = models.CharField(max_length=255)
-    status = models.CharField(max_length=30, blank=True)
-    intent = models.CharField(max_length=30, blank=True)
-    category = models.CharField(max_length=255, blank=True)
-    priority = models.CharField(max_length=30, blank=True)
-    do_not_perform = models.BooleanField(default=False)
-    authored_on = models.DateTimeField(null=True, blank=True)
-    occurrence_start = models.DateTimeField(null=True, blank=True)
-    occurrence_end = models.DateTimeField(null=True, blank=True)
-    performer_type = models.CharField(max_length=255, blank=True)
-    location_code = models.CharField(max_length=255, blank=True)
-    reason = models.CharField(max_length=255, blank=True)
-    patient_instruction = models.TextField(blank=True)
-    notes = models.TextField(blank=True)
+    performers_care_teams = models.ManyToManyField(CareTeam, blank=True, related_name="service_requests", help_text="FHIR performer: care teams asked to perform the service.")
+    performers_devices = models.ManyToManyField(Device, blank=True, related_name="service_request_performances", help_text="FHIR performer: devices asked to perform the service.")
+    locations = models.ManyToManyField("Location", blank=True, related_name="service_requests", help_text="FHIR locationReference: requested service locations.")
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="service_requests", help_text="FHIR reasonReference: conditions supporting the request.")
+    specimens = models.ManyToManyField(Specimen, blank=True, related_name="service_requests", help_text="FHIR specimen: specimens relevant to the request.")
+    name = models.CharField(max_length=255, help_text="FHIR code: service, order, procedure, or diagnostic request.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: draft, active, on-hold, revoked, completed, entered-in-error, or unknown.")
+    intent = models.CharField(max_length=30, blank=True, help_text="FHIR intent: proposal, plan, directive, order, original-order, etc.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: classification of service requested.")
+    priority = models.CharField(max_length=30, blank=True, help_text="FHIR priority: routine, urgent, asap, or stat.")
+    do_not_perform = models.BooleanField(default=False, help_text="FHIR doNotPerform: true when this is a request not to perform the service.")
+    authored_on = models.DateTimeField(null=True, blank=True, help_text="FHIR authoredOn: when the request was signed or authored.")
+    occurrence_start = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrence[x]: requested start or occurrence time.")
+    occurrence_end = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrencePeriod.end: requested end time when a period is used.")
+    performer_type = models.CharField(max_length=255, blank=True, help_text="FHIR performerType: requested performer type.")
+    location_code = models.CharField(max_length=255, blank=True, help_text="FHIR locationCode: coded requested location.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode: coded reason for the request.")
+    patient_instruction = models.TextField(blank=True, help_text="FHIR patientInstruction: instructions for the patient.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional service request comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1067,13 +1679,14 @@ class ServiceRequest(models.Model):
 
 
 class EpisodeOfCare(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="episodes_of_care")
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="episodes_of_care", help_text="FHIR patient: patient whose care is grouped into this episode.")
     managing_organization = models.ForeignKey(
         "Organization",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="episodes_of_care",
+        help_text="FHIR managingOrganization: organization with care responsibility.",
     )
     care_manager_practitioner = models.ForeignKey(
         "Practitioner",
@@ -1081,6 +1694,7 @@ class EpisodeOfCare(models.Model):
         null=True,
         blank=True,
         related_name="managed_episodes",
+        help_text="FHIR careManager: practitioner coordinating the episode.",
     )
     care_manager_role = models.ForeignKey(
         PractitionerRole,
@@ -1088,15 +1702,16 @@ class EpisodeOfCare(models.Model):
         null=True,
         blank=True,
         related_name="managed_episodes",
+        help_text="FHIR careManager: practitioner role coordinating the episode.",
     )
-    referral_requests = models.ManyToManyField(ServiceRequest, blank=True, related_name="episodes_of_care")
-    care_teams = models.ManyToManyField(CareTeam, blank=True, related_name="episodes_of_care")
-    status = models.CharField(max_length=30, blank=True)
-    episode_type = models.CharField(max_length=255, blank=True)
-    diagnosis_summary = models.TextField(blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    notes = models.TextField(blank=True)
+    referral_requests = models.ManyToManyField(ServiceRequest, blank=True, related_name="episodes_of_care", help_text="FHIR referralRequest: referrals or requests initiating this episode.")
+    care_teams = models.ManyToManyField(CareTeam, blank=True, related_name="episodes_of_care", help_text="FHIR team: care teams involved in this episode.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: planned, waitlist, active, onhold, finished, cancelled, etc.")
+    episode_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: type of episode or care responsibility.")
+    diagnosis_summary = models.TextField(blank=True, help_text="FHIR diagnosis: imported diagnosis/role/rank summary.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR period.start: start of episode responsibility.")
+    end_date = models.DateField(null=True, blank=True, help_text="FHIR period.end: end of episode responsibility.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this episode of care.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1253,13 +1868,14 @@ class AdverseEvent(models.Model):
 
 
 class CareTeamParticipant(models.Model):
-    care_team = models.ForeignKey(CareTeam, on_delete=models.CASCADE, related_name="participant_links")
+    care_team = models.ForeignKey(CareTeam, on_delete=models.CASCADE, related_name="participant_links", help_text="FHIR CareTeam.participant owner: care team this participant belongs to.")
     practitioner = models.ForeignKey(
         "Practitioner",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="care_team_participations",
+        help_text="FHIR participant.member: practitioner participant.",
     )
     organization = models.ForeignKey(
         "Organization",
@@ -1267,6 +1883,7 @@ class CareTeamParticipant(models.Model):
         null=True,
         blank=True,
         related_name="care_team_participations",
+        help_text="FHIR participant.member: organization participant.",
     )
     location = models.ForeignKey(
         "Location",
@@ -1274,6 +1891,7 @@ class CareTeamParticipant(models.Model):
         null=True,
         blank=True,
         related_name="care_team_participations",
+        help_text="FHIR participant.member: location participant.",
     )
     related_person = models.ForeignKey(
         RelatedPerson,
@@ -1281,14 +1899,15 @@ class CareTeamParticipant(models.Model):
         null=True,
         blank=True,
         related_name="care_team_participations",
+        help_text="FHIR participant.member: related person participant.",
     )
-    role = models.CharField(max_length=255, blank=True)
-    member_display = models.CharField(max_length=255, blank=True)
-    member_reference = models.CharField(max_length=255, blank=True)
-    on_behalf_of_display = models.CharField(max_length=255, blank=True)
-    on_behalf_of_reference = models.CharField(max_length=255, blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
+    role = models.CharField(max_length=255, blank=True, help_text="FHIR participant.role: role of this participant on the team.")
+    member_display = models.CharField(max_length=255, blank=True, help_text="FHIR participant.member.display: imported participant display text.")
+    member_reference = models.CharField(max_length=255, blank=True, help_text="FHIR participant.member.reference: original FHIR member reference.")
+    on_behalf_of_display = models.CharField(max_length=255, blank=True, help_text="FHIR participant.onBehalfOf.display: organization represented by participant.")
+    on_behalf_of_reference = models.CharField(max_length=255, blank=True, help_text="FHIR participant.onBehalfOf.reference: original FHIR onBehalfOf reference.")
+    start_date = models.DateField(null=True, blank=True, help_text="FHIR participant.period.start: when participation started.")
+    end_date = models.DateField(null=True, blank=True, help_text="FHIR participant.period.end: when participation ended.")
 
     class Meta:
         verbose_name = "Care Team Participant"
@@ -1302,14 +1921,14 @@ class CareTeamParticipant(models.Model):
 
 
 class Practitioner(models.Model):
-    name = models.CharField(max_length=255)
-    npi = models.CharField(max_length=30, blank=True)
-    active = models.BooleanField(default=True)
-    qualification = models.CharField(max_length=255, blank=True)
-    phone = models.CharField(max_length=30, blank=True)
-    email = models.EmailField(blank=True)
-    address = models.TextField(blank=True)
-    notes = models.TextField(blank=True)
+    name = models.CharField(max_length=255, help_text="FHIR name: practitioner name.")
+    npi = models.CharField(max_length=30, blank=True, help_text="FHIR identifier: National Provider Identifier when present.")
+    active = models.BooleanField(default=True, help_text="FHIR active: whether the practitioner record is in active use.")
+    qualification = models.CharField(max_length=255, blank=True, help_text="FHIR qualification.code: professional qualification or credential.")
+    phone = models.CharField(max_length=30, blank=True, help_text="FHIR telecom: phone contact.")
+    email = models.EmailField(blank=True, help_text="FHIR telecom: email contact.")
+    address = models.TextField(blank=True, help_text="FHIR address: practitioner address.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this practitioner.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1319,27 +1938,28 @@ class Practitioner(models.Model):
 
 
 class Procedure(models.Model):
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="procedures")
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="procedures", help_text="FHIR subject: patient the procedure was performed on.")
     encounter = models.ForeignKey(
         Encounter,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="procedures",
+        help_text="FHIR encounter: encounter associated with the procedure.",
     )
-    care_plans = models.ManyToManyField(CarePlan, blank=True, related_name="procedures")
-    service_requests = models.ManyToManyField(ServiceRequest, blank=True, related_name="procedures")
-    conditions = models.ManyToManyField(Condition, blank=True, related_name="procedures")
-    name = models.CharField(max_length=255)
-    status = models.CharField(max_length=30, blank=True)
-    category = models.CharField(max_length=255, blank=True)
-    performed_start = models.DateTimeField(null=True, blank=True)
-    performed_end = models.DateTimeField(null=True, blank=True)
-    body_site = models.CharField(max_length=255, blank=True)
-    outcome = models.CharField(max_length=255, blank=True)
-    reason = models.CharField(max_length=255, blank=True)
-    location_display = models.CharField(max_length=255, blank=True)
-    notes = models.TextField(blank=True)
+    care_plans = models.ManyToManyField(CarePlan, blank=True, related_name="procedures", help_text="FHIR basedOn/partOf: care plans related to the procedure.")
+    service_requests = models.ManyToManyField(ServiceRequest, blank=True, related_name="procedures", help_text="FHIR basedOn: service requests fulfilled by the procedure.")
+    conditions = models.ManyToManyField(Condition, blank=True, related_name="procedures", help_text="FHIR reasonReference: conditions that explain why the procedure was performed.")
+    name = models.CharField(max_length=255, help_text="FHIR code: procedure performed.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: preparation, in-progress, completed, stopped, entered-in-error, etc.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: broad classification of procedure.")
+    performed_start = models.DateTimeField(null=True, blank=True, help_text="FHIR performed[x]: start or occurrence time.")
+    performed_end = models.DateTimeField(null=True, blank=True, help_text="FHIR performedPeriod.end: end time when a period is used.")
+    body_site = models.CharField(max_length=255, blank=True, help_text="FHIR bodySite: anatomical site where procedure was performed.")
+    outcome = models.CharField(max_length=255, blank=True, help_text="FHIR outcome: result of the procedure.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reasonCode: coded reason for procedure.")
+    location_display = models.CharField(max_length=255, blank=True, help_text="FHIR location: where procedure was performed.")
+    notes = models.TextField(blank=True, help_text="FHIR note: additional procedure comments.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1349,13 +1969,14 @@ class Procedure(models.Model):
 
 
 class ProcedurePerformer(models.Model):
-    procedure = models.ForeignKey(Procedure, on_delete=models.CASCADE, related_name="performer_links")
+    procedure = models.ForeignKey(Procedure, on_delete=models.CASCADE, related_name="performer_links", help_text="FHIR Procedure.performer owner: procedure this performer belongs to.")
     practitioner = models.ForeignKey(
         Practitioner,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="procedure_performances",
+        help_text="FHIR performer.actor: practitioner who performed the procedure.",
     )
     organization = models.ForeignKey(
         "Organization",
@@ -1363,12 +1984,13 @@ class ProcedurePerformer(models.Model):
         null=True,
         blank=True,
         related_name="procedure_performances",
+        help_text="FHIR performer.actor/onBehalfOf: organization involved in the procedure.",
     )
-    role = models.CharField(max_length=255, blank=True)
-    actor_display = models.CharField(max_length=255, blank=True)
-    actor_reference = models.CharField(max_length=255, blank=True)
-    on_behalf_of_display = models.CharField(max_length=255, blank=True)
-    on_behalf_of_reference = models.CharField(max_length=255, blank=True)
+    role = models.CharField(max_length=255, blank=True, help_text="FHIR performer.function: role or function of the performer.")
+    actor_display = models.CharField(max_length=255, blank=True, help_text="FHIR performer.actor.display: imported performer display text.")
+    actor_reference = models.CharField(max_length=255, blank=True, help_text="FHIR performer.actor.reference: original FHIR actor reference.")
+    on_behalf_of_display = models.CharField(max_length=255, blank=True, help_text="FHIR performer.onBehalfOf.display: organization represented by actor.")
+    on_behalf_of_reference = models.CharField(max_length=255, blank=True, help_text="FHIR performer.onBehalfOf.reference: original FHIR onBehalfOf reference.")
 
     class Meta:
         verbose_name = "Procedure Performer"
@@ -1382,13 +2004,13 @@ class ProcedurePerformer(models.Model):
 
 
 class Organization(models.Model):
-    name = models.CharField(max_length=255)
-    organization_type = models.CharField(max_length=255, blank=True)
-    active = models.BooleanField(default=True)
-    phone = models.CharField(max_length=30, blank=True)
-    email = models.EmailField(blank=True)
-    address = models.TextField(blank=True)
-    notes = models.TextField(blank=True)
+    name = models.CharField(max_length=255, help_text="FHIR name: organization name.")
+    organization_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: kind of organization, such as provider, department, team, or payer.")
+    active = models.BooleanField(default=True, help_text="FHIR active: whether this organization's record is active.")
+    phone = models.CharField(max_length=30, blank=True, help_text="FHIR telecom: phone contact.")
+    email = models.EmailField(blank=True, help_text="FHIR telecom: email contact.")
+    address = models.TextField(blank=True, help_text="FHIR address: organization address.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this organization.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1398,15 +2020,15 @@ class Organization(models.Model):
 
 
 class Location(models.Model):
-    name = models.CharField(max_length=255)
-    status = models.CharField(max_length=30, blank=True)
-    mode = models.CharField(max_length=30, blank=True)
-    location_type = models.CharField(max_length=255, blank=True)
-    managing_organization = models.CharField(max_length=255, blank=True)
-    phone = models.CharField(max_length=30, blank=True)
-    email = models.EmailField(blank=True)
-    address = models.TextField(blank=True)
-    notes = models.TextField(blank=True)
+    name = models.CharField(max_length=255, help_text="FHIR name: location name.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, suspended, or inactive.")
+    mode = models.CharField(max_length=30, blank=True, help_text="FHIR mode: instance or kind.")
+    location_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: kind of location, such as clinic, ward, room, or vehicle.")
+    managing_organization = models.CharField(max_length=255, blank=True, help_text="FHIR managingOrganization: organization responsible for the location.")
+    phone = models.CharField(max_length=30, blank=True, help_text="FHIR telecom: phone contact.")
+    email = models.EmailField(blank=True, help_text="FHIR telecom: email contact.")
+    address = models.TextField(blank=True, help_text="FHIR address: physical address of the location.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this location.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

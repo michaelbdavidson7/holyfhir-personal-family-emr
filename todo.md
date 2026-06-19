@@ -21,33 +21,33 @@
     [x] PractitionerRole - medium priority; connects practitioners to organizations, specialties, locations, and roles
     [x] Device - lower-medium priority; implanted devices, medical equipment, and patient devices
     [ ] Binary - seen in older invalid snapshots; decide whether to import as document attachments or keep as snapshots
-    [ ] Medication - seen in older invalid snapshots; decide whether to map to medication catalog/details or keep using MedicationRequest/MedicationStatement only
+    [x] Medication - standalone medication catalog/details; maps to MedicationCatalog while MedicationRequest/MedicationStatement keep using patient Medication records
     [ ] ImagingStudy - imaging studies/series/instances; link to DiagnosticReport, Encounter, Procedure, and Media where possible
     [ ] Media - clinical photos, imaging key images, waveforms, or other captured media; link to Patient/Encounter/Procedure
-    [ ] Goal - patient/care-team goals; link to CarePlan, Conditions, and lifecycle status
-    [ ] RiskAssessment - risk predictions and probabilities; link to Conditions/Observations/Encounter
+    [x] Goal - patient/care-team goals; link to CarePlan, Conditions, and lifecycle status
+    [x] RiskAssessment - risk predictions and probabilities; link to Conditions/Observations/Encounter
     [x] ClinicalImpression - clinician assessment/synthesis; link to findings, problems, investigations, and plans
     [x] FamilyMemberHistory - family history conditions and relationships
     [x] AdverseEvent - harmful events and contributing products/substances/procedures
     [x] DetectedIssue - clinical safety/quality issues such as drug interactions or duplicate therapy
-    [ ] BodyStructure - body site details used by Procedure, Observation, ImagingStudy, etc.
-    [ ] MedicationAdministration - administered meds; distinct from medication orders/statements
-    [ ] MedicationDispense - dispensed meds; pharmacy/supply event distinct from orders/statements
-    [ ] DeviceRequest - orders/requests for devices
-    [ ] DeviceUseStatement - patient/device usage history
-    [ ] NutritionOrder - dietary/oral/enteral/supplement orders; likely pairs with dietary component
+    [x] BodyStructure - body site details used by Procedure, Observation, ImagingStudy, etc.
+    [x] MedicationAdministration - administered meds; distinct from medication orders/statements
+    [x] MedicationDispense - dispensed meds; pharmacy/supply event distinct from orders/statements
+    [x] DeviceRequest - orders/requests for devices
+    [x] DeviceUseStatement - patient/device usage history
+    [x] NutritionOrder - dietary/oral/enteral/supplement orders; likely pairs with dietary component
     [ ] MedicationKnowledge - drug knowledge/catalog metadata; probably snapshot/generic first, first-class later only if needed
     [ ] Medication-related definitional resources - MedicinalProduct*, Substance*, MedicationKnowledge; probably snapshot/generic unless building a medication knowledge base
     [ ] ImmunizationEvaluation - immunization validity/status evaluation
-    [ ] ImmunizationRecommendation - vaccine forecast/recommendations
-    [ ] QuestionnaireResponse - patient-entered forms and assessments
+    [x] ImmunizationRecommendation - vaccine forecast/recommendations
+    [x] QuestionnaireResponse - patient-entered forms and assessments
     [ ] Questionnaire - form definitions for QuestionnaireResponse
-    [ ] Communication - messages/communications about care
-    [ ] CommunicationRequest - requested communications
+    [x] Communication - messages/communications about care
+    [x] CommunicationRequest - requested communications
     [ ] RequestGroup - grouped/conditional requests and plans
     [ ] GuidanceResponse - decision-support output
-    [ ] Flag - warnings/alerts on patient records
-    [ ] List - FHIR lists/groupings of clinical resources
+    [x] Flag - warnings/alerts on patient records
+    [x] List - FHIR lists/groupings of clinical resources
     [ ] Composition - structured clinical documents; may map to ClinicalDocument or document sections
     [ ] DocumentManifest - document package/index; link to ClinicalDocument/DocumentReference
     [x] RelatedPerson - caregivers/family/proxies related to patient

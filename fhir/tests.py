@@ -16,6 +16,7 @@ from django.urls import reverse
 
 from clinical.models import (
     AdverseEvent,
+    BodyStructure,
     CarePlan,
     CareTeam,
     CareTeamParticipant,
@@ -24,6 +25,8 @@ from clinical.models import (
     Condition,
     DetectedIssue,
     Device,
+    DeviceRequest,
+    DeviceUseStatement,
     DiagnosticReport,
     Encounter,
     EpisodeOfCare,
@@ -31,9 +34,17 @@ from clinical.models import (
     FamilyMemberHistoryCondition,
     FHIRGroup,
     FHIRGroupMember,
+    FHIRList,
+    Flag,
+    Goal,
     Immunization,
+    ImmunizationRecommendation,
     Location,
+    MedicationAdministration,
+    MedicationCatalog,
+    MedicationDispense,
     Medication,
+    NutritionOrder,
     Observation,
     Organization,
     Person,
@@ -43,8 +54,12 @@ from clinical.models import (
     Procedure,
     ProcedurePerformer,
     RelatedPerson,
+    RiskAssessment,
     ServiceRequest,
     Specimen,
+    Communication,
+    CommunicationRequest,
+    QuestionnaireResponse,
 )
 from documents.models import ClinicalDocument
 from patients.models import PatientProfile
@@ -141,6 +156,193 @@ class FHIRImportTests(TestCase):
 
         self.assertEqual(FHIRResourceSnapshot.objects.count(), 4)
         self.assertEqual(FHIRLink.objects.count(), 4)
+
+    def test_imports_extended_clinical_resource_batch(self):
+        payload = {
+            "resourceType": "Bundle",
+            "entry": [
+                {"resource": {"resourceType": "Patient", "id": "pat-extended", "name": [{"family": "Chen", "given": ["Ari"]}]}},
+                {"resource": {"resourceType": "Organization", "id": "org-1", "name": "Good Health"}},
+                {"resource": {"resourceType": "Practitioner", "id": "prac-1", "name": [{"text": "Dr. Stone"}]}},
+                {
+                    "resource": {
+                        "resourceType": "Medication",
+                        "id": "medcat-1",
+                        "code": {"text": "Acetaminophen 325 MG Oral Tablet"},
+                        "status": "active",
+                        "manufacturer": {"reference": "Organization/org-1"},
+                        "form": {"text": "Tablet"},
+                        "ingredient": [{"itemCodeableConcept": {"text": "Acetaminophen"}, "isActive": True}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Condition",
+                        "id": "cond-ext",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "code": {"text": "Fever"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Observation",
+                        "id": "obs-ext",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "code": {"text": "Temperature"},
+                        "valueQuantity": {"value": 38.2, "unit": "C"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Immunization",
+                        "id": "imm-ext",
+                        "patient": {"reference": "Patient/pat-extended"},
+                        "vaccineCode": {"text": "Influenza vaccine"},
+                        "occurrenceDateTime": "2024-10-01",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ServiceRequest",
+                        "id": "sr-ext",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "active",
+                        "intent": "order",
+                        "code": {"text": "Follow up call"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "MedicationAdministration",
+                        "id": "medadmin-1",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "completed",
+                        "medicationReference": {"reference": "Medication/medcat-1", "display": "Acetaminophen"},
+                        "request": {"reference": "ServiceRequest/sr-ext"},
+                        "effectiveDateTime": "2024-01-02T10:00:00Z",
+                        "performer": [{"actor": {"reference": "Practitioner/prac-1"}}],
+                        "dosage": {"text": "One tablet", "dose": {"value": 325, "unit": "mg"}},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "MedicationDispense",
+                        "id": "meddisp-1",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "completed",
+                        "medicationReference": {"reference": "Medication/medcat-1", "display": "Acetaminophen"},
+                        "performer": [{"actor": {"reference": "Organization/org-1"}}],
+                        "quantity": {"value": 30, "unit": "tablet"},
+                        "whenHandedOver": "2024-01-02T11:00:00Z",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "NutritionOrder",
+                        "id": "nutrition-1",
+                        "patient": {"reference": "Patient/pat-extended"},
+                        "status": "active",
+                        "intent": "order",
+                        "dateTime": "2024-01-03T09:00:00Z",
+                        "orderer": {"reference": "Practitioner/prac-1"},
+                        "oralDiet": {"type": [{"text": "Low sodium diet"}]},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Communication",
+                        "id": "comm-1",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "completed",
+                        "sender": {"reference": "Practitioner/prac-1"},
+                        "recipient": [{"reference": "Organization/org-1"}],
+                        "sent": "2024-01-04T09:00:00Z",
+                        "payload": [{"contentString": "Patient instructions sent."}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "CommunicationRequest",
+                        "id": "commreq-1",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "active",
+                        "requester": {"reference": "Practitioner/prac-1"},
+                        "recipient": [{"reference": "Practitioner/prac-1"}],
+                        "basedOn": [{"reference": "ServiceRequest/sr-ext"}],
+                        "payload": [{"contentString": "Call patient tomorrow."}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Flag",
+                        "id": "flag-1",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "active",
+                        "author": {"reference": "Organization/org-1"},
+                        "code": {"text": "Interpreter requested"},
+                        "period": {"start": "2024-01-01T00:00:00Z"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "List",
+                        "id": "list-1",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "current",
+                        "mode": "working",
+                        "title": "Problem and result list",
+                        "entry": [
+                            {"item": {"reference": "Condition/cond-ext"}},
+                            {"item": {"reference": "Observation/obs-ext"}},
+                        ],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "QuestionnaireResponse",
+                        "id": "qr-1",
+                        "subject": {"reference": "Patient/pat-extended"},
+                        "status": "completed",
+                        "questionnaire": "http://example.test/forms/intake",
+                        "authored": "2024-01-05T09:00:00Z",
+                        "basedOn": [{"reference": "ServiceRequest/sr-ext"}],
+                        "item": [{"linkId": "symptoms", "text": "Symptoms", "answer": [{"valueString": "Fever"}]}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ImmunizationRecommendation",
+                        "id": "immrec-1",
+                        "patient": {"reference": "Patient/pat-extended"},
+                        "date": "2024-01-06T09:00:00Z",
+                        "authority": {"reference": "Organization/org-1"},
+                        "recommendation": [
+                            {
+                                "vaccineCode": [{"text": "COVID-19 vaccine"}],
+                                "targetDisease": {"text": "COVID-19"},
+                                "forecastStatus": {"text": "Due"},
+                                "supportingImmunization": [{"reference": "Immunization/imm-ext"}],
+                                "supportingPatientInformation": [{"reference": "Observation/obs-ext"}],
+                            }
+                        ],
+                    }
+                },
+            ],
+        }
+
+        result = import_fhir_json(payload)
+
+        self.assertEqual(result.errors, [])
+        self.assertEqual(MedicationCatalog.objects.get().manufacturer.name, "Good Health")
+        self.assertEqual(MedicationAdministration.objects.get().medication_catalog.name, "Acetaminophen 325 MG Oral Tablet")
+        self.assertEqual(MedicationDispense.objects.get().performer_organization.name, "Good Health")
+        self.assertEqual(NutritionOrder.objects.get().oral_diet_summary, "Low sodium diet")
+        self.assertEqual(Communication.objects.get().recipients_organizations.get().name, "Good Health")
+        self.assertEqual(CommunicationRequest.objects.get().based_on_service_requests.get().name, "Follow up call")
+        self.assertEqual(Flag.objects.get().code, "Interpreter requested")
+        self.assertEqual(FHIRList.objects.get().conditions.get().name, "Fever")
+        self.assertEqual(QuestionnaireResponse.objects.get().based_on_service_requests.get().name, "Follow up call")
+        self.assertEqual(ImmunizationRecommendation.objects.get().supporting_immunizations.get().vaccine_name, "Influenza vaccine")
 
     def test_reimport_updates_linked_resources(self):
         payload = {
@@ -1462,6 +1664,149 @@ class FHIRImportTests(TestCase):
         self.assertEqual(FHIRGroupMember.objects.get(patient=PatientProfile.objects.get()).group, group)
         self.assertEqual(FHIRGroupMember.objects.get(device=Device.objects.get()).group, group)
 
+    def test_imports_goal_risk_body_structure_and_device_resources(self):
+        payload = {
+            "resourceType": "Bundle",
+            "type": "collection",
+            "entry": [
+                {"resource": {"resourceType": "Patient", "id": "pat-1", "name": [{"family": "Rivera", "given": ["Maya"]}]}},
+                {"resource": {"resourceType": "Practitioner", "id": "prac-1", "name": [{"family": "Nguyen", "given": ["Ari"]}]}},
+                {"resource": {"resourceType": "Organization", "id": "org-1", "name": "Example Clinic"}},
+                {"resource": {"resourceType": "Encounter", "id": "enc-1", "subject": {"reference": "Patient/pat-1"}}},
+                {"resource": {"resourceType": "Condition", "id": "cond-1", "subject": {"reference": "Patient/pat-1"}, "code": {"text": "Fall risk"}}},
+                {"resource": {"resourceType": "Observation", "id": "obs-1", "subject": {"reference": "Patient/pat-1"}, "code": {"text": "Gait score"}, "valueString": "Unsteady"}},
+                {"resource": {"resourceType": "Device", "id": "device-1", "patient": {"reference": "Patient/pat-1"}, "type": {"text": "Walker"}}},
+                {"resource": {"resourceType": "ServiceRequest", "id": "sr-1", "subject": {"reference": "Patient/pat-1"}, "status": "active", "intent": "order", "code": {"text": "PT evaluation"}}},
+                {
+                    "resource": {
+                        "resourceType": "DiagnosticReport",
+                        "id": "dr-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "status": "final",
+                        "code": {"text": "Mobility report"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "RiskAssessment",
+                        "id": "risk-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "encounter": {"reference": "Encounter/enc-1"},
+                        "status": "final",
+                        "code": {"text": "Fall risk assessment"},
+                        "performer": {"reference": "Practitioner/prac-1"},
+                        "basis": [
+                            {"reference": "Condition/cond-1"},
+                            {"reference": "Observation/obs-1"},
+                            {"reference": "DiagnosticReport/dr-1"},
+                        ],
+                        "prediction": [{"outcome": {"text": "Fall"}, "probabilityDecimal": 0.2, "qualitativeRisk": {"text": "moderate"}}],
+                        "mitigation": "Use walker.",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Goal",
+                        "id": "goal-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "lifecycleStatus": "active",
+                        "achievementStatus": {"text": "in progress"},
+                        "description": {"text": "Walk safely at home"},
+                        "expressedBy": {"reference": "Practitioner/prac-1"},
+                        "addresses": [
+                            {"reference": "Condition/cond-1"},
+                            {"reference": "Observation/obs-1"},
+                            {"reference": "RiskAssessment/risk-1"},
+                        ],
+                        "target": [{"measure": {"text": "Falls"}, "detailInteger": 0, "dueDate": "2024-05-01"}],
+                        "outcomeReference": [{"reference": "Observation/obs-1"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "BodyStructure",
+                        "id": "body-1",
+                        "patient": {"reference": "Patient/pat-1"},
+                        "active": True,
+                        "location": {"text": "Left knee"},
+                        "morphology": {"text": "Surgical site"},
+                        "description": "Left knee surgical site",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "DeviceRequest",
+                        "id": "devreq-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "encounter": {"reference": "Encounter/enc-1"},
+                        "status": "active",
+                        "intent": "order",
+                        "codeReference": {"reference": "Device/device-1"},
+                        "requester": {"reference": "Practitioner/prac-1"},
+                        "basedOn": [{"reference": "ServiceRequest/sr-1"}],
+                        "reasonReference": [
+                            {"reference": "Condition/cond-1"},
+                            {"reference": "RiskAssessment/risk-1"},
+                        ],
+                        "performer": [{"reference": "Organization/org-1"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "DeviceUseStatement",
+                        "id": "devuse-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "status": "active",
+                        "device": {"reference": "Device/device-1"},
+                        "source": {"reference": "Practitioner/prac-1"},
+                        "basedOn": [
+                            {"reference": "ServiceRequest/sr-1"},
+                            {"reference": "DeviceRequest/devreq-1"},
+                        ],
+                        "reasonReference": [
+                            {"reference": "Condition/cond-1"},
+                            {"reference": "RiskAssessment/risk-1"},
+                        ],
+                        "bodySite": {"text": "Left hand"},
+                    }
+                },
+            ],
+        }
+
+        result = import_fhir_json(payload)
+
+        self.assertEqual(result.errors, [])
+        risk = RiskAssessment.objects.get()
+        self.assertEqual(risk.encounter, Encounter.objects.get())
+        self.assertEqual(risk.performer_practitioner, Practitioner.objects.get())
+        self.assertEqual(risk.conditions.get(), Condition.objects.get())
+        self.assertEqual(risk.observations.get(), Observation.objects.get())
+        self.assertEqual(risk.diagnostic_reports.get(), DiagnosticReport.objects.get())
+
+        goal = Goal.objects.get()
+        self.assertEqual(goal.expressed_by_practitioner, Practitioner.objects.get())
+        self.assertEqual(goal.addresses_conditions.get(), Condition.objects.get())
+        self.assertEqual(goal.addresses_observations.get(), Observation.objects.get())
+        self.assertEqual(goal.addresses_risk_assessments.get(), risk)
+        self.assertEqual(goal.outcome_observations.get(), Observation.objects.get())
+
+        self.assertEqual(BodyStructure.objects.get().description, "Left knee surgical site")
+
+        device_request = DeviceRequest.objects.get()
+        self.assertEqual(device_request.devices.get(), Device.objects.get())
+        self.assertEqual(device_request.service_requests.get(), ServiceRequest.objects.get())
+        self.assertEqual(device_request.conditions.get(), Condition.objects.get())
+        self.assertEqual(device_request.risk_assessments.get(), risk)
+        self.assertEqual(device_request.performers_organizations.get(), Organization.objects.get())
+
+        device_use = DeviceUseStatement.objects.get()
+        self.assertEqual(device_use.device, Device.objects.get())
+        self.assertEqual(device_use.source_practitioner, Practitioner.objects.get())
+        self.assertEqual(device_use.based_on_service_requests.get(), ServiceRequest.objects.get())
+        self.assertEqual(device_use.based_on_device_requests.get(), device_request)
+        self.assertEqual(device_use.reason_conditions.get(), Condition.objects.get())
+        self.assertEqual(device_use.reason_risk_assessments.get(), risk)
+
     def test_missing_patient_reference_is_snapshotted_as_invalid(self):
         result = import_fhir_json(
             {
@@ -1482,11 +1827,10 @@ class FHIRImportTests(TestCase):
     def test_unsupported_resource_is_preserved_as_valid_snapshot_only(self):
         result = import_fhir_json(
             {
-                "resourceType": "Goal",
-                "id": "goal-1",
-                "lifecycleStatus": "active",
-                "subject": {"reference": "Patient/missing"},
-                "description": {"text": "Walk daily"},
+                "resourceType": "VisionPrescription",
+                "id": "vision-1",
+                "status": "active",
+                "patient": {"reference": "Patient/missing"},
             }
         )
 
@@ -1498,7 +1842,7 @@ class FHIRImportTests(TestCase):
         self.assertTrue(snapshot.is_valid)
         self.assertEqual(snapshot.import_status, FHIRResourceSnapshot.IMPORT_STATUS_SNAPSHOT_ONLY)
         self.assertEqual(snapshot.validation_errors, [])
-        self.assertEqual(snapshot.resource_type, "Goal")
+        self.assertEqual(snapshot.resource_type, "VisionPrescription")
 
     def test_loads_fhir_json_rejects_invalid_json(self):
         with self.assertRaises(ValueError):
