@@ -12,20 +12,27 @@ from django.utils.dateparse import parse_date, parse_datetime
 from clinical.models import (
     AdverseEvent,
     Allergy,
+    Appointment,
+    AppointmentResponse,
+    BinaryResource,
     BodyStructure,
     CarePlan,
     CareTeam,
     CareTeamParticipant,
     ClinicalImpression,
     ClinicalImpressionFinding,
+    Composition,
     Condition,
     DetectedIssue,
     Device,
+    DeviceMetric,
     DeviceRequest,
     DeviceUseStatement,
     DiagnosticReport,
+    DocumentManifest,
     Encounter,
     EpisodeOfCare,
+    Endpoint,
     FamilyMemberHistory,
     FamilyMemberHistoryCondition,
     FHIRGroup,
@@ -34,6 +41,7 @@ from clinical.models import (
     Flag,
     GuidanceResponse,
     Goal,
+    HealthcareService,
     ImagingStudy,
     Immunization,
     ImmunizationEvaluation,
@@ -49,6 +57,7 @@ from clinical.models import (
     NutritionOrder,
     Observation,
     Organization,
+    OrganizationAffiliation,
     Person,
     PersonLink,
     Practitioner,
@@ -66,9 +75,14 @@ from clinical.models import (
     ExplanationOfBenefit,
     InsurancePlan,
     QuestionnaireResponse,
+    Provenance,
     RequestGroup,
+    Schedule,
+    Slot,
+    Substance,
     SupplyDelivery,
     SupplyRequest,
+    Task,
     VisionPrescription,
 )
 from documents.models import ClinicalDocument
@@ -80,6 +94,9 @@ from .models import FHIRLink, FHIRResourceSnapshot
 SUPPORTED_RESOURCE_TYPES = {
     "Patient",
     "AdverseEvent",
+    "Appointment",
+    "AppointmentResponse",
+    "Binary",
     "Condition",
     "AllergyIntolerance",
     "BodyStructure",
@@ -109,28 +126,39 @@ SUPPORTED_RESOURCE_TYPES = {
     "CarePlan",
     "Communication",
     "CommunicationRequest",
+    "Composition",
     "Consent",
     "Coverage",
     "Device",
+    "DeviceMetric",
     "DeviceRequest",
     "DeviceUseStatement",
     "DocumentReference",
+    "DocumentManifest",
     "EpisodeOfCare",
+    "Endpoint",
     "Group",
     "Goal",
     "ExplanationOfBenefit",
     "InsurancePlan",
+    "HealthcareService",
+    "OrganizationAffiliation",
     "PractitionerRole",
     "Person",
+    "Provenance",
     "Procedure",
     "QuestionnaireResponse",
     "RequestGroup",
     "RelatedPerson",
     "RiskAssessment",
+    "Schedule",
     "ServiceRequest",
+    "Slot",
     "Specimen",
+    "Substance",
     "SupplyDelivery",
     "SupplyRequest",
+    "Task",
     "VisionPrescription",
     "Practitioner",
     "Organization",
@@ -141,14 +169,23 @@ SUPPORTED_RESOURCE_TYPES = {
 
 PATIENTLESS_RESOURCE_TYPES = {
     "Group",
+    "Binary",
+    "Endpoint",
+    "HealthcareService",
     "InsurancePlan",
     "MedicationKnowledge",
     "Medication",
+    "OrganizationAffiliation",
     "Person",
     "Practitioner",
     "PractitionerRole",
+    "Provenance",
     "Organization",
     "Location",
+    "Schedule",
+    "Slot",
+    "Substance",
+    "DeviceMetric",
 }
 
 
@@ -194,20 +231,30 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 continue
 
             importer = {
+                "Binary": _import_binary_resource,
+                "DeviceMetric": _import_device_metric,
+                "Endpoint": _import_endpoint,
                 "Group": _import_group,
+                "HealthcareService": _import_healthcare_service,
                 "InsurancePlan": _import_insurance_plan,
                 "MedicationKnowledge": _import_medication_knowledge,
                 "Medication": _import_medication_catalog,
+                "OrganizationAffiliation": _import_organization_affiliation,
                 "Person": _import_person,
                 "Practitioner": _import_practitioner,
                 "PractitionerRole": _import_practitioner_role,
+                "Provenance": _import_provenance,
                 "Organization": _import_organization,
                 "Location": _import_location,
+                "Schedule": _import_schedule,
+                "Slot": _import_slot,
+                "Substance": _import_substance,
             }[resource_type]
-            obj, created = importer(resource, None)
+            patient = _resolve_patient(resource, patient_by_reference, default_patient=target_patient)
+            obj, created = importer(resource, patient)
             _record_import(result, created)
-            _snapshot(resource, None, source, result)
-            _link(resource, None, _model_label(obj), obj.id, "fhir_to_internal")
+            _snapshot(resource, patient, source, result)
+            _link(resource, patient, _model_label(obj), obj.id, "fhir_to_internal")
 
         for resource in resources:
             resource_type = resource.get("resourceType")
@@ -243,12 +290,16 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 "Condition": _import_condition,
                 "AdverseEvent": _import_adverse_event,
                 "AllergyIntolerance": _import_allergy,
+                "Appointment": _import_appointment,
+                "AppointmentResponse": _import_appointment_response,
                 "BodyStructure": _import_body_structure,
                 "ClinicalImpression": _import_clinical_impression,
+                "Composition": _import_composition,
                 "DetectedIssue": _import_detected_issue,
                 "DeviceRequest": _import_device_request,
                 "DeviceUseStatement": _import_device_use_statement,
                 "DiagnosticReport": _import_diagnostic_report,
+                "DocumentManifest": _import_document_manifest,
                 "FamilyMemberHistory": _import_family_member_history,
                 "Flag": _import_flag,
                 "GuidanceResponse": _import_guidance_response,
@@ -279,14 +330,18 @@ def import_fhir_payloads(payloads, source="imported", target_patient=None):
                 "Goal": _import_goal,
                 "PractitionerRole": _import_practitioner_role,
                 "Procedure": _import_procedure,
+                "Provenance": _import_provenance,
                 "QuestionnaireResponse": _import_questionnaire_response,
                 "RequestGroup": _import_request_group,
                 "RelatedPerson": _import_related_person,
                 "RiskAssessment": _import_risk_assessment,
                 "ServiceRequest": _import_service_request,
+                "Schedule": _import_schedule,
+                "Slot": _import_slot,
                 "Specimen": _import_specimen,
                 "SupplyDelivery": _import_supply_delivery,
                 "SupplyRequest": _import_supply_request,
+                "Task": _import_task,
                 "VisionPrescription": _import_vision_prescription,
                 "Practitioner": _import_practitioner,
                 "Organization": _import_organization,
@@ -1112,6 +1167,165 @@ def _import_supply_delivery(resource, patient):
     return obj, created
 
 
+def _import_provenance(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Provenance") or Provenance(patient=patient)
+    occurred_period = resource.get("occurredPeriod") or {}
+    obj.patient = patient
+    obj.location = _reference_as(resource.get("location"), Location)
+    obj.target_summary = "\n".join(_display(ref) for ref in resource.get("target") or [])
+    obj.activity = _codeable_text(resource.get("activity")) or ""
+    obj.occurred_start = _datetime(resource.get("occurredDateTime") or occurred_period.get("start"))
+    obj.occurred_end = _datetime(occurred_period.get("end"))
+    obj.recorded = _datetime(resource.get("recorded"))
+    obj.policy = "\n".join(resource.get("policy") or [])
+    obj.reason = ", ".join(text for text in (_codeable_text(v) for v in resource.get("reason") or []) if text)
+    obj.agent_summary = _provenance_agent_summary(resource)
+    obj.entity_summary = _provenance_entity_summary(resource)
+    obj.signature_summary = _signature_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_composition(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Composition") or Composition(patient=patient)
+    obj.patient = patient
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.custodian = _reference_as(resource.get("custodian"), Organization)
+    obj.status = resource.get("status") or ""
+    obj.composition_type = _codeable_text(resource.get("type")) or ""
+    obj.category = ", ".join(text for text in (_codeable_text(v) for v in resource.get("category") or []) if text)
+    obj.title = resource.get("title") or obj.composition_type or "Composition"
+    obj.date = _datetime(resource.get("date"))
+    obj.confidentiality = resource.get("confidentiality") or ""
+    obj.section_summary = _composition_section_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    obj.authors_practitioners.set([o for o in (_reference_as(ref, Practitioner) for ref in resource.get("author") or []) if o])
+    return obj, created
+
+
+def _import_document_manifest(resource, patient):
+    obj = _object_for_resource(resource, "clinical.DocumentManifest") or DocumentManifest(patient=patient)
+    obj.patient = patient
+    obj.author_practitioner = _reference_as(_first(resource.get("author")), Practitioner)
+    obj.source = resource.get("source") or ""
+    obj.status = resource.get("status") or ""
+    obj.manifest_type = _codeable_text(resource.get("type")) or ""
+    obj.created_datetime = _datetime(resource.get("created"))
+    obj.description = resource.get("description") or ""
+    obj.content_summary = "\n".join(_display(ref) for ref in resource.get("content") or [])
+    obj.related_summary = _document_manifest_related_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_schedule(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Schedule") or Schedule(patient=patient)
+    horizon = resource.get("planningHorizon") or {}
+    obj.patient = patient
+    obj.active = bool(resource.get("active", True))
+    obj.service_category = _codeable_text(_first(resource.get("serviceCategory"))) or ""
+    obj.service_type = _codeable_text(_first(resource.get("serviceType"))) or ""
+    obj.specialty = _codeable_text(_first(resource.get("specialty"))) or ""
+    obj.planning_horizon_start = _datetime(horizon.get("start"))
+    obj.planning_horizon_end = _datetime(horizon.get("end"))
+    obj.comment = resource.get("comment") or ""
+    created = obj.pk is None
+    obj.save()
+    actors = resource.get("actor") or []
+    obj.actors_practitioners.set([o for o in (_reference_as(ref, Practitioner) for ref in actors) if o])
+    obj.actors_locations.set([o for o in (_reference_as(ref, Location) for ref in actors) if o])
+    obj.actors_healthcare_services.set([o for o in (_reference_as(ref, HealthcareService) for ref in actors) if o])
+    return obj, created
+
+
+def _import_slot(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Slot") or Slot()
+    obj.schedule = _reference_as(resource.get("schedule"), Schedule)
+    obj.status = resource.get("status") or ""
+    obj.service_category = _codeable_text(_first(resource.get("serviceCategory"))) or ""
+    obj.service_type = _codeable_text(_first(resource.get("serviceType"))) or ""
+    obj.specialty = _codeable_text(_first(resource.get("specialty"))) or ""
+    obj.appointment_type = _codeable_text(resource.get("appointmentType")) or ""
+    obj.start_time = _datetime(resource.get("start"))
+    obj.end_time = _datetime(resource.get("end"))
+    obj.overbooked = bool(resource.get("overbooked", False))
+    obj.comment = resource.get("comment") or ""
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_appointment(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Appointment") or Appointment(patient=patient)
+    obj.patient = patient
+    obj.status = resource.get("status") or ""
+    obj.cancelation_reason = _codeable_text(resource.get("cancelationReason")) or ""
+    obj.service_category = _codeable_text(_first(resource.get("serviceCategory"))) or ""
+    obj.service_type = _codeable_text(_first(resource.get("serviceType"))) or ""
+    obj.appointment_type = _codeable_text(resource.get("appointmentType")) or ""
+    obj.reason = _codeable_text(_first(resource.get("reasonCode"))) or ""
+    obj.description = resource.get("description") or ""
+    obj.start_time = _datetime(resource.get("start"))
+    obj.end_time = _datetime(resource.get("end"))
+    obj.minutes_duration = resource.get("minutesDuration")
+    obj.participant_summary = _appointment_participant_summary(resource)
+    obj.comment = "\n".join(part for part in [resource.get("comment") or "", resource.get("patientInstruction") or ""] if part)
+    created = obj.pk is None
+    obj.save()
+    obj.slots.set([o for o in (_reference_as(ref, Slot) for ref in resource.get("slot") or []) if o])
+    obj.participants_practitioners.set([o for o in (_reference_as((p.get("actor") or {}), Practitioner) for p in resource.get("participant") or []) if o])
+    obj.participants_locations.set([o for o in (_reference_as((p.get("actor") or {}), Location) for p in resource.get("participant") or []) if o])
+    obj.based_on_service_requests.set([o for o in (_reference_as(ref, ServiceRequest) for ref in resource.get("basedOn") or []) if o])
+    return obj, created
+
+
+def _import_appointment_response(resource, patient):
+    obj = _object_for_resource(resource, "clinical.AppointmentResponse") or AppointmentResponse(patient=patient)
+    obj.appointment = _reference_as(resource.get("appointment"), Appointment)
+    obj.patient = patient or _reference_as(resource.get("actor"), PatientProfile)
+    obj.actor_practitioner = _reference_as(resource.get("actor"), Practitioner)
+    obj.actor_location = _reference_as(resource.get("actor"), Location)
+    obj.participant_status = resource.get("participantStatus") or ""
+    obj.participant_type = ", ".join(text for text in (_codeable_text(v) for v in resource.get("participantType") or []) if text)
+    obj.start_time = _datetime(resource.get("start"))
+    obj.end_time = _datetime(resource.get("end"))
+    obj.comment = resource.get("comment") or ""
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_task(resource, patient):
+    obj = _object_for_resource(resource, "clinical.Task") or Task(patient=patient)
+    execution = resource.get("executionPeriod") or {}
+    obj.patient = patient or _reference_as(resource.get("for"), PatientProfile)
+    obj.encounter = _reference_as(resource.get("encounter"), Encounter)
+    obj.owner_practitioner = _reference_as(resource.get("owner"), Practitioner)
+    obj.owner_organization = _reference_as(resource.get("owner"), Organization)
+    obj.status = resource.get("status") or ""
+    obj.intent = resource.get("intent") or ""
+    obj.priority = resource.get("priority") or ""
+    obj.code = _codeable_text(resource.get("code")) or ""
+    obj.description = resource.get("description") or ""
+    obj.authored_on = _datetime(resource.get("authoredOn"))
+    obj.last_modified = _datetime(resource.get("lastModified"))
+    obj.execution_start = _datetime(execution.get("start"))
+    obj.execution_end = _datetime(execution.get("end"))
+    obj.input_summary = _task_io_summary(resource, "input")
+    obj.output_summary = _task_io_summary(resource, "output")
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    obj.based_on_service_requests.set([o for o in (_reference_as(ref, ServiceRequest) for ref in resource.get("basedOn") or []) if o])
+    return obj, created
+
+
 def _import_coverage(resource, patient):
     obj = _object_for_resource(resource, "clinical.Coverage") or Coverage(patient=patient)
     period = resource.get("period") or {}
@@ -1600,6 +1814,112 @@ def _import_insurance_plan(resource, patient=None):
     return obj, created
 
 
+def _import_binary_resource(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.BinaryResource") or BinaryResource(patient=patient)
+    data = resource.get("data") or ""
+    decoded = b""
+    if data:
+        try:
+            decoded = b64decode(data)
+        except (BinasciiError, ValueError):
+            decoded = b""
+    obj.patient = patient
+    obj.content_type = resource.get("contentType") or "application/octet-stream"
+    obj.security_context = _display(resource.get("securityContext"))
+    obj.data_size = len(decoded) if decoded else None
+    obj.data_hash = hashlib.sha256(decoded).hexdigest() if decoded else ""
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_endpoint(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.Endpoint") or Endpoint()
+    obj.managing_organization = _reference_as(resource.get("managingOrganization"), Organization)
+    obj.status = resource.get("status") or ""
+    obj.connection_type = _coding_text(resource.get("connectionType")) or _codeable_text(resource.get("connectionType"))
+    obj.name = resource.get("name") or ""
+    obj.payload_type = ", ".join(text for text in (_codeable_text(v) for v in resource.get("payloadType") or []) if text)
+    obj.payload_mime_type = ", ".join(resource.get("payloadMimeType") or [])
+    obj.address = resource.get("address") or ""
+    obj.header_summary = "\n".join(resource.get("header") or [])
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_healthcare_service(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.HealthcareService") or HealthcareService()
+    obj.provided_by = _reference_as(resource.get("providedBy"), Organization)
+    obj.active = bool(resource.get("active", True))
+    obj.category = _codeable_text(_first(resource.get("category"))) or ""
+    obj.service_type = _codeable_text(_first(resource.get("type"))) or ""
+    obj.specialty = _codeable_text(_first(resource.get("specialty"))) or ""
+    obj.name = resource.get("name") or "Healthcare service"
+    obj.comment = resource.get("comment") or ""
+    obj.telecom = _telecom_summary(resource)
+    obj.availability_summary = _availability_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    obj.locations.set([o for o in (_reference_as(ref, Location) for ref in resource.get("location") or []) if o])
+    obj.endpoints.set([o for o in (_reference_as(ref, Endpoint) for ref in resource.get("endpoint") or []) if o])
+    return obj, created
+
+
+def _import_organization_affiliation(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.OrganizationAffiliation") or OrganizationAffiliation()
+    period = resource.get("period") or {}
+    obj.organization = _reference_as(resource.get("organization"), Organization)
+    obj.participating_organization = _reference_as(resource.get("participatingOrganization"), Organization)
+    obj.active = bool(resource.get("active", True))
+    obj.start_date = _date(period.get("start"))
+    obj.end_date = _date(period.get("end"))
+    obj.role = ", ".join(text for text in (_codeable_text(v) for v in resource.get("code") or []) if text)
+    obj.specialty = ", ".join(text for text in (_codeable_text(v) for v in resource.get("specialty") or []) if text)
+    obj.telecom = _telecom_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    obj.networks.set([o for o in (_reference_as(ref, Organization) for ref in resource.get("network") or []) if o])
+    obj.locations.set([o for o in (_reference_as(ref, Location) for ref in resource.get("location") or []) if o])
+    obj.healthcare_services.set([o for o in (_reference_as(ref, HealthcareService) for ref in resource.get("healthcareService") or []) if o])
+    obj.endpoints.set([o for o in (_reference_as(ref, Endpoint) for ref in resource.get("endpoint") or []) if o])
+    return obj, created
+
+
+def _import_substance(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.Substance") or Substance()
+    obj.status = resource.get("status") or ""
+    obj.category = ", ".join(text for text in (_codeable_text(v) for v in resource.get("category") or []) if text)
+    obj.code = _codeable_text(resource.get("code")) or "Substance"
+    obj.description = resource.get("description") or ""
+    obj.instance_summary = _substance_instance_summary(resource)
+    obj.ingredient_summary = _substance_ingredient_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
+def _import_device_metric(resource, patient=None):
+    obj = _object_for_resource(resource, "clinical.DeviceMetric") or DeviceMetric()
+    obj.source = _reference_as(resource.get("source"), Device)
+    obj.parent = _reference_as(resource.get("parent"), Device)
+    obj.metric_type = _codeable_text(resource.get("type")) or "Device metric"
+    obj.unit = _codeable_text(resource.get("unit")) or ""
+    obj.operational_status = resource.get("operationalStatus") or ""
+    obj.color = resource.get("color") or ""
+    obj.category = resource.get("category") or ""
+    obj.calibration_summary = _device_metric_calibration_summary(resource)
+    obj.notes = _notes(resource)
+    created = obj.pk is None
+    obj.save()
+    return obj, created
+
+
 def _import_practitioner(resource, patient=None):
     obj = _object_for_resource(resource, "clinical.Practitioner") or Practitioner()
     obj.name = _human_name(resource) or "Unknown practitioner"
@@ -1665,10 +1985,18 @@ def _object_for_resource(resource, django_model):
         Allergy,
         ClinicalImpression,
         ClinicalImpressionFinding,
+        Composition,
         DetectedIssue,
         DiagnosticReport,
+        DocumentManifest,
+        BinaryResource,
+        Endpoint,
+        HealthcareService,
+        OrganizationAffiliation,
+        Provenance,
         DeviceRequest,
         DeviceUseStatement,
+        DeviceMetric,
         FamilyMemberHistory,
         FamilyMemberHistoryCondition,
         FHIRGroup,
@@ -1714,9 +2042,13 @@ def _object_for_resource(resource, django_model):
         RequestGroup,
         RelatedPerson,
         RiskAssessment,
+        Schedule,
         ServiceRequest,
+        Slot,
         SupplyDelivery,
         SupplyRequest,
+        Substance,
+        Task,
         VisionPrescription,
         Organization,
         Location,
@@ -1742,10 +2074,18 @@ def _object_for_reference(reference):
         "AdverseEvent": "clinical.AdverseEvent",
         "AllergyIntolerance": "clinical.Allergy",
         "ClinicalImpression": "clinical.ClinicalImpression",
+        "Composition": "clinical.Composition",
         "DetectedIssue": "clinical.DetectedIssue",
         "DiagnosticReport": "clinical.DiagnosticReport",
+        "DocumentManifest": "clinical.DocumentManifest",
+        "Binary": "clinical.BinaryResource",
+        "Endpoint": "clinical.Endpoint",
+        "HealthcareService": "clinical.HealthcareService",
+        "OrganizationAffiliation": "clinical.OrganizationAffiliation",
+        "Provenance": "clinical.Provenance",
         "DeviceRequest": "clinical.DeviceRequest",
         "DeviceUseStatement": "clinical.DeviceUseStatement",
+        "DeviceMetric": "clinical.DeviceMetric",
         "FamilyMemberHistory": "clinical.FamilyMemberHistory",
         "Flag": "clinical.Flag",
         "GuidanceResponse": "clinical.GuidanceResponse",
@@ -1781,10 +2121,14 @@ def _object_for_reference(reference):
         "RequestGroup": "clinical.RequestGroup",
         "RelatedPerson": "clinical.RelatedPerson",
         "RiskAssessment": "clinical.RiskAssessment",
+        "Schedule": "clinical.Schedule",
         "ServiceRequest": "clinical.ServiceRequest",
+        "Slot": "clinical.Slot",
         "Specimen": "clinical.Specimen",
+        "Substance": "clinical.Substance",
         "SupplyDelivery": "clinical.SupplyDelivery",
         "SupplyRequest": "clinical.SupplyRequest",
+        "Task": "clinical.Task",
         "VisionPrescription": "clinical.VisionPrescription",
         "DocumentReference": "documents.ClinicalDocument",
         "Patient": "patients.PatientProfile",
@@ -1798,6 +2142,28 @@ def _object_for_reference(reference):
 def _resolve_patient(resource, patient_by_reference, default_patient=None):
     subject = resource.get("subject") or resource.get("patient") or resource.get("beneficiary")
     reference = subject.get("reference") if isinstance(subject, dict) else None
+    if not reference and isinstance(resource.get("for"), dict):
+        reference = resource["for"].get("reference")
+    if not reference:
+        for participant in resource.get("participant") or []:
+            actor = participant.get("actor") or {}
+            if (actor.get("reference") or "").startswith("Patient/"):
+                reference = actor.get("reference")
+                break
+    if not reference:
+        for target in resource.get("target") or []:
+            if (target.get("reference") or "").startswith("Patient/"):
+                reference = target.get("reference")
+                break
+    if not reference:
+        for actor in resource.get("actor") or []:
+            if (actor.get("reference") or "").startswith("Patient/"):
+                reference = actor.get("reference")
+                break
+    if not reference and isinstance(resource.get("actor"), dict):
+        actor_reference = resource["actor"].get("reference") or ""
+        if actor_reference.startswith("Patient/"):
+            reference = actor_reference
     if reference in patient_by_reference:
         return patient_by_reference[reference]
     if reference:
@@ -1894,6 +2260,16 @@ def _telecom(resource, system):
         if telecom.get("system") == system:
             return telecom.get("value") or ""
     return ""
+
+
+def _telecom_summary(resource):
+    lines = []
+    for telecom in resource.get("telecom") or []:
+        value = telecom.get("value")
+        if value:
+            parts = [telecom.get("system") or "", value, telecom.get("use") or ""]
+            lines.append(" / ".join(part for part in parts if part))
+    return "\n".join(lines)
 
 
 def _identifier_value(resource, system_fragment):
@@ -2484,6 +2860,126 @@ def _guidance_data_requirement_summary(resource):
     lines = []
     for requirement in resource.get("dataRequirement") or []:
         line = " / ".join(part for part in [requirement.get("type"), requirement.get("profile", [""])[0] if requirement.get("profile") else ""] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _availability_summary(resource):
+    lines = []
+    for item in resource.get("availableTime") or []:
+        days = ", ".join(item.get("daysOfWeek") or [])
+        times = " - ".join(part for part in [item.get("availableStartTime"), item.get("availableEndTime")] if part)
+        line = " / ".join(part for part in [days, times, "all day" if item.get("allDay") else ""] if part)
+        if line:
+            lines.append(line)
+    for item in resource.get("notAvailable") or []:
+        line = " / ".join(part for part in [item.get("description"), _range_text(item.get("during"))] if part)
+        if line:
+            lines.append(f"Not available: {line}")
+    return "\n".join(lines)
+
+
+def _substance_instance_summary(resource):
+    lines = []
+    for item in resource.get("instance") or []:
+        parts = [
+            (item.get("identifier") or {}).get("value") if isinstance(item.get("identifier"), dict) else "",
+            item.get("expiry") or "",
+            _age_text(item.get("quantity")),
+        ]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _substance_ingredient_summary(resource):
+    lines = []
+    for item in resource.get("ingredient") or []:
+        line = " / ".join(part for part in [_age_text(item.get("quantity")), _codeable_text(item.get("substanceCodeableConcept")) or _display(item.get("substanceReference"))] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _device_metric_calibration_summary(resource):
+    lines = []
+    for item in resource.get("calibration") or []:
+        line = " / ".join(part for part in [item.get("type"), item.get("state"), item.get("time")] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _provenance_agent_summary(resource):
+    lines = []
+    for item in resource.get("agent") or []:
+        parts = [_codeable_text(item.get("type")), _display(item.get("who")), _display(item.get("onBehalfOf"))]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _provenance_entity_summary(resource):
+    lines = []
+    for item in resource.get("entity") or []:
+        line = " / ".join(part for part in [item.get("role"), _display(item.get("what"))] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _signature_summary(resource):
+    lines = []
+    for item in resource.get("signature") or []:
+        line = " / ".join(part for part in [item.get("when"), _display(item.get("who")), item.get("sigFormat") or item.get("targetFormat") or ""] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _composition_section_summary(resource):
+    lines = []
+    for section in resource.get("section") or []:
+        entries = ", ".join(_display(ref) for ref in section.get("entry") or [] if _display(ref))
+        line = " / ".join(part for part in [section.get("title"), _codeable_text(section.get("code")), entries] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _document_manifest_related_summary(resource):
+    lines = []
+    for item in resource.get("related") or []:
+        identifier = item.get("identifier") or {}
+        line = " / ".join(part for part in [identifier.get("value") if isinstance(identifier, dict) else "", _display(item.get("ref"))] if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _appointment_participant_summary(resource):
+    lines = []
+    for item in resource.get("participant") or []:
+        parts = [_display(item.get("actor")), item.get("status") or "", _codeable_text(_first(item.get("type")))]
+        line = " / ".join(part for part in parts if part)
+        if line:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def _task_io_summary(resource, key):
+    lines = []
+    for item in resource.get(key) or []:
+        value = (
+            _codeable_text(item.get("valueCodeableConcept"))
+            or item.get("valueString")
+            or _display(item.get("valueReference"))
+            or _age_text(item.get("valueQuantity"))
+        )
+        line = " / ".join(part for part in [_codeable_text(item.get("type")), value] if part)
         if line:
             lines.append(line)
     return "\n".join(lines)

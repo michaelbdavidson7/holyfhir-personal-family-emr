@@ -14,20 +14,27 @@ Status legend:
 
 - `AllergyIntolerance` -> `clinical.Allergy`
 - `AdverseEvent` -> `clinical.AdverseEvent`
+- `Appointment` -> `clinical.Appointment`
+- `AppointmentResponse` -> `clinical.AppointmentResponse`
+- `Binary` -> `clinical.BinaryResource`
 - `BodyStructure` -> `clinical.BodyStructure`
 - `CarePlan` -> `clinical.CarePlan`
 - `CareTeam` -> `clinical.CareTeam`
 - `ClinicalImpression` -> `clinical.ClinicalImpression`
+- `Composition` -> `clinical.Composition`
 - `Condition` -> `clinical.Condition`
 - `Consent` -> `clinical.Consent`
 - `Coverage` -> `clinical.Coverage`
 - `DetectedIssue` -> `clinical.DetectedIssue`
 - `Device` -> `clinical.Device`
+- `DeviceMetric` -> `clinical.DeviceMetric`
 - `DeviceRequest` -> `clinical.DeviceRequest`
 - `DeviceUseStatement` -> `clinical.DeviceUseStatement`
 - `DiagnosticReport` -> `clinical.DiagnosticReport`
+- `DocumentManifest` -> `clinical.DocumentManifest`
 - `DocumentReference` -> `documents.ClinicalDocument`
 - `Encounter` -> `clinical.Encounter`
+- `Endpoint` -> `clinical.Endpoint`
 - `EpisodeOfCare` -> `clinical.EpisodeOfCare`
 - `ExplanationOfBenefit` -> `clinical.ExplanationOfBenefit`
 - `FamilyMemberHistory` -> `clinical.FamilyMemberHistory`
@@ -35,6 +42,7 @@ Status legend:
 - `GuidanceResponse` -> `clinical.GuidanceResponse`
 - `Group` -> `clinical.FHIRGroup`
 - `Goal` -> `clinical.Goal`
+- `HealthcareService` -> `clinical.HealthcareService`
 - `ImagingStudy` -> `clinical.ImagingStudy`
 - `Immunization` -> `clinical.Immunization`
 - `ImmunizationEvaluation` -> `clinical.ImmunizationEvaluation`
@@ -52,19 +60,25 @@ Status legend:
 - `NutritionOrder` -> `clinical.NutritionOrder`
 - `Observation` -> `clinical.Observation`
 - `Organization` -> `clinical.Organization`
+- `OrganizationAffiliation` -> `clinical.OrganizationAffiliation`
 - `Patient` -> `patients.PatientProfile`
 - `Person` -> `clinical.Person`
 - `Practitioner` -> `clinical.Practitioner`
 - `PractitionerRole` -> `clinical.PractitionerRole`
 - `Procedure` -> `clinical.Procedure`
+- `Provenance` -> `clinical.Provenance`
 - `QuestionnaireResponse` -> `clinical.QuestionnaireResponse`
 - `RequestGroup` -> `clinical.RequestGroup`
 - `RelatedPerson` -> `clinical.RelatedPerson`
 - `RiskAssessment` -> `clinical.RiskAssessment`
+- `Schedule` -> `clinical.Schedule`
 - `ServiceRequest` -> `clinical.ServiceRequest`
+- `Slot` -> `clinical.Slot`
 - `Specimen` -> `clinical.Specimen`
+- `Substance` -> `clinical.Substance`
 - `SupplyDelivery` -> `clinical.SupplyDelivery`
 - `SupplyRequest` -> `clinical.SupplyRequest`
+- `Task` -> `clinical.Task`
 - `VisionPrescription` -> `clinical.VisionPrescription`
 - `MolecularSequence` -> `clinical.MolecularSequence`
 
@@ -99,7 +113,7 @@ Status legend:
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `Provenance` | Planned | Useful for import/source trust and record history. |
+| `Provenance` | First-class | Useful for import/source trust and record history. |
 | `AuditEvent` | Snapshot candidate | Security/system audit event. |
 | `Consent` | First-class | Privacy, treatment, procedure, vaccine, and other consent directives. |
 
@@ -107,8 +121,8 @@ Status legend:
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `Composition` | Planned | Structured document sections; may map to ClinicalDocument/document sections. |
-| `DocumentManifest` | Planned | Document package/index; link to ClinicalDocument/DocumentReference. |
+| `Composition` | First-class | Structured document sections; may map to ClinicalDocument/document sections. |
+| `DocumentManifest` | First-class | Document package/index; link to ClinicalDocument/DocumentReference. |
 | `DocumentReference` | First-class | Maps to `ClinicalDocument`; stores attachments and relationships. |
 
 ### Other
@@ -117,7 +131,7 @@ Status legend:
 | --- | --- | --- |
 | `CatalogEntry` | Snapshot candidate | Catalog metadata. |
 | `Basic` | Snapshot candidate | Generic extension resource. |
-| `Binary` | Planned | Needed for external/inline document or media content. |
+| `Binary` | First-class | Needed for external/inline document or media content. |
 | `Bundle` | Parser/container | Extracted into contained resources; not stored as a model. |
 | `Linkage` | Snapshot candidate | Resource identity/linkage metadata. |
 | `MessageHeader` | Snapshot candidate | Messaging envelope. |
@@ -143,29 +157,29 @@ Status legend:
 | Resource | Status | Notes |
 | --- | --- | --- |
 | `Organization` | First-class | Directory resource. |
-| `OrganizationAffiliation` | Planned | Organization-to-organization/service relationships. |
-| `HealthcareService` | Planned | Services offered by organizations/locations. |
-| `Endpoint` | Planned | Technical endpoint; likely interop/directory support. |
+| `OrganizationAffiliation` | First-class | Organization-to-organization/service relationships. |
+| `HealthcareService` | First-class | Services offered by organizations/locations. |
+| `Endpoint` | First-class | Technical endpoint; likely interop/directory support. |
 | `Location` | First-class | Directory/site resource. |
 
 ### Entities #2
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `Substance` | Planned | Useful for allergies/medications/labs; likely catalog-style. |
+| `Substance` | First-class | Useful for allergies/medications/labs; likely catalog-style. |
 | `BiologicallyDerivedProduct` | Snapshot candidate | Blood/tissue/product details. |
 | `Device` | First-class | Patient/device inventory and references. |
-| `DeviceMetric` | Planned | Device measurement channels/configuration. |
+| `DeviceMetric` | First-class | Device measurement channels/configuration. |
 
 ### Workflow Management
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `Task` | Planned | Workflow/reminders/imported tasks. |
-| `Appointment` | Planned | Scheduling/calendar support. |
-| `AppointmentResponse` | Planned | Appointment participant response. |
-| `Schedule` | Planned | Availability schedule. |
-| `Slot` | Planned | Bookable time slot. |
+| `Task` | First-class | Workflow/reminders/imported tasks. |
+| `Appointment` | First-class | Scheduling/calendar support. |
+| `AppointmentResponse` | First-class | Appointment participant response. |
+| `Schedule` | First-class | Availability schedule. |
+| `Slot` | First-class | Bookable time slot. |
 | `VerificationResult` | Snapshot candidate | Verification metadata. |
 | `Encounter` | First-class | Visit/action record. |
 | `EpisodeOfCare` | First-class | Larger care episode grouping. |

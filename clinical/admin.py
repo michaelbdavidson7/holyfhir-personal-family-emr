@@ -54,14 +54,28 @@ from .models import (
     CommunicationRequest,
     Consent,
     Coverage,
+    Appointment,
+    AppointmentResponse,
+    BinaryResource,
+    Composition,
+    DeviceMetric,
+    DocumentManifest,
+    Endpoint,
     ExplanationOfBenefit,
     Flag,
+    HealthcareService,
     InsurancePlan,
     QuestionnaireResponse,
     RequestGroup,
+    Schedule,
+    Slot,
+    Substance,
     SupplyDelivery,
     SupplyRequest,
+    Task,
     VisionPrescription,
+    OrganizationAffiliation,
+    Provenance,
 )
 
 
@@ -975,6 +989,141 @@ class InsurancePlanAdmin(admin.ModelAdmin):
     list_filter = ("status", "plan_type", "owned_by", "administered_by")
     ordering = ("name",)
     autocomplete_fields = ["owned_by", "administered_by"]
+
+
+@admin.register(Provenance)
+class ProvenanceAdmin(admin.ModelAdmin):
+    list_display = ("id", "activity", "patient", "recorded", "location")
+    list_display_links = ("activity",)
+    search_fields = ("activity", "target_summary", "agent_summary", "entity_summary", "policy", "notes")
+    list_filter = ("patient", "activity", "location")
+    ordering = ("-recorded",)
+    autocomplete_fields = ["patient", "location"]
+
+
+@admin.register(Composition)
+class CompositionAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "patient", "status", "composition_type", "date")
+    list_display_links = ("title",)
+    search_fields = ("title", "composition_type", "category", "section_summary", "notes")
+    list_filter = ("patient", "status", "composition_type", "custodian")
+    ordering = ("-date",)
+    autocomplete_fields = ["patient", "encounter", "custodian"]
+    filter_horizontal = ("authors_practitioners",)
+
+
+@admin.register(DocumentManifest)
+class DocumentManifestAdmin(admin.ModelAdmin):
+    list_display = ("id", "manifest_type", "patient", "status", "created_datetime")
+    list_display_links = ("manifest_type",)
+    search_fields = ("manifest_type", "description", "content_summary", "related_summary", "source")
+    list_filter = ("patient", "status", "manifest_type")
+    ordering = ("-created_datetime",)
+    autocomplete_fields = ["patient", "author_practitioner"]
+
+
+@admin.register(BinaryResource)
+class BinaryResourceAdmin(admin.ModelAdmin):
+    list_display = ("id", "content_type", "patient", "data_size", "security_context")
+    list_display_links = ("content_type",)
+    search_fields = ("content_type", "security_context", "data_hash", "notes")
+    list_filter = ("patient", "content_type")
+    autocomplete_fields = ["patient"]
+
+
+@admin.register(Endpoint)
+class EndpointAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "status", "connection_type", "managing_organization")
+    list_display_links = ("name",)
+    search_fields = ("name", "connection_type", "address", "payload_type")
+    list_filter = ("status", "connection_type", "managing_organization")
+    autocomplete_fields = ["managing_organization"]
+
+
+@admin.register(HealthcareService)
+class HealthcareServiceAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "provided_by", "active", "service_type", "specialty")
+    list_display_links = ("name",)
+    search_fields = ("name", "category", "service_type", "specialty", "comment")
+    list_filter = ("active", "category", "service_type", "provided_by")
+    autocomplete_fields = ["provided_by"]
+    filter_horizontal = ("locations", "endpoints")
+
+
+@admin.register(OrganizationAffiliation)
+class OrganizationAffiliationAdmin(admin.ModelAdmin):
+    list_display = ("id", "role", "organization", "participating_organization", "active", "start_date", "end_date")
+    list_display_links = ("role",)
+    search_fields = ("role", "specialty", "telecom", "notes")
+    list_filter = ("active", "role", "organization", "participating_organization")
+    autocomplete_fields = ["organization", "participating_organization"]
+    filter_horizontal = ("networks", "locations", "healthcare_services", "endpoints")
+
+
+@admin.register(Substance)
+class SubstanceAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "status", "category")
+    list_display_links = ("code",)
+    search_fields = ("code", "category", "description", "instance_summary", "ingredient_summary")
+    list_filter = ("status", "category")
+
+
+@admin.register(DeviceMetric)
+class DeviceMetricAdmin(admin.ModelAdmin):
+    list_display = ("id", "metric_type", "source", "category", "operational_status", "unit")
+    list_display_links = ("metric_type",)
+    search_fields = ("metric_type", "unit", "category", "calibration_summary")
+    list_filter = ("category", "operational_status", "source")
+    autocomplete_fields = ["source", "parent"]
+
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ("id", "service_type", "patient", "active", "planning_horizon_start", "planning_horizon_end")
+    list_display_links = ("service_type",)
+    search_fields = ("service_category", "service_type", "specialty", "comment")
+    list_filter = ("patient", "active", "service_category", "service_type")
+    autocomplete_fields = ["patient"]
+    filter_horizontal = ("actors_practitioners", "actors_locations", "actors_healthcare_services")
+
+
+@admin.register(Slot)
+class SlotAdmin(admin.ModelAdmin):
+    list_display = ("id", "schedule", "status", "start_time", "end_time", "overbooked")
+    list_display_links = ("schedule",)
+    search_fields = ("service_category", "service_type", "specialty", "appointment_type", "comment")
+    list_filter = ("status", "overbooked", "schedule")
+    autocomplete_fields = ["schedule"]
+
+
+@admin.register(Appointment)
+class AppointmentAdmin(admin.ModelAdmin):
+    list_display = ("id", "description", "patient", "status", "appointment_type", "start_time")
+    list_display_links = ("description",)
+    search_fields = ("description", "appointment_type", "reason", "participant_summary", "comment")
+    list_filter = ("patient", "status", "appointment_type")
+    autocomplete_fields = ["patient"]
+    filter_horizontal = ("slots", "participants_practitioners", "participants_locations", "based_on_service_requests")
+
+
+@admin.register(AppointmentResponse)
+class AppointmentResponseAdmin(admin.ModelAdmin):
+    list_display = ("id", "appointment", "patient", "participant_status", "start_time")
+    list_display_links = ("appointment",)
+    search_fields = ("participant_status", "participant_type", "comment")
+    list_filter = ("patient", "participant_status", "appointment")
+    autocomplete_fields = ["appointment", "patient", "actor_practitioner", "actor_location"]
+
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "patient", "status", "intent", "priority", "authored_on")
+    list_display_links = ("code",)
+    search_fields = ("code", "description", "input_summary", "output_summary", "notes")
+    list_filter = ("patient", "status", "intent", "priority")
+    ordering = ("-authored_on",)
+    autocomplete_fields = ["patient", "encounter", "owner_practitioner", "owner_organization"]
+    filter_horizontal = ("based_on_service_requests",)
 
 
 @admin.register(Coverage)

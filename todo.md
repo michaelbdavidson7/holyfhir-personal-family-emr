@@ -20,7 +20,8 @@
     [x] EpisodeOfCare - medium priority; groups visits/actions into a larger care episode
     [x] PractitionerRole - medium priority; connects practitioners to organizations, specialties, locations, and roles
     [x] Device - lower-medium priority; implanted devices, medical equipment, and patient devices
-    [ ] Binary - seen in older invalid snapshots; decide whether to import as document attachments or keep as snapshots
+    [x] DeviceMetric - device measurement channels/configuration
+    [x] Binary - seen in older invalid snapshots; decide whether to import as document attachments or keep as snapshots
     [x] Medication - standalone medication catalog/details; maps to MedicationCatalog while MedicationRequest/MedicationStatement keep using patient Medication records
     [x] ImagingStudy - imaging studies/series/instances; link to DiagnosticReport, Encounter, Procedure, and Media where possible
     [x] Media - clinical photos, imaging key images, waveforms, or other captured media; link to Patient/Encounter/Procedure
@@ -37,6 +38,7 @@
     [x] DeviceUseStatement - patient/device usage history
     [x] NutritionOrder - dietary/oral/enteral/supplement orders; likely pairs with dietary component
     [x] MedicationKnowledge - drug knowledge/catalog metadata; probably snapshot/generic first, first-class later only if needed
+    [x] Substance - catalog-style substance support for allergies, medications, labs, and ingredients
     [ ] Medication-related definitional resources - MedicinalProduct*, Substance*, MedicationKnowledge; probably snapshot/generic unless building a medication knowledge base
     [x] ImmunizationEvaluation - immunization validity/status evaluation
     [x] ImmunizationRecommendation - vaccine forecast/recommendations
@@ -48,17 +50,17 @@
     [x] GuidanceResponse - decision-support output
     [x] Flag - warnings/alerts on patient records
     [x] List - FHIR lists/groupings of clinical resources
-    [ ] Composition - structured clinical documents; may map to ClinicalDocument or document sections
-    [ ] DocumentManifest - document package/index; link to ClinicalDocument/DocumentReference
+    [x] Composition - structured clinical documents; may map to ClinicalDocument or document sections
+    [x] DocumentManifest - document package/index; link to ClinicalDocument/DocumentReference
     [x] RelatedPerson - caregivers/family/proxies related to patient
     [x] Person - cross-resource person identity; links Patient/Practitioner/RelatedPerson/Person records
     [x] Group - patient/care cohorts; stores managing entity, characteristics, and members
-    [ ] HealthcareService - services offered by organizations/locations
-    [ ] Endpoint - technical service endpoints; likely directory/interop support
-    [ ] OrganizationAffiliation - relationships between organizations and services
-    [ ] Appointment, AppointmentResponse, Schedule, Slot - scheduling resources; useful if we add appointments/calendar
-    [ ] Task - workflow task tracking; useful later for reminders/to-dos/imported tasks
-    [ ] Provenance - source/audit provenance; important for trust/history, can attach to snapshots/links
+    [x] HealthcareService - services offered by organizations/locations
+    [x] Endpoint - technical service endpoints; likely directory/interop support
+    [x] OrganizationAffiliation - relationships between organizations and services
+    [x] Appointment, AppointmentResponse, Schedule, Slot - scheduling resources; useful if we add appointments/calendar
+    [x] Task - workflow task tracking; useful later for reminders/to-dos/imported tasks
+    [x] Provenance - source/audit provenance; important for trust/history, can attach to snapshots/links
     [x] Consent - patient consents/privacy choices, including vaccine/procedure consent links when references resolve
     [ ] AuditEvent - security/audit events; probably system-level rather than clinical UI
     [x] Coverage - insurance coverage, subscriber IDs, payer details, and benefit classifications
