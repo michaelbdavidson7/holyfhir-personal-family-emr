@@ -100,6 +100,17 @@ class SettingsBackupPageTests(TestCase):
             ("Coverages", "admin:clinical_coverage_changelist"),
             ("Explanations of Benefits", "admin:clinical_explanationofbenefit_changelist"),
             ("Insurance Plans", "admin:clinical_insuranceplan_changelist"),
+            ("Claims", "admin:clinical_claim_changelist"),
+            ("Claim Responses", "admin:clinical_claimresponse_changelist"),
+            ("Accounts", "admin:clinical_account_changelist"),
+            ("Audit Events", "admin:clinical_auditevent_changelist"),
+            ("Invoices", "admin:clinical_invoice_changelist"),
+            ("Charge Items", "admin:clinical_chargeitem_changelist"),
+            ("Research Studies", "admin:clinical_researchstudy_changelist"),
+            ("Research Subjects", "admin:clinical_researchsubject_changelist"),
+            ("Questionnaires", "admin:clinical_questionnaire_changelist"),
+            ("Device Definitions", "admin:clinical_devicedefinition_changelist"),
+            ("Observation Definitions", "admin:clinical_observationdefinition_changelist"),
             ("Compositions", "admin:clinical_composition_changelist"),
             ("Document Manifests", "admin:clinical_documentmanifest_changelist"),
             ("Binary Resources", "admin:clinical_binaryresource_changelist"),
@@ -148,6 +159,10 @@ class SettingsBackupPageTests(TestCase):
         self.assertContains(response, "Vitals &amp; Labs")
         self.assertContains(response, "Documents")
         self.assertContains(response, "Coverages")
+        self.assertContains(response, "Claims")
+        self.assertContains(response, "Accounts")
+        self.assertContains(response, "Research Subjects")
+        self.assertContains(response, "Audit Events")
         self.assertContains(response, "Consents")
         self.assertContains(response, "Tasks")
         self.assertContains(response, "Appointments")
@@ -156,5 +171,7 @@ class SettingsBackupPageTests(TestCase):
         self.assertContains(response, f"{reverse('admin:clinical_observation_changelist')}?patient__id__exact={patient.pk}")
         self.assertContains(response, f"{reverse('admin:documents_clinicaldocument_changelist')}?patient__id__exact={patient.pk}")
         self.assertContains(response, f"{reverse('admin:clinical_coverage_changelist')}?patient__id__exact={patient.pk}")
+        self.assertContains(response, f"{reverse('admin:clinical_claim_changelist')}?patient__id__exact={patient.pk}")
+        self.assertContains(response, f"{reverse('admin:clinical_account_changelist')}?patient__id__exact={patient.pk}")
         self.assertContains(response, f"{reverse('admin:clinical_task_changelist')}?patient__id__exact={patient.pk}")
         self.assertContains(response, "1 record")

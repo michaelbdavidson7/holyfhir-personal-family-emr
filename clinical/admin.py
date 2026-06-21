@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.db import models
 from .models import (
+    Account,
     AdverseEvent,
     Allergy,
     CarePlan,
@@ -11,6 +12,7 @@ from .models import (
     ClinicalImpressionFinding,
     Condition,
     DetectedIssue,
+    DeviceDefinition,
     Device,
     DeviceRequest,
     DeviceUseStatement,
@@ -38,6 +40,7 @@ from .models import (
     MolecularSequence,
     NutritionOrder,
     Observation,
+    ObservationDefinition,
     Organization,
     Person,
     PersonLink,
@@ -46,6 +49,8 @@ from .models import (
     Procedure,
     ProcedurePerformer,
     RelatedPerson,
+    ResearchStudy,
+    ResearchSubject,
     RiskAssessment,
     ServiceRequest,
     Specimen,
@@ -56,15 +61,21 @@ from .models import (
     Coverage,
     Appointment,
     AppointmentResponse,
+    AuditEvent,
+    ChargeItem,
+    Claim,
+    ClaimResponse,
     BinaryResource,
     Composition,
     DeviceMetric,
     DocumentManifest,
+    Invoice,
     Endpoint,
     ExplanationOfBenefit,
     Flag,
     HealthcareService,
     InsurancePlan,
+    Questionnaire,
     QuestionnaireResponse,
     RequestGroup,
     Schedule,
@@ -1124,7 +1135,127 @@ class TaskAdmin(admin.ModelAdmin):
     ordering = ("-authored_on",)
     autocomplete_fields = ["patient", "encounter", "owner_practitioner", "owner_organization"]
     filter_horizontal = ("based_on_service_requests",)
+@admin.register(AuditEvent)
+class AuditEventAdmin(admin.ModelAdmin):
+    list_display = ("id", "audit_type", "patient", "action", "outcome", "recorded")
+    list_display_links = ("audit_type",)
+    search_fields = ("audit_type", "subtype", "action", "outcome", "outcome_description", "agent_summary", "entity_summary")
+    list_filter = ("patient", "action", "outcome", "audit_type")
+    ordering = ("-recorded",)
+    autocomplete_fields = ["patient"]
 
+@admin.register(Account)
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ("id", "account_label", "patient", "status", "account_type", "owner", "service_period_start")
+    list_display_links = ("account_label",)
+    search_fields = ("name", "account_type", "description", "guarantor_summary", "balance_summary")
+    list_filter = ("patient", "status", "account_type", "owner")
+    autocomplete_fields = ["patient", "owner"]
+    filter_horizontal = ("coverages",)
+
+    @admin.display(description="Account", ordering="name")
+    def account_label(self, obj):
+        return obj.name or obj.account_type or f"Account #{obj.pk}"
+
+
+@admin.register(Claim)
+class ClaimAdmin(admin.ModelAdmin):
+    list_display = ("id", "claim_label", "patient", "status", "claim_type", "use", "created_date")
+    list_display_links = ("claim_label",)
+    search_fields = ("claim_type", "use", "priority", "diagnosis_summary", "item_summary", "insurance_summary")
+    list_filter = ("patient", "status", "claim_type", "use", "insurer")
+    ordering = ("-created_date", "-billable_period_start")
+    autocomplete_fields = ["patient", "insurer", "provider_practitioner", "provider_organization"]
+    filter_horizontal = ("coverages",)
+
+    @admin.display(description="Claim", ordering="claim_type")
+    def claim_label(self, obj):
+        return obj.claim_type or obj.use or f"Claim #{obj.pk}"
+
+
+@admin.register(ClaimResponse)
+class ClaimResponseAdmin(admin.ModelAdmin):
+    list_display = ("id", "response_label", "patient", "status", "response_type", "outcome", "created_date")
+    list_display_links = ("response_label",)
+    search_fields = ("response_type", "outcome", "disposition", "item_summary", "total_summary", "payment_summary", "error_summary")
+    list_filter = ("patient", "status", "response_type", "outcome", "insurer")
+    ordering = ("-created_date",)
+    autocomplete_fields = ["patient", "request_claim", "insurer"]
+
+    @admin.display(description="Claim response", ordering="response_type")
+    def response_label(self, obj):
+        return obj.response_type or obj.outcome or f"Claim Response #{obj.pk}"
+
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ("id", "invoice_label", "patient", "status", "invoice_type", "date", "total_gross")
+    list_display_links = ("invoice_label",)
+    search_fields = ("invoice_type", "participant_summary", "line_item_summary", "total_net", "total_gross", "payment_terms")
+    list_filter = ("patient", "status", "invoice_type", "issuer_organization")
+    ordering = ("-date",)
+    autocomplete_fields = ["patient", "account", "issuer_organization"]
+
+    @admin.display(description="Invoice", ordering="invoice_type")
+    def invoice_label(self, obj):
+        return obj.invoice_type or obj.status or f"Invoice #{obj.pk}"
+
+
+@admin.register(ChargeItem)
+class ChargeItemAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "patient", "status", "encounter", "occurrence_datetime")
+    list_display_links = ("code",)
+    search_fields = ("code", "quantity", "price_override", "total_price_component", "reason", "notes")
+    list_filter = ("patient", "status", "encounter", "account")
+    ordering = ("-occurrence_datetime",)
+    autocomplete_fields = ["patient", "encounter", "account"]
+    filter_horizontal = ("service_requests", "performer_practitioners")
+
+
+@admin.register(ResearchStudy)
+class ResearchStudyAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "status", "phase", "sponsor", "period_start", "period_end")
+    list_display_links = ("title",)
+    search_fields = ("title", "phase", "category", "focus", "condition", "description")
+    list_filter = ("status", "phase", "sponsor")
+    ordering = ("title",)
+    autocomplete_fields = ["sponsor", "principal_investigator"]
+    filter_horizontal = ("sites",)
+
+
+@admin.register(ResearchSubject)
+class ResearchSubjectAdmin(admin.ModelAdmin):
+    list_display = ("id", "patient", "study", "status", "assigned_arm", "period_start", "period_end")
+    list_display_links = ("patient",)
+    search_fields = ("assigned_arm", "actual_arm", "notes", "study__title")
+    list_filter = ("patient", "status", "study")
+    autocomplete_fields = ["patient", "study", "consent"]
+
+
+@admin.register(DeviceDefinition)
+class DeviceDefinitionAdmin(admin.ModelAdmin):
+    list_display = ("id", "device_name", "device_type", "manufacturer", "model_number", "version")
+    list_display_links = ("device_name",)
+    search_fields = ("device_name", "device_type", "model_number", "version", "udi_device_identifier")
+    list_filter = ("device_type", "manufacturer")
+    autocomplete_fields = ["manufacturer"]
+
+
+@admin.register(ObservationDefinition)
+class ObservationDefinitionAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "category", "permitted_data_type", "multiple_results_allowed")
+    list_display_links = ("code",)
+    search_fields = ("code", "category", "method", "preferred_report_name", "qualified_interval_summary")
+    list_filter = ("category", "permitted_data_type", "multiple_results_allowed")
+
+
+@admin.register(Questionnaire)
+class QuestionnaireAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "status", "version", "publisher", "approval_date")
+    list_display_links = ("title",)
+    search_fields = ("title", "name", "url", "publisher", "subject_type", "item_summary")
+    list_filter = ("status", "publisher", "subject_type")
+    ordering = ("title",)
 
 @admin.register(Coverage)
 class CoverageAdmin(admin.ModelAdmin):

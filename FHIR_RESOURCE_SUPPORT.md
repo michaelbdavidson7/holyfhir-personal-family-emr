@@ -12,14 +12,19 @@ Status legend:
 
 ## Current First-Class Support
 
-- `AllergyIntolerance` -> `clinical.Allergy`
+- `Account` -> `clinical.Account`
 - `AdverseEvent` -> `clinical.AdverseEvent`
+- `AllergyIntolerance` -> `clinical.Allergy`
 - `Appointment` -> `clinical.Appointment`
 - `AppointmentResponse` -> `clinical.AppointmentResponse`
+- `AuditEvent` -> `clinical.AuditEvent`
 - `Binary` -> `clinical.BinaryResource`
 - `BodyStructure` -> `clinical.BodyStructure`
 - `CarePlan` -> `clinical.CarePlan`
 - `CareTeam` -> `clinical.CareTeam`
+- `ChargeItem` -> `clinical.ChargeItem`
+- `Claim` -> `clinical.Claim`
+- `ClaimResponse` -> `clinical.ClaimResponse`
 - `ClinicalImpression` -> `clinical.ClinicalImpression`
 - `Composition` -> `clinical.Composition`
 - `Condition` -> `clinical.Condition`
@@ -27,6 +32,7 @@ Status legend:
 - `Coverage` -> `clinical.Coverage`
 - `DetectedIssue` -> `clinical.DetectedIssue`
 - `Device` -> `clinical.Device`
+- `DeviceDefinition` -> `clinical.DeviceDefinition`
 - `DeviceMetric` -> `clinical.DeviceMetric`
 - `DeviceRequest` -> `clinical.DeviceRequest`
 - `DeviceUseStatement` -> `clinical.DeviceUseStatement`
@@ -39,15 +45,16 @@ Status legend:
 - `ExplanationOfBenefit` -> `clinical.ExplanationOfBenefit`
 - `FamilyMemberHistory` -> `clinical.FamilyMemberHistory`
 - `Flag` -> `clinical.Flag`
-- `GuidanceResponse` -> `clinical.GuidanceResponse`
-- `Group` -> `clinical.FHIRGroup`
 - `Goal` -> `clinical.Goal`
+- `Group` -> `clinical.FHIRGroup`
+- `GuidanceResponse` -> `clinical.GuidanceResponse`
 - `HealthcareService` -> `clinical.HealthcareService`
 - `ImagingStudy` -> `clinical.ImagingStudy`
 - `Immunization` -> `clinical.Immunization`
 - `ImmunizationEvaluation` -> `clinical.ImmunizationEvaluation`
 - `ImmunizationRecommendation` -> `clinical.ImmunizationRecommendation`
 - `InsurancePlan` -> `clinical.InsurancePlan`
+- `Invoice` -> `clinical.Invoice`
 - `List` -> `clinical.FHIRList`
 - `Location` -> `clinical.Location`
 - `Media` -> `clinical.Media`
@@ -57,8 +64,10 @@ Status legend:
 - `MedicationKnowledge` -> `clinical.MedicationKnowledge`
 - `MedicationRequest` -> `clinical.Medication`
 - `MedicationStatement` -> `clinical.Medication`
+- `MolecularSequence` -> `clinical.MolecularSequence`
 - `NutritionOrder` -> `clinical.NutritionOrder`
 - `Observation` -> `clinical.Observation`
+- `ObservationDefinition` -> `clinical.ObservationDefinition`
 - `Organization` -> `clinical.Organization`
 - `OrganizationAffiliation` -> `clinical.OrganizationAffiliation`
 - `Patient` -> `patients.PatientProfile`
@@ -67,9 +76,12 @@ Status legend:
 - `PractitionerRole` -> `clinical.PractitionerRole`
 - `Procedure` -> `clinical.Procedure`
 - `Provenance` -> `clinical.Provenance`
+- `Questionnaire` -> `clinical.Questionnaire`
 - `QuestionnaireResponse` -> `clinical.QuestionnaireResponse`
-- `RequestGroup` -> `clinical.RequestGroup`
 - `RelatedPerson` -> `clinical.RelatedPerson`
+- `RequestGroup` -> `clinical.RequestGroup`
+- `ResearchStudy` -> `clinical.ResearchStudy`
+- `ResearchSubject` -> `clinical.ResearchSubject`
 - `RiskAssessment` -> `clinical.RiskAssessment`
 - `Schedule` -> `clinical.Schedule`
 - `ServiceRequest` -> `clinical.ServiceRequest`
@@ -80,7 +92,6 @@ Status legend:
 - `SupplyRequest` -> `clinical.SupplyRequest`
 - `Task` -> `clinical.Task`
 - `VisionPrescription` -> `clinical.VisionPrescription`
-- `MolecularSequence` -> `clinical.MolecularSequence`
 
 ## Foundation
 
@@ -114,7 +125,7 @@ Status legend:
 | Resource | Status | Notes |
 | --- | --- | --- |
 | `Provenance` | First-class | Useful for import/source trust and record history. |
-| `AuditEvent` | Snapshot candidate | Security/system audit event. |
+| `AuditEvent` | First-class | Security/system audit event. |
 | `Consent` | First-class | Privacy, treatment, procedure, vaccine, and other consent directives. |
 
 ### Documents
@@ -269,9 +280,9 @@ Status legend:
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `Claim` | Planned | Claims support if adding insurance/finance. |
-| `ClaimResponse` | Planned | Claim adjudication response. |
-| `Invoice` | Planned | Billing invoice. |
+| `Claim` | First-class | Claims support if adding insurance/finance. |
+| `ClaimResponse` | First-class | Claim adjudication response. |
+| `Invoice` | First-class | Billing invoice. |
 
 ### Payment
 
@@ -284,8 +295,8 @@ Status legend:
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `Account` | Planned | Billing/account grouping. |
-| `ChargeItem` | Planned | Charge line item. |
+| `Account` | First-class | Billing/account grouping. |
+| `ChargeItem` | First-class | Charge line item. |
 | `ChargeItemDefinition` | Snapshot candidate | Charge item definition. |
 | `Contract` | Snapshot candidate | Contract/legal agreement. |
 | `ExplanationOfBenefit` | First-class | EOB/claims summary; useful for personal records. |
@@ -297,19 +308,19 @@ Status legend:
 
 | Resource | Status | Notes |
 | --- | --- | --- |
-| `ResearchStudy` | Planned | Optional research participation area. |
-| `ResearchSubject` | Planned | Patient participation in a study. |
+| `ResearchStudy` | First-class | Optional research participation area. |
+| `ResearchSubject` | First-class | Patient participation in a study. |
 
 ### Definitional Artifacts
 
 | Resource | Status | Notes |
 | --- | --- | --- |
 | `ActivityDefinition` | Snapshot candidate | Knowledge artifact. |
-| `DeviceDefinition` | Planned | Device catalog/definition. |
+| `DeviceDefinition` | First-class | Device catalog/definition. |
 | `EventDefinition` | Snapshot candidate | Knowledge artifact. |
-| `ObservationDefinition` | Planned | Observation catalog/definition. |
+| `ObservationDefinition` | First-class | Observation catalog/definition. |
 | `PlanDefinition` | Snapshot candidate | Care plan definition/knowledge artifact. |
-| `Questionnaire` | Planned | Form definitions. |
+| `Questionnaire` | First-class | Form definitions. |
 | `SpecimenDefinition` | Snapshot candidate | Specimen catalog/definition. |
 
 ### Evidence-Based Medicine

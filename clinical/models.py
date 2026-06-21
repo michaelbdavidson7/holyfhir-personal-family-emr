@@ -2674,7 +2674,225 @@ class Task(models.Model):
 
     def __str__(self):
         return self.code or self.description or f"Task #{self.pk}"
+class AuditEvent(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="audit_events", help_text="Local patient association when the audit event references a patient.")
+    recorded = models.DateTimeField(null=True, blank=True, help_text="FHIR recorded: when the activity was recorded.")
+    audit_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: identifier for the category of event.")
+    subtype = models.CharField(max_length=255, blank=True, help_text="FHIR subtype: more specific event type.")
+    action = models.CharField(max_length=30, blank=True, help_text="FHIR action: create, read, update, delete, execute, etc.")
+    outcome = models.CharField(max_length=30, blank=True, help_text="FHIR outcome: success, minor failure, serious failure, or major failure.")
+    outcome_description = models.TextField(blank=True, help_text="FHIR outcomeDesc: description of the outcome.")
+    agent_summary = models.TextField(blank=True, help_text="FHIR agent: people, systems, or organizations involved in the event.")
+    source_observer = models.CharField(max_length=255, blank=True, help_text="FHIR source.observer: system or actor reporting the event.")
+    source_type = models.CharField(max_length=255, blank=True, help_text="FHIR source.type: type of audit source.")
+    entity_summary = models.TextField(blank=True, help_text="FHIR entity: data or objects involved in the event.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this audit event.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.audit_type or self.action or f"Audit Event #{self.pk}"
+
+class Account(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="accounts", help_text="FHIR subject: patient or other party the account tracks.")
+    owner = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="owned_accounts", help_text="FHIR owner: organization responsible for tracking the account.")
+    coverages = models.ManyToManyField("Coverage", blank=True, related_name="accounts", help_text="FHIR coverage.coverage: insurance coverages associated with the account.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, inactive, entered-in-error, or on-hold.")
+    account_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: categorization of the account.")
+    name = models.CharField(max_length=255, blank=True, help_text="FHIR name: human-readable account name.")
+    description = models.TextField(blank=True, help_text="FHIR description: account description.")
+    service_period_start = models.DateField(null=True, blank=True, help_text="FHIR servicePeriod.start: start of account coverage/service dates.")
+    service_period_end = models.DateField(null=True, blank=True, help_text="FHIR servicePeriod.end: end of account coverage/service dates.")
+    guarantor_summary = models.TextField(blank=True, help_text="FHIR guarantor: parties responsible for account balances.")
+    balance_summary = models.TextField(blank=True, help_text="FHIR balance: account balances by term/type.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this account.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name or self.account_type or f"Account #{self.pk}"
+
+
+class Claim(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="claims", help_text="FHIR patient: patient receiving products or services.")
+    insurer = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="claims_as_insurer", help_text="FHIR insurer: target insurer for adjudication.")
+    provider_practitioner = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="claims_as_provider", help_text="FHIR provider: practitioner responsible for the claim when present.")
+    provider_organization = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="claims_as_provider", help_text="FHIR provider: organization responsible for the claim when present.")
+    coverages = models.ManyToManyField("Coverage", blank=True, related_name="claims", help_text="FHIR insurance.coverage: coverages used for this claim.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, cancelled, draft, or entered-in-error.")
+    claim_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: category of claim, such as institutional, oral, pharmacy, or professional.")
+    use = models.CharField(max_length=30, blank=True, help_text="FHIR use: claim, preauthorization, predetermination, etc.")
+    priority = models.CharField(max_length=255, blank=True, help_text="FHIR priority: desired processing priority.")
+    billable_period_start = models.DateField(null=True, blank=True, help_text="FHIR billablePeriod.start: beginning of service billing period.")
+    billable_period_end = models.DateField(null=True, blank=True, help_text="FHIR billablePeriod.end: end of service billing period.")
+    created_date = models.DateField(null=True, blank=True, help_text="FHIR created: claim creation date.")
+    diagnosis_summary = models.TextField(blank=True, help_text="FHIR diagnosis: diagnosis codes or references on the claim.")
+    item_summary = models.TextField(blank=True, help_text="FHIR item: claim line items, products/services, quantities, and net amounts.")
+    insurance_summary = models.TextField(blank=True, help_text="FHIR insurance: claim insurance sequence, focal status, and coverage displays.")
+    total = models.CharField(max_length=255, blank=True, help_text="FHIR total: total claim amount.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this claim.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.claim_type or self.use or f"Claim #{self.pk}"
+
+
+class ClaimResponse(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="claim_responses", help_text="FHIR patient: patient associated with the claim response.")
+    request_claim = models.ForeignKey(Claim, on_delete=models.SET_NULL, null=True, blank=True, related_name="responses", help_text="FHIR request: claim this response adjudicates.")
+    insurer = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="claim_responses", help_text="FHIR insurer: party responsible for adjudication.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, cancelled, draft, or entered-in-error.")
+    response_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: claim response category.")
+    use = models.CharField(max_length=30, blank=True, help_text="FHIR use: claim, preauthorization, predetermination, etc.")
+    outcome = models.CharField(max_length=30, blank=True, help_text="FHIR outcome: queued, complete, error, or partial.")
+    disposition = models.TextField(blank=True, help_text="FHIR disposition: disposition message from adjudication.")
+    created_date = models.DateField(null=True, blank=True, help_text="FHIR created: response creation date.")
+    item_summary = models.TextField(blank=True, help_text="FHIR item/addItem: adjudication line summary.")
+    total_summary = models.TextField(blank=True, help_text="FHIR total: adjudication totals by category.")
+    payment_summary = models.TextField(blank=True, help_text="FHIR payment: payment type, amount, and date.")
+    error_summary = models.TextField(blank=True, help_text="FHIR error: adjudication errors.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this claim response.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.response_type or self.outcome or f"Claim Response #{self.pk}"
+
+
+class Invoice(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="invoices", help_text="FHIR subject/recipient: patient associated with the invoice when present.")
+    account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices", help_text="FHIR account: account that tracks this invoice.")
+    issuer_organization = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="issued_invoices", help_text="FHIR issuer: organization issuing the invoice.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: draft, issued, balanced, cancelled, or entered-in-error.")
+    invoice_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: invoice type.")
+    date = models.DateTimeField(null=True, blank=True, help_text="FHIR date: when the invoice was issued.")
+    participant_summary = models.TextField(blank=True, help_text="FHIR participant: parties involved in invoice creation or processing.")
+    line_item_summary = models.TextField(blank=True, help_text="FHIR lineItem: charges included in the invoice.")
+    total_net = models.CharField(max_length=255, blank=True, help_text="FHIR totalNet: net invoice amount.")
+    total_gross = models.CharField(max_length=255, blank=True, help_text="FHIR totalGross: gross invoice amount.")
+    payment_terms = models.TextField(blank=True, help_text="FHIR paymentTerms: payment timing or terms.")
+    notes = models.TextField(blank=True, help_text="FHIR note: invoice notes.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.invoice_type or self.status or f"Invoice #{self.pk}"
+
+
+class ChargeItem(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True, related_name="charge_items", help_text="FHIR subject: patient associated with the charge.")
+    encounter = models.ForeignKey("Encounter", on_delete=models.SET_NULL, null=True, blank=True, related_name="charge_items", help_text="FHIR context: encounter associated with the charge.")
+    account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True, related_name="charge_items", help_text="FHIR account: account this charge belongs to.")
+    service_requests = models.ManyToManyField("ServiceRequest", blank=True, related_name="charge_items", help_text="FHIR service: service requests represented by this charge.")
+    performer_practitioners = models.ManyToManyField("Practitioner", blank=True, related_name="charge_items", help_text="FHIR performer.actor: practitioners involved with the charge.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: planned, billable, not-billable, aborted, billed, or entered-in-error.")
+    code = models.CharField(max_length=255, help_text="FHIR code: charge item code.")
+    occurrence_datetime = models.DateTimeField(null=True, blank=True, help_text="FHIR occurrence[x]: when charge item occurred.")
+    quantity = models.CharField(max_length=255, blank=True, help_text="FHIR quantity: quantity of service/product.")
+    factor_override = models.DecimalField(max_digits=12, decimal_places=3, null=True, blank=True, help_text="FHIR factorOverride: multiplying factor override.")
+    price_override = models.CharField(max_length=255, blank=True, help_text="FHIR priceOverride: price override.")
+    total_price_component = models.TextField(blank=True, help_text="FHIR totalPriceComponent: total price components.")
+    reason = models.CharField(max_length=255, blank=True, help_text="FHIR reason: coded reason for charge.")
+    notes = models.TextField(blank=True, help_text="FHIR note: charge comments.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.code or f"Charge Item #{self.pk}"
+class ResearchStudy(models.Model):
+    sponsor = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="sponsored_research_studies", help_text="FHIR sponsor: organization responsible for study initiation/management.")
+    principal_investigator = models.ForeignKey("Practitioner", on_delete=models.SET_NULL, null=True, blank=True, related_name="research_studies", help_text="FHIR principalInvestigator: investigator responsible for the study.")
+    sites = models.ManyToManyField("Location", blank=True, related_name="research_studies", help_text="FHIR site: locations where the study is conducted.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: active, administratively-completed, approved, closed-to-accrual, completed, etc.")
+    title = models.CharField(max_length=255, blank=True, help_text="FHIR title: human-readable study title.")
+    phase = models.CharField(max_length=255, blank=True, help_text="FHIR phase: phase of the study.")
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: study category.")
+    focus = models.TextField(blank=True, help_text="FHIR focus: drugs, devices, conditions, or other focus codes.")
+    condition = models.TextField(blank=True, help_text="FHIR condition: conditions being studied.")
+    contact_summary = models.TextField(blank=True, help_text="FHIR contact: study contact details.")
+    period_start = models.DateField(null=True, blank=True, help_text="FHIR period.start: study start date.")
+    period_end = models.DateField(null=True, blank=True, help_text="FHIR period.end: study end date.")
+    description = models.TextField(blank=True, help_text="FHIR description: study description.")
+    notes = models.TextField(blank=True, help_text="FHIR note: study notes.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title or f"Research Study #{self.pk}"
+
+
+class ResearchSubject(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="research_subjects", help_text="FHIR individual: patient participating in the research study.")
+    study = models.ForeignKey(ResearchStudy, on_delete=models.SET_NULL, null=True, blank=True, related_name="subjects", help_text="FHIR study: research study this subject participates in.")
+    consent = models.ForeignKey("Consent", on_delete=models.SET_NULL, null=True, blank=True, related_name="research_subjects", help_text="FHIR consent: consent record for study participation.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: candidate, eligible, follow-up, ineligible, on-study, withdrawn, etc.")
+    period_start = models.DateField(null=True, blank=True, help_text="FHIR period.start: participation start date.")
+    period_end = models.DateField(null=True, blank=True, help_text="FHIR period.end: participation end date.")
+    assigned_arm = models.CharField(max_length=255, blank=True, help_text="FHIR assignedArm: study arm assigned to subject.")
+    actual_arm = models.CharField(max_length=255, blank=True, help_text="FHIR actualArm: study arm actually followed.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this research subject.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.assigned_arm or self.status or f"Research Subject #{self.pk}"
+
+
+class DeviceDefinition(models.Model):
+    manufacturer = models.ForeignKey("Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="device_definitions", help_text="FHIR manufacturer[x]: organization responsible for the device definition.")
+    device_name = models.CharField(max_length=255, blank=True, help_text="FHIR deviceName.name: device name.")
+    device_type = models.CharField(max_length=255, blank=True, help_text="FHIR type: type of device.")
+    model_number = models.CharField(max_length=255, blank=True, help_text="FHIR modelNumber: manufacturer model number.")
+    version = models.CharField(max_length=255, blank=True, help_text="FHIR version: device version.")
+    udi_device_identifier = models.CharField(max_length=255, blank=True, help_text="FHIR udiDeviceIdentifier: device identifier details.")
+    specialization_summary = models.TextField(blank=True, help_text="FHIR specialization: standards/specializations supported.")
+    property_summary = models.TextField(blank=True, help_text="FHIR property: device properties.")
+    capability_summary = models.TextField(blank=True, help_text="FHIR capability: device capabilities.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this device definition.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.device_name or self.device_type or f"Device Definition #{self.pk}"
+
+
+class ObservationDefinition(models.Model):
+    category = models.CharField(max_length=255, blank=True, help_text="FHIR category: observation category.")
+    code = models.CharField(max_length=255, help_text="FHIR code: type of observation being defined.")
+    permitted_data_type = models.CharField(max_length=255, blank=True, help_text="FHIR permittedDataType: allowed observation value data types.")
+    multiple_results_allowed = models.BooleanField(default=False, help_text="FHIR multipleResultsAllowed: whether multiple results are allowed.")
+    method = models.CharField(max_length=255, blank=True, help_text="FHIR method: method used to produce the observation.")
+    preferred_report_name = models.CharField(max_length=255, blank=True, help_text="FHIR preferredReportName: preferred report display name.")
+    quantitative_details = models.TextField(blank=True, help_text="FHIR quantitativeDetails: measurement unit, decimal precision, and conversion details.")
+    qualified_interval_summary = models.TextField(blank=True, help_text="FHIR qualifiedInterval: reference ranges/intervals.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this observation definition.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.code
+
+
+class Questionnaire(models.Model):
+    url = models.URLField(blank=True, help_text="FHIR url: canonical URL for this questionnaire.")
+    version = models.CharField(max_length=100, blank=True, help_text="FHIR version: business version of the questionnaire.")
+    name = models.CharField(max_length=255, blank=True, help_text="FHIR name: computer-friendly questionnaire name.")
+    title = models.CharField(max_length=255, help_text="FHIR title: human-friendly questionnaire title.")
+    status = models.CharField(max_length=30, blank=True, help_text="FHIR status: draft, active, retired, or unknown.")
+    publisher = models.CharField(max_length=255, blank=True, help_text="FHIR publisher: organization or individual responsible for publication.")
+    subject_type = models.CharField(max_length=255, blank=True, help_text="FHIR subjectType: resource types the questionnaire can apply to.")
+    approval_date = models.DateField(null=True, blank=True, help_text="FHIR approvalDate: when questionnaire was approved.")
+    last_review_date = models.DateField(null=True, blank=True, help_text="FHIR lastReviewDate: when questionnaire was last reviewed.")
+    effective_start = models.DateField(null=True, blank=True, help_text="FHIR effectivePeriod.start: beginning of questionnaire effective period.")
+    effective_end = models.DateField(null=True, blank=True, help_text="FHIR effectivePeriod.end: end of questionnaire effective period.")
+    item_summary = models.TextField(blank=True, help_text="FHIR item: questionnaire questions/groups.")
+    notes = models.TextField(blank=True, help_text="Imported notes or source text for this questionnaire.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
 
 class Organization(models.Model):
     name = models.CharField(max_length=255, help_text="FHIR name: organization name.")

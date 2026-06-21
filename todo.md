@@ -43,7 +43,7 @@
     [x] ImmunizationEvaluation - immunization validity/status evaluation
     [x] ImmunizationRecommendation - vaccine forecast/recommendations
     [x] QuestionnaireResponse - patient-entered forms and assessments
-    [ ] Questionnaire - form definitions for QuestionnaireResponse
+    [x] Questionnaire - form definitions for QuestionnaireResponse
     [x] Communication - messages/communications about care
     [x] CommunicationRequest - requested communications
     [x] RequestGroup - grouped/conditional requests and plans
@@ -66,11 +66,12 @@
     [x] Coverage - insurance coverage, subscriber IDs, payer details, and benefit classifications
     [x] ExplanationOfBenefit - EOB/claims summary, service lines, adjudication totals, and payment summaries
     [x] InsurancePlan - payer plan/product definitions and benefit summaries
-    [ ] Claim, ClaimResponse, Account, Invoice - remaining financial/insurance resources; optional personal finance/claims area
+    [x] Claim, ClaimResponse, Account, Invoice - remaining financial/insurance resources; optional personal finance/claims area
     [x] SupplyRequest and SupplyDelivery - supplies and delivery events
     [x] MolecularSequence - genetics/genomics; snapshot/generic unless genomics UI is planned
-    [ ] ResearchStudy and ResearchSubject - research participation; optional
+    [x] ResearchStudy and ResearchSubject - research participation; optional
     [x] Generic FHIR resource fallback - accept every FHIR resourceType into valid FHIRResourceSnapshot even when no first-class model exists
+    [x] DeviceDefinition, ObservationDefinition, and ChargeItem are now first-class; continue leaving lower-value definitional resources as snapshots unless needed
     [ ] Unsupported-resource dashboard - show resource types/counts imported only as snapshots, with "promote to model later" notes
     [ ] AllergyIntolerance orphan strategy - parser exists, but sample allergies reference patient IDs missing from Patient.000.ndjson
     [ ] CareTeam sample coverage - importer exists, but the development sample zip has no CareTeam resources
