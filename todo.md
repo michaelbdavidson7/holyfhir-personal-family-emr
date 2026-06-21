@@ -239,3 +239,9 @@
     [ ] Simplification note: keep FHIRResourceSnapshot as source of truth for full FHIR JSON even when local models intentionally flatten or omit uncommon fields
     [ ] Simplification note: keep text fallback fields during migrations so unresolved references and human-entered records still display well
 [ ] add a dietary component
+[ ] fix the admin links for these: CatalogEntry, Basic, Linkage, MessageHeader, OperationOutcome, Parameters, Subscription, BiologicallyDerivedProduct, VerificationResult, ChargeItemDefinition, Contract, ResearchDefinition, ResearchElementDefinition, Evidence, EvidenceVariable, EffectEvidenceSynthesis, RiskEvidenceSynthesis, plus the medicinal product and substance definition resources. they were added with a simple model
+[ ] significant cleanup of admin page links needed
+[ ] another clarifying parse through every fhir resource documentation page 
+[ ] a reconsideration of each model being an admin page primarily - we can probably use many of them as related without the first-class admin page link, and have a full list of all first class admin pages on another page
+[ ] full page of links to each and every admin page
+[ ] normal person clinical dashboard, with admin pages mostly hidden but relevant ones shown 
