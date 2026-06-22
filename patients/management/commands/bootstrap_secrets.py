@@ -29,7 +29,11 @@ class Command(BaseCommand):
     help = "Create or update a local .env file with generated development secrets."
 
     def add_arguments(self, parser):
-        parser.add_argument("--env-file", default=".env", help="Environment file to create or update. Default: .env.")
+        parser.add_argument(
+            "--env-file",
+            default=".env",
+            help="Environment file to create or update. Default: .env.",
+        )
         parser.add_argument(
             "--example-file",
             default=".env.example",
@@ -70,7 +74,9 @@ class Command(BaseCommand):
         ]
         needs_confirmation = env_path.exists()
         if options["rotate"] and existing_real_secret_keys:
-            self._confirm_rotation(env_path, existing_real_secret_keys, assume_yes=options["yes"])
+            self._confirm_rotation(
+                env_path, existing_real_secret_keys, assume_yes=options["yes"]
+            )
         elif needs_confirmation:
             self._confirm_existing_env_update(env_path, assume_yes=options["yes"])
 
@@ -91,12 +97,18 @@ class Command(BaseCommand):
         backup_path = backup_existing_file(env_path)
         self._write_env_file(env_path, example_path, example_values, merged_values)
 
-        os.environ.setdefault("DATABASE_ENCRYPTION_KEY", merged_values["DATABASE_ENCRYPTION_KEY"])
+        os.environ.setdefault(
+            "DATABASE_ENCRYPTION_KEY", merged_values["DATABASE_ENCRYPTION_KEY"]
+        )
         os.environ.setdefault("SECRET_KEY", merged_values["SECRET_KEY"])
 
         if backup_path:
-            self.stdout.write(self.style.WARNING(f"Backed up previous .env to {backup_path}"))
-        self.stdout.write(self.style.SUCCESS(f"Bootstrapped local secrets in {env_path}"))
+            self.stdout.write(
+                self.style.WARNING(f"Backed up previous .env to {backup_path}")
+            )
+        self.stdout.write(
+            self.style.SUCCESS(f"Bootstrapped local secrets in {env_path}")
+        )
         if options["rotate"]:
             self.stdout.write(
                 self.style.WARNING(
@@ -128,14 +140,18 @@ class Command(BaseCommand):
                 f"WARNING: {env_path} already exists. This command will rewrite the file using .env.example order."
             )
         )
-        self.stdout.write("Existing usable secrets will be preserved, but comments and formatting may be overwritten.")
+        self.stdout.write(
+            "Existing usable secrets will be preserved, but comments and formatting may be overwritten."
+        )
         self._require_yes("Continue rewriting this .env file?")
 
     def _confirm_rotation(self, env_path, secret_keys, assume_yes=False):
         if assume_yes:
             return
 
-        self.stdout.write(self.style.ERROR("DANGER: You are about to rotate local HolyFHIR secrets."))
+        self.stdout.write(
+            self.style.ERROR("DANGER: You are about to rotate local HolyFHIR secrets.")
+        )
         self.stdout.write(
             self.style.ERROR(
                 "Changing DATABASE_ENCRYPTION_KEY can permanently lock you out of the existing encrypted database "

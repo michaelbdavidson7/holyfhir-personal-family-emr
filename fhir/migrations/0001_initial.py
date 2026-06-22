@@ -5,41 +5,76 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('patients', '0001_initial'),
+        ("patients", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FHIRResourceSnapshot',
+            name="FHIRResourceSnapshot",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('resource_type', models.CharField(max_length=100)),
-                ('resource_id', models.CharField(blank=True, max_length=100)),
-                ('version_id', models.CharField(blank=True, max_length=100)),
-                ('source', models.CharField(default='internal', max_length=50)),
-                ('raw_json', models.JSONField()),
-                ('checksum', models.CharField(blank=True, max_length=128)),
-                ('is_valid', models.BooleanField(default=True)),
-                ('validation_errors', models.JSONField(blank=True, default=list)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('patient', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='fhir_snapshots', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("resource_type", models.CharField(max_length=100)),
+                ("resource_id", models.CharField(blank=True, max_length=100)),
+                ("version_id", models.CharField(blank=True, max_length=100)),
+                ("source", models.CharField(default="internal", max_length=50)),
+                ("raw_json", models.JSONField()),
+                ("checksum", models.CharField(blank=True, max_length=128)),
+                ("is_valid", models.BooleanField(default=True)),
+                ("validation_errors", models.JSONField(blank=True, default=list)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="fhir_snapshots",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FHIRLink',
+            name="FHIRLink",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('resource_type', models.CharField(max_length=100)),
-                ('resource_id', models.CharField(blank=True, max_length=100)),
-                ('django_model', models.CharField(max_length=100)),
-                ('django_object_id', models.PositiveIntegerField()),
-                ('last_synced_at', models.DateTimeField(blank=True, null=True)),
-                ('direction', models.CharField(default='internal_to_fhir', max_length=20)),
-                ('patient', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("resource_type", models.CharField(max_length=100)),
+                ("resource_id", models.CharField(blank=True, max_length=100)),
+                ("django_model", models.CharField(max_length=100)),
+                ("django_object_id", models.PositiveIntegerField()),
+                ("last_synced_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "direction",
+                    models.CharField(default="internal_to_fhir", max_length=20),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
         ),
     ]

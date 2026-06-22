@@ -50,8 +50,12 @@ def unlock_app(request):
         request.session["unlock_failures"] = failures
 
         if failures >= UNLOCK_MAX_ATTEMPTS:
-            request.session["unlock_locked_until"] = timezone.now().timestamp() + UNLOCK_LOCKOUT_SECONDS
-            messages.error(request, "Too many unlock attempts. Wait a few minutes and try again.")
+            request.session["unlock_locked_until"] = (
+                timezone.now().timestamp() + UNLOCK_LOCKOUT_SECONDS
+            )
+            messages.error(
+                request, "Too many unlock attempts. Wait a few minutes and try again."
+            )
         else:
             messages.error(request, "That password did not unlock HolyFHIR.")
 

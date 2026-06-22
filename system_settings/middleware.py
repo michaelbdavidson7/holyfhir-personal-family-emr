@@ -31,4 +31,6 @@ class AppLockMiddleware:
             reverse("admin:logout"),
         }
 
-        return request.path not in allowed_paths and not request.path.startswith("/static/")
+        return request.path not in allowed_paths and not request.path.startswith(
+            "/static/"
+        )

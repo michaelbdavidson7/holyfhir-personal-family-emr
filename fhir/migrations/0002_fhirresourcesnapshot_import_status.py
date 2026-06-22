@@ -22,7 +22,6 @@ def classify_existing_snapshots(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("fhir", "0001_initial"),
     ]

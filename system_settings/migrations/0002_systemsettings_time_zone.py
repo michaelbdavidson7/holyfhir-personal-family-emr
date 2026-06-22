@@ -7,11 +7,12 @@ from django.db import migrations, models
 
 def set_existing_time_zone(apps, schema_editor):
     SystemSettings = apps.get_model("system_settings", "SystemSettings")
-    SystemSettings.objects.update(time_zone=getattr(settings, "TIME_ZONE", "America/New_York"))
+    SystemSettings.objects.update(
+        time_zone=getattr(settings, "TIME_ZONE", "America/New_York")
+    )
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("system_settings", "0001_initial"),
     ]

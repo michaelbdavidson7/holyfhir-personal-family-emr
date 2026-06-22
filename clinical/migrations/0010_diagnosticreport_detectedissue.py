@@ -5,87 +5,487 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0004_alter_patientprofile_options'),
-        ('documents', '0002_clinicaldocument_authors_clinicaldocument_custodian_and_more'),
-        ('clinical', '0009_alter_adverseevent_actuality_and_more'),
+        ("patients", "0004_alter_patientprofile_options"),
+        (
+            "documents",
+            "0002_clinicaldocument_authors_clinicaldocument_custodian_and_more",
+        ),
+        ("clinical", "0009_alter_adverseevent_actuality_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DiagnosticReport',
+            name="DiagnosticReport",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: registered, partial, preliminary, final, etc.', max_length=30)),
-                ('category', models.CharField(blank=True, help_text='FHIR category: diagnostic service section.', max_length=255)),
-                ('code', models.CharField(help_text='FHIR code: name or code for this diagnostic report.', max_length=255)),
-                ('effective_datetime', models.DateTimeField(blank=True, help_text='FHIR effective[x]: clinically relevant date/time for the report.', null=True)),
-                ('issued', models.DateTimeField(blank=True, help_text='FHIR issued: when this report version was released.', null=True)),
-                ('conclusion', models.TextField(blank=True, help_text='FHIR conclusion: clinical interpretation of test results.')),
-                ('conclusion_code', models.CharField(blank=True, help_text='FHIR conclusionCode: coded interpretation.', max_length=255)),
-                ('presented_form_summary', models.TextField(blank=True, help_text='FHIR presentedForm: summary of attachments that were not stored.')),
-                ('imaging_study_summary', models.TextField(blank=True, help_text='FHIR imagingStudy: unresolved imaging study references.')),
-                ('media_summary', models.TextField(blank=True, help_text='FHIR media: unresolved key image/media references.')),
-                ('notes', models.TextField(blank=True, help_text='FHIR note/text: additional imported report notes.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('care_plans', models.ManyToManyField(blank=True, help_text='FHIR basedOn: care plans that requested or relate to this report.', related_name='diagnostic_reports', to='clinical.careplan')),
-                ('encounter', models.ForeignKey(blank=True, help_text='FHIR encounter: care event associated with the report.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='diagnostic_reports', to='clinical.encounter')),
-                ('interpreter_care_teams', models.ManyToManyField(blank=True, help_text='FHIR resultsInterpreter: care teams responsible for interpreting results.', related_name='interpreted_diagnostic_reports', to='clinical.careteam')),
-                ('interpreter_organizations', models.ManyToManyField(blank=True, help_text='FHIR resultsInterpreter: organizations responsible for interpreting results.', related_name='interpreted_diagnostic_reports', to='clinical.organization')),
-                ('interpreter_practitioners', models.ManyToManyField(blank=True, help_text='FHIR resultsInterpreter: practitioners responsible for interpreting results.', related_name='interpreted_diagnostic_reports', to='clinical.practitioner')),
-                ('interpreter_roles', models.ManyToManyField(blank=True, help_text='FHIR resultsInterpreter: practitioner roles responsible for interpreting results.', related_name='interpreted_diagnostic_reports', to='clinical.practitionerrole')),
-                ('observations', models.ManyToManyField(blank=True, help_text='FHIR result: observations included as atomic report results.', related_name='diagnostic_reports', to='clinical.observation')),
-                ('patient', models.ForeignKey(help_text='FHIR subject: patient who the report is about.', on_delete=django.db.models.deletion.CASCADE, related_name='diagnostic_reports', to='patients.patientprofile')),
-                ('performers_care_teams', models.ManyToManyField(blank=True, help_text='FHIR performer: care teams responsible for issuing the report.', related_name='performed_diagnostic_reports', to='clinical.careteam')),
-                ('performers_organizations', models.ManyToManyField(blank=True, help_text='FHIR performer: organizations responsible for issuing the report.', related_name='performed_diagnostic_reports', to='clinical.organization')),
-                ('performers_practitioners', models.ManyToManyField(blank=True, help_text='FHIR performer: practitioners responsible for issuing the report.', related_name='performed_diagnostic_reports', to='clinical.practitioner')),
-                ('performers_roles', models.ManyToManyField(blank=True, help_text='FHIR performer: practitioner roles responsible for issuing the report.', related_name='performed_diagnostic_reports', to='clinical.practitionerrole')),
-                ('presented_documents', models.ManyToManyField(blank=True, help_text='FHIR presentedForm: documents created from attached issued report content.', related_name='diagnostic_reports', to='documents.clinicaldocument')),
-                ('service_requests', models.ManyToManyField(blank=True, help_text='FHIR basedOn: service requests or orders this report fulfills.', related_name='diagnostic_reports', to='clinical.servicerequest')),
-                ('specimens', models.ManyToManyField(blank=True, help_text='FHIR specimen: specimens the report is based on.', related_name='diagnostic_reports', to='clinical.specimen')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: registered, partial, preliminary, final, etc.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "category",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR category: diagnostic service section.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "code",
+                    models.CharField(
+                        help_text="FHIR code: name or code for this diagnostic report.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "effective_datetime",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR effective[x]: clinically relevant date/time for the report.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "issued",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR issued: when this report version was released.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "conclusion",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR conclusion: clinical interpretation of test results.",
+                    ),
+                ),
+                (
+                    "conclusion_code",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR conclusionCode: coded interpretation.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "presented_form_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR presentedForm: summary of attachments that were not stored.",
+                    ),
+                ),
+                (
+                    "imaging_study_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR imagingStudy: unresolved imaging study references.",
+                    ),
+                ),
+                (
+                    "media_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR media: unresolved key image/media references.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR note/text: additional imported report notes.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "care_plans",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR basedOn: care plans that requested or relate to this report.",
+                        related_name="diagnostic_reports",
+                        to="clinical.careplan",
+                    ),
+                ),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR encounter: care event associated with the report.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="diagnostic_reports",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "interpreter_care_teams",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR resultsInterpreter: care teams responsible for interpreting results.",
+                        related_name="interpreted_diagnostic_reports",
+                        to="clinical.careteam",
+                    ),
+                ),
+                (
+                    "interpreter_organizations",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR resultsInterpreter: organizations responsible for interpreting results.",
+                        related_name="interpreted_diagnostic_reports",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "interpreter_practitioners",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR resultsInterpreter: practitioners responsible for interpreting results.",
+                        related_name="interpreted_diagnostic_reports",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "interpreter_roles",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR resultsInterpreter: practitioner roles responsible for interpreting results.",
+                        related_name="interpreted_diagnostic_reports",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
+                (
+                    "observations",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR result: observations included as atomic report results.",
+                        related_name="diagnostic_reports",
+                        to="clinical.observation",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        help_text="FHIR subject: patient who the report is about.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="diagnostic_reports",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "performers_care_teams",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR performer: care teams responsible for issuing the report.",
+                        related_name="performed_diagnostic_reports",
+                        to="clinical.careteam",
+                    ),
+                ),
+                (
+                    "performers_organizations",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR performer: organizations responsible for issuing the report.",
+                        related_name="performed_diagnostic_reports",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "performers_practitioners",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR performer: practitioners responsible for issuing the report.",
+                        related_name="performed_diagnostic_reports",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "performers_roles",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR performer: practitioner roles responsible for issuing the report.",
+                        related_name="performed_diagnostic_reports",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
+                (
+                    "presented_documents",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR presentedForm: documents created from attached issued report content.",
+                        related_name="diagnostic_reports",
+                        to="documents.clinicaldocument",
+                    ),
+                ),
+                (
+                    "service_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR basedOn: service requests or orders this report fulfills.",
+                        related_name="diagnostic_reports",
+                        to="clinical.servicerequest",
+                    ),
+                ),
+                (
+                    "specimens",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR specimen: specimens the report is based on.",
+                        related_name="diagnostic_reports",
+                        to="clinical.specimen",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Diagnostic Report',
-                'verbose_name_plural': 'Diagnostic Reports',
+                "verbose_name": "Diagnostic Report",
+                "verbose_name_plural": "Diagnostic Reports",
             },
         ),
         migrations.CreateModel(
-            name='DetectedIssue',
+            name="DetectedIssue",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: registered, preliminary, final, etc.', max_length=30)),
-                ('code', models.CharField(blank=True, help_text='FHIR code: issue category such as duplicate therapy.', max_length=255)),
-                ('severity', models.CharField(blank=True, help_text='FHIR severity: high, moderate, or low.', max_length=30)),
-                ('identified_datetime', models.DateTimeField(blank=True, help_text='FHIR identified[x]: when the issue was first identified.', null=True)),
-                ('detail', models.TextField(blank=True, help_text='FHIR detail: description and context for the issue.')),
-                ('reference', models.URLField(blank=True, help_text='FHIR reference: authority or knowledge source for the issue.')),
-                ('evidence_summary', models.TextField(blank=True, help_text='FHIR evidence.code/detail: imported evidence summary.')),
-                ('mitigation_summary', models.TextField(blank=True, help_text='FHIR mitigation: steps taken to reduce or address the risk.')),
-                ('implicated_summary', models.TextField(blank=True, help_text='FHIR implicated: unresolved implicated resource references.')),
-                ('notes', models.TextField(blank=True, help_text='Additional imported issue notes.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('author_device', models.ForeignKey(blank=True, help_text='FHIR author: device or decision-support system that identified the issue.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='authored_detected_issues', to='clinical.device')),
-                ('author_practitioner', models.ForeignKey(blank=True, help_text='FHIR author: practitioner who identified the issue.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='authored_detected_issues', to='clinical.practitioner')),
-                ('author_role', models.ForeignKey(blank=True, help_text='FHIR author: practitioner role that identified the issue.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='authored_detected_issues', to='clinical.practitionerrole')),
-                ('evidence_conditions', models.ManyToManyField(blank=True, help_text='FHIR evidence.detail: conditions that support the detected issue.', related_name='detected_issue_evidence', to='clinical.condition')),
-                ('evidence_diagnostic_reports', models.ManyToManyField(blank=True, help_text='FHIR evidence.detail: diagnostic reports that support the detected issue.', related_name='detected_issue_evidence', to='clinical.diagnosticreport')),
-                ('evidence_observations', models.ManyToManyField(blank=True, help_text='FHIR evidence.detail: observations that support the detected issue.', related_name='detected_issue_evidence', to='clinical.observation')),
-                ('implicated_conditions', models.ManyToManyField(blank=True, help_text='FHIR implicated: condition resources involved in the issue.', related_name='detected_issue_implications', to='clinical.condition')),
-                ('implicated_devices', models.ManyToManyField(blank=True, help_text='FHIR implicated: devices involved in the issue.', related_name='detected_issue_implications', to='clinical.device')),
-                ('implicated_diagnostic_reports', models.ManyToManyField(blank=True, help_text='FHIR implicated: diagnostic reports involved in the issue.', related_name='detected_issue_implications', to='clinical.diagnosticreport')),
-                ('implicated_immunizations', models.ManyToManyField(blank=True, help_text='FHIR implicated: immunizations involved in the issue.', related_name='detected_issue_implications', to='clinical.immunization')),
-                ('implicated_medications', models.ManyToManyField(blank=True, help_text='FHIR implicated: medication request/statement resources involved in the issue.', related_name='detected_issue_implications', to='clinical.medication')),
-                ('implicated_observations', models.ManyToManyField(blank=True, help_text='FHIR implicated: observations involved in the issue.', related_name='detected_issue_implications', to='clinical.observation')),
-                ('implicated_procedures', models.ManyToManyField(blank=True, help_text='FHIR implicated: procedures involved in the issue.', related_name='detected_issue_implications', to='clinical.procedure')),
-                ('implicated_service_requests', models.ManyToManyField(blank=True, help_text='FHIR implicated: service requests or orders involved in the issue.', related_name='detected_issue_implications', to='clinical.servicerequest')),
-                ('patient', models.ForeignKey(help_text='FHIR patient: patient whose care record contains the issue.', on_delete=django.db.models.deletion.CASCADE, related_name='detected_issues', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: registered, preliminary, final, etc.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "code",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR code: issue category such as duplicate therapy.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "severity",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR severity: high, moderate, or low.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "identified_datetime",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR identified[x]: when the issue was first identified.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "detail",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR detail: description and context for the issue.",
+                    ),
+                ),
+                (
+                    "reference",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR reference: authority or knowledge source for the issue.",
+                    ),
+                ),
+                (
+                    "evidence_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR evidence.code/detail: imported evidence summary.",
+                    ),
+                ),
+                (
+                    "mitigation_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR mitigation: steps taken to reduce or address the risk.",
+                    ),
+                ),
+                (
+                    "implicated_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR implicated: unresolved implicated resource references.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True, help_text="Additional imported issue notes."
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "author_device",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR author: device or decision-support system that identified the issue.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="authored_detected_issues",
+                        to="clinical.device",
+                    ),
+                ),
+                (
+                    "author_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR author: practitioner who identified the issue.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="authored_detected_issues",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "author_role",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR author: practitioner role that identified the issue.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="authored_detected_issues",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
+                (
+                    "evidence_conditions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR evidence.detail: conditions that support the detected issue.",
+                        related_name="detected_issue_evidence",
+                        to="clinical.condition",
+                    ),
+                ),
+                (
+                    "evidence_diagnostic_reports",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR evidence.detail: diagnostic reports that support the detected issue.",
+                        related_name="detected_issue_evidence",
+                        to="clinical.diagnosticreport",
+                    ),
+                ),
+                (
+                    "evidence_observations",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR evidence.detail: observations that support the detected issue.",
+                        related_name="detected_issue_evidence",
+                        to="clinical.observation",
+                    ),
+                ),
+                (
+                    "implicated_conditions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: condition resources involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.condition",
+                    ),
+                ),
+                (
+                    "implicated_devices",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: devices involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.device",
+                    ),
+                ),
+                (
+                    "implicated_diagnostic_reports",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: diagnostic reports involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.diagnosticreport",
+                    ),
+                ),
+                (
+                    "implicated_immunizations",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: immunizations involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.immunization",
+                    ),
+                ),
+                (
+                    "implicated_medications",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: medication request/statement resources involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.medication",
+                    ),
+                ),
+                (
+                    "implicated_observations",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: observations involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.observation",
+                    ),
+                ),
+                (
+                    "implicated_procedures",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: procedures involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.procedure",
+                    ),
+                ),
+                (
+                    "implicated_service_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR implicated: service requests or orders involved in the issue.",
+                        related_name="detected_issue_implications",
+                        to="clinical.servicerequest",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        help_text="FHIR patient: patient whose care record contains the issue.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="detected_issues",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Detected Issue',
-                'verbose_name_plural': 'Detected Issues',
+                "verbose_name": "Detected Issue",
+                "verbose_name_plural": "Detected Issues",
             },
         ),
     ]

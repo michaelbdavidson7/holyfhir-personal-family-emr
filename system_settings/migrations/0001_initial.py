@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []
@@ -13,11 +12,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="SystemSettings",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("singleton_id", models.PositiveSmallIntegerField(default=1, editable=False, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "singleton_id",
+                    models.PositiveSmallIntegerField(
+                        default=1, editable=False, unique=True
+                    ),
+                ),
                 (
                     "lock_shortcut_enabled",
-                    models.BooleanField(default=False, help_text="Allow Ctrl+Shift+L to lock the desktop app."),
+                    models.BooleanField(
+                        default=False,
+                        help_text="Allow Ctrl+Shift+L to lock the desktop app.",
+                    ),
                 ),
                 ("updated_at", models.DateTimeField(auto_now=True)),
             ],

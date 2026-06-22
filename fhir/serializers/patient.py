@@ -1,4 +1,3 @@
-
 def patient_to_fhir(patient):
     return {
         "resourceType": "Patient",
@@ -9,14 +8,18 @@ def patient_to_fhir(patient):
                 "given": [patient.first_name],
             }
         ],
-        "birthDate": patient.date_of_birth.isoformat() if patient.date_of_birth else None,
+        "birthDate": patient.date_of_birth.isoformat()
+        if patient.date_of_birth
+        else None,
         "telecom": [
             {"system": "phone", "value": patient.phone},
             {"system": "email", "value": patient.email},
         ],
         "address": [
             {
-                "line": [patient.address_line_1, patient.address_line_2] if patient.address_line_2 else [patient.address_line_1],
+                "line": [patient.address_line_1, patient.address_line_2]
+                if patient.address_line_2
+                else [patient.address_line_1],
                 "city": patient.city,
                 "state": patient.state,
                 "postalCode": patient.postal_code,

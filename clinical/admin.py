@@ -194,32 +194,73 @@ class MedicationCatalogAdmin(admin.ModelAdmin):
 
 @admin.register(MedicationAdministration)
 class MedicationAdministrationAdmin(admin.ModelAdmin):
-    list_display = ("id", "administration_label", "patient", "status", "effective_start", "dose_value", "dose_unit")
+    list_display = (
+        "id",
+        "administration_label",
+        "patient",
+        "status",
+        "effective_start",
+        "dose_value",
+        "dose_unit",
+    )
     list_display_links = ("administration_label",)
     search_fields = ("medication_text", "dosage_text", "route", "notes")
     list_filter = ("patient", "status", "route")
     ordering = ("-effective_start",)
-    autocomplete_fields = ["patient", "encounter", "medication", "medication_catalog", "performer_practitioner", "performer_role"]
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "medication",
+        "medication_catalog",
+        "performer_practitioner",
+        "performer_role",
+    ]
     filter_horizontal = ("service_requests", "reason_conditions")
 
     @admin.display(description="Medication administration", ordering="medication_text")
     def administration_label(self, obj):
-        return obj.medication_text or str(obj.medication or obj.medication_catalog or f"Medication Administration #{obj.pk}")
+        return obj.medication_text or str(
+            obj.medication
+            or obj.medication_catalog
+            or f"Medication Administration #{obj.pk}"
+        )
 
 
 @admin.register(MedicationDispense)
 class MedicationDispenseAdmin(admin.ModelAdmin):
-    list_display = ("id", "dispense_label", "patient", "status", "when_handed_over", "quantity", "days_supply")
+    list_display = (
+        "id",
+        "dispense_label",
+        "patient",
+        "status",
+        "when_handed_over",
+        "quantity",
+        "days_supply",
+    )
     list_display_links = ("dispense_label",)
-    search_fields = ("medication_text", "quantity", "days_supply", "dosage_instruction", "notes")
+    search_fields = (
+        "medication_text",
+        "quantity",
+        "days_supply",
+        "dosage_instruction",
+        "notes",
+    )
     list_filter = ("patient", "status")
     ordering = ("-when_handed_over", "-when_prepared")
-    autocomplete_fields = ["patient", "medication", "medication_catalog", "performer_practitioner", "performer_organization"]
+    autocomplete_fields = [
+        "patient",
+        "medication",
+        "medication_catalog",
+        "performer_practitioner",
+        "performer_organization",
+    ]
     filter_horizontal = ("authorizing_requests",)
 
     @admin.display(description="Medication dispense", ordering="medication_text")
     def dispense_label(self, obj):
-        return obj.medication_text or str(obj.medication or obj.medication_catalog or f"Medication Dispense #{obj.pk}")
+        return obj.medication_text or str(
+            obj.medication or obj.medication_catalog or f"Medication Dispense #{obj.pk}"
+        )
 
 
 @admin.register(Immunization)
@@ -234,22 +275,51 @@ class ImmunizationAdmin(admin.ModelAdmin):
 
 @admin.register(ImmunizationRecommendation)
 class ImmunizationRecommendationAdmin(admin.ModelAdmin):
-    list_display = ("id", "recommendation_label", "patient", "forecast_status", "target_disease", "date")
+    list_display = (
+        "id",
+        "recommendation_label",
+        "patient",
+        "forecast_status",
+        "target_disease",
+        "date",
+    )
     list_display_links = ("recommendation_label",)
-    search_fields = ("vaccine_code", "target_disease", "forecast_status", "forecast_reason", "recommendation_summary")
+    search_fields = (
+        "vaccine_code",
+        "target_disease",
+        "forecast_status",
+        "forecast_reason",
+        "recommendation_summary",
+    )
     list_filter = ("patient", "forecast_status", "target_disease", "authority")
     ordering = ("-date",)
     autocomplete_fields = ["patient", "authority"]
-    filter_horizontal = ("supporting_immunizations", "supporting_observations", "supporting_diagnostic_reports")
+    filter_horizontal = (
+        "supporting_immunizations",
+        "supporting_observations",
+        "supporting_diagnostic_reports",
+    )
 
     @admin.display(description="Recommendation", ordering="vaccine_code")
     def recommendation_label(self, obj):
-        return obj.vaccine_code or obj.target_disease or f"Immunization Recommendation #{obj.pk}"
+        return (
+            obj.vaccine_code
+            or obj.target_disease
+            or f"Immunization Recommendation #{obj.pk}"
+        )
 
 
 @admin.register(Observation)
 class ObservationAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "name", "category", "specimen", "device", "effective_datetime")
+    list_display = (
+        "id",
+        "patient",
+        "name",
+        "category",
+        "specimen",
+        "device",
+        "effective_datetime",
+    )
     list_display_links = ("name",)
     search_fields = ("name", "loinc_code")
     list_filter = ("patient", "category")
@@ -259,7 +329,15 @@ class ObservationAdmin(admin.ModelAdmin):
 
 @admin.register(DiagnosticReport)
 class DiagnosticReportAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "code", "status", "category", "effective_datetime", "issued")
+    list_display = (
+        "id",
+        "patient",
+        "code",
+        "status",
+        "category",
+        "effective_datetime",
+        "issued",
+    )
     list_display_links = ("code",)
     search_fields = ("code", "category", "conclusion", "conclusion_code", "notes")
     list_filter = ("patient", "status", "category")
@@ -284,12 +362,31 @@ class DiagnosticReportAdmin(admin.ModelAdmin):
 
 @admin.register(DetectedIssue)
 class DetectedIssueAdmin(admin.ModelAdmin):
-    list_display = ("id", "issue_label", "patient", "severity", "status", "identified_datetime")
+    list_display = (
+        "id",
+        "issue_label",
+        "patient",
+        "severity",
+        "status",
+        "identified_datetime",
+    )
     list_display_links = ("issue_label",)
-    search_fields = ("code", "detail", "evidence_summary", "mitigation_summary", "implicated_summary", "notes")
+    search_fields = (
+        "code",
+        "detail",
+        "evidence_summary",
+        "mitigation_summary",
+        "implicated_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "severity", "code")
     ordering = ("-identified_datetime", "-updated_at")
-    autocomplete_fields = ["patient", "author_practitioner", "author_role", "author_device"]
+    autocomplete_fields = [
+        "patient",
+        "author_practitioner",
+        "author_role",
+        "author_device",
+    ]
     filter_horizontal = (
         "implicated_conditions",
         "implicated_medications",
@@ -328,7 +425,16 @@ class PersonLinkInline(admin.StackedInline):
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     inlines = (PersonLinkInline,)
-    list_display = ("id", "person_label", "gender", "birth_date", "phone", "email", "managing_organization", "active")
+    list_display = (
+        "id",
+        "person_label",
+        "gender",
+        "birth_date",
+        "phone",
+        "email",
+        "managing_organization",
+        "active",
+    )
     list_display_links = ("person_label",)
     search_fields = ("name", "phone", "email", "address", "notes")
     list_filter = ("active", "gender", "managing_organization")
@@ -342,7 +448,16 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(RelatedPerson)
 class RelatedPersonAdmin(admin.ModelAdmin):
-    list_display = ("id", "person_label", "person", "patient", "relationship", "phone", "email", "active")
+    list_display = (
+        "id",
+        "person_label",
+        "person",
+        "patient",
+        "relationship",
+        "phone",
+        "email",
+        "active",
+    )
     list_display_links = ("person_label",)
     search_fields = ("name", "relationship", "phone", "email", "address", "notes")
     list_filter = ("patient", "active", "relationship", "gender", "person")
@@ -359,28 +474,41 @@ class FHIRGroupMemberInline(admin.StackedInline):
     fk_name = "group"
     extra = 0
     fieldsets = (
-        (None, {
-            "fields": (
-                "patient",
-                "practitioner",
-                "practitioner_role",
-                "device",
-                "medication",
-                "member_group",
-            ),
-        }),
-        ("Source details", {
-            "fields": (
-                "entity_display",
-                "entity_reference",
-                "start_date",
-                "end_date",
-                "inactive",
-            ),
-            "classes": ("collapse",),
-        }),
+        (
+            None,
+            {
+                "fields": (
+                    "patient",
+                    "practitioner",
+                    "practitioner_role",
+                    "device",
+                    "medication",
+                    "member_group",
+                ),
+            },
+        ),
+        (
+            "Source details",
+            {
+                "fields": (
+                    "entity_display",
+                    "entity_reference",
+                    "start_date",
+                    "end_date",
+                    "inactive",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
     )
-    autocomplete_fields = ["patient", "practitioner", "practitioner_role", "device", "medication", "member_group"]
+    autocomplete_fields = [
+        "patient",
+        "practitioner",
+        "practitioner_role",
+        "device",
+        "medication",
+        "member_group",
+    ]
 
 
 @admin.register(FHIRGroup)
@@ -405,21 +533,46 @@ class FHIRGroupAdmin(admin.ModelAdmin):
 
 @admin.register(BodyStructure)
 class BodyStructureAdmin(admin.ModelAdmin):
-    list_display = ("id", "structure_label", "patient", "location", "morphology", "active")
+    list_display = (
+        "id",
+        "structure_label",
+        "patient",
+        "location",
+        "morphology",
+        "active",
+    )
     list_display_links = ("structure_label",)
-    search_fields = ("description", "location", "morphology", "location_qualifier", "notes")
+    search_fields = (
+        "description",
+        "location",
+        "morphology",
+        "location_qualifier",
+        "notes",
+    )
     list_filter = ("patient", "active", "location")
     ordering = ("patient", "location", "description")
     autocomplete_fields = ["patient"]
 
     @admin.display(description="Body structure", ordering="description")
     def structure_label(self, obj):
-        return obj.description or obj.location or obj.morphology or f"Body Structure #{obj.pk}"
+        return (
+            obj.description
+            or obj.location
+            or obj.morphology
+            or f"Body Structure #{obj.pk}"
+        )
 
 
 @admin.register(RiskAssessment)
 class RiskAssessmentAdmin(admin.ModelAdmin):
-    list_display = ("id", "risk_label", "patient", "status", "occurrence_datetime", "authored_on")
+    list_display = (
+        "id",
+        "risk_label",
+        "patient",
+        "status",
+        "occurrence_datetime",
+        "authored_on",
+    )
     list_display_links = ("risk_label",)
     search_fields = ("code", "method", "prediction_summary", "mitigation", "notes")
     list_filter = ("patient", "status", "code")
@@ -441,10 +594,30 @@ class RiskAssessmentAdmin(admin.ModelAdmin):
 
 @admin.register(Goal)
 class GoalAdmin(admin.ModelAdmin):
-    list_display = ("id", "description", "patient", "lifecycle_status", "achievement_status", "priority", "start_date")
+    list_display = (
+        "id",
+        "description",
+        "patient",
+        "lifecycle_status",
+        "achievement_status",
+        "priority",
+        "start_date",
+    )
     list_display_links = ("description",)
-    search_fields = ("description", "target_summary", "outcome_summary", "status_reason", "notes")
-    list_filter = ("patient", "lifecycle_status", "achievement_status", "category", "priority")
+    search_fields = (
+        "description",
+        "target_summary",
+        "outcome_summary",
+        "status_reason",
+        "notes",
+    )
+    list_filter = (
+        "patient",
+        "lifecycle_status",
+        "achievement_status",
+        "category",
+        "priority",
+    )
     ordering = ("patient", "description")
     autocomplete_fields = [
         "patient",
@@ -465,12 +638,25 @@ class GoalAdmin(admin.ModelAdmin):
 
 @admin.register(DeviceRequest)
 class DeviceRequestAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "patient", "status", "intent", "priority", "authored_on")
+    list_display = (
+        "id",
+        "code",
+        "patient",
+        "status",
+        "intent",
+        "priority",
+        "authored_on",
+    )
     list_display_links = ("code",)
     search_fields = ("code", "reason", "notes")
     list_filter = ("patient", "status", "intent", "priority")
     ordering = ("-authored_on", "code")
-    autocomplete_fields = ["patient", "encounter", "requester_practitioner", "requester_role"]
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "requester_practitioner",
+        "requester_role",
+    ]
     filter_horizontal = (
         "devices",
         "care_plans",
@@ -488,12 +674,25 @@ class DeviceRequestAdmin(admin.ModelAdmin):
 
 @admin.register(DeviceUseStatement)
 class DeviceUseStatementAdmin(admin.ModelAdmin):
-    list_display = ("id", "use_label", "patient", "status", "recorded_on", "timing_start")
+    list_display = (
+        "id",
+        "use_label",
+        "patient",
+        "status",
+        "recorded_on",
+        "timing_start",
+    )
     list_display_links = ("use_label",)
     search_fields = ("body_site", "notes", "device__display_name")
     list_filter = ("patient", "status", "device")
     ordering = ("-recorded_on", "-timing_start")
-    autocomplete_fields = ["patient", "device", "source_practitioner", "source_role", "source_related_person"]
+    autocomplete_fields = [
+        "patient",
+        "device",
+        "source_practitioner",
+        "source_role",
+        "source_related_person",
+    ]
     filter_horizontal = (
         "based_on_service_requests",
         "based_on_device_requests",
@@ -526,18 +725,42 @@ class NutritionOrderAdmin(admin.ModelAdmin):
 
     @admin.display(description="Nutrition order")
     def nutrition_label(self, obj):
-        return obj.oral_diet_summary or obj.supplement_summary or obj.enteral_formula_summary or f"Nutrition Order #{obj.pk}"
+        return (
+            obj.oral_diet_summary
+            or obj.supplement_summary
+            or obj.enteral_formula_summary
+            or f"Nutrition Order #{obj.pk}"
+        )
 
 
 @admin.register(Communication)
 class CommunicationAdmin(admin.ModelAdmin):
-    list_display = ("id", "communication_label", "patient", "status", "category", "sent", "received")
+    list_display = (
+        "id",
+        "communication_label",
+        "patient",
+        "status",
+        "category",
+        "sent",
+        "received",
+    )
     list_display_links = ("communication_label",)
     search_fields = ("topic", "payload_summary", "reason", "notes")
     list_filter = ("patient", "status", "category", "priority", "medium")
     ordering = ("-sent", "-received")
-    autocomplete_fields = ["patient", "encounter", "sender_practitioner", "sender_organization", "sender_related_person"]
-    filter_horizontal = ("recipients_practitioners", "recipients_organizations", "recipients_related_people", "in_response_to")
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "sender_practitioner",
+        "sender_organization",
+        "sender_related_person",
+    ]
+    filter_horizontal = (
+        "recipients_practitioners",
+        "recipients_organizations",
+        "recipients_related_people",
+        "in_response_to",
+    )
 
     @admin.display(description="Communication", ordering="topic")
     def communication_label(self, obj):
@@ -546,27 +769,62 @@ class CommunicationAdmin(admin.ModelAdmin):
 
 @admin.register(CommunicationRequest)
 class CommunicationRequestAdmin(admin.ModelAdmin):
-    list_display = ("id", "request_label", "patient", "status", "category", "priority", "authored_on")
+    list_display = (
+        "id",
+        "request_label",
+        "patient",
+        "status",
+        "category",
+        "priority",
+        "authored_on",
+    )
     list_display_links = ("request_label",)
     search_fields = ("payload_summary", "reason", "category", "notes")
     list_filter = ("patient", "status", "category", "priority", "medium")
     ordering = ("-authored_on",)
-    autocomplete_fields = ["patient", "encounter", "requester_practitioner", "sender_practitioner"]
-    filter_horizontal = ("recipients_practitioners", "recipients_related_people", "based_on_service_requests", "replaces")
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "requester_practitioner",
+        "sender_practitioner",
+    ]
+    filter_horizontal = (
+        "recipients_practitioners",
+        "recipients_related_people",
+        "based_on_service_requests",
+        "replaces",
+    )
 
     @admin.display(description="Communication request")
     def request_label(self, obj):
-        return obj.payload_summary[:80] or obj.category or f"Communication Request #{obj.pk}"
+        return (
+            obj.payload_summary[:80]
+            or obj.category
+            or f"Communication Request #{obj.pk}"
+        )
 
 
 @admin.register(Flag)
 class FlagAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "patient", "status", "category", "start_date", "end_date")
+    list_display = (
+        "id",
+        "code",
+        "patient",
+        "status",
+        "category",
+        "start_date",
+        "end_date",
+    )
     list_display_links = ("code",)
     search_fields = ("code", "category", "notes")
     list_filter = ("patient", "status", "category")
     ordering = ("-start_date",)
-    autocomplete_fields = ["patient", "encounter", "author_practitioner", "author_organization"]
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "author_practitioner",
+        "author_organization",
+    ]
 
 
 @admin.register(FHIRList)
@@ -576,8 +834,20 @@ class FHIRListAdmin(admin.ModelAdmin):
     search_fields = ("title", "code", "entry_summary", "empty_reason", "notes")
     list_filter = ("patient", "status", "mode", "code")
     ordering = ("-date", "title")
-    autocomplete_fields = ["patient", "encounter", "source_practitioner", "source_organization"]
-    filter_horizontal = ("conditions", "observations", "medications", "procedures", "diagnostic_reports", "documents")
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "source_practitioner",
+        "source_organization",
+    ]
+    filter_horizontal = (
+        "conditions",
+        "observations",
+        "medications",
+        "procedures",
+        "diagnostic_reports",
+        "documents",
+    )
 
     @admin.display(description="List", ordering="title")
     def list_label(self, obj):
@@ -586,13 +856,30 @@ class FHIRListAdmin(admin.ModelAdmin):
 
 @admin.register(QuestionnaireResponse)
 class QuestionnaireResponseAdmin(admin.ModelAdmin):
-    list_display = ("id", "response_label", "patient", "status", "authored", "encounter")
+    list_display = (
+        "id",
+        "response_label",
+        "patient",
+        "status",
+        "authored",
+        "encounter",
+    )
     list_display_links = ("response_label",)
     search_fields = ("questionnaire", "item_summary", "notes")
     list_filter = ("patient", "status")
     ordering = ("-authored",)
-    autocomplete_fields = ["patient", "encounter", "author_practitioner", "source_patient", "source_related_person"]
-    filter_horizontal = ("based_on_service_requests", "part_of_observations", "part_of_procedures")
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "author_practitioner",
+        "source_patient",
+        "source_related_person",
+    ]
+    filter_horizontal = (
+        "based_on_service_requests",
+        "part_of_observations",
+        "part_of_procedures",
+    )
 
     @admin.display(description="Questionnaire response", ordering="questionnaire")
     def response_label(self, obj):
@@ -601,9 +888,25 @@ class QuestionnaireResponseAdmin(admin.ModelAdmin):
 
 @admin.register(Media)
 class MediaAdmin(admin.ModelAdmin):
-    list_display = ("id", "media_label", "patient", "status", "media_type", "modality", "created_datetime")
+    list_display = (
+        "id",
+        "media_label",
+        "patient",
+        "status",
+        "media_type",
+        "modality",
+        "created_datetime",
+    )
     list_display_links = ("media_label",)
-    search_fields = ("media_type", "modality", "view", "body_site", "content_title", "content_url", "notes")
+    search_fields = (
+        "media_type",
+        "modality",
+        "view",
+        "body_site",
+        "content_title",
+        "content_url",
+        "notes",
+    )
     list_filter = ("patient", "status", "media_type", "modality")
     ordering = ("-created_datetime", "-issued")
     autocomplete_fields = ["patient", "encounter", "operator_practitioner", "device"]
@@ -616,13 +919,31 @@ class MediaAdmin(admin.ModelAdmin):
 
 @admin.register(ImagingStudy)
 class ImagingStudyAdmin(admin.ModelAdmin):
-    list_display = ("id", "study_label", "patient", "status", "started", "procedure_code")
+    list_display = (
+        "id",
+        "study_label",
+        "patient",
+        "status",
+        "started",
+        "procedure_code",
+    )
     list_display_links = ("study_label",)
-    search_fields = ("description", "procedure_code", "reason", "modality_summary", "series_summary", "notes")
+    search_fields = (
+        "description",
+        "procedure_code",
+        "reason",
+        "modality_summary",
+        "series_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "procedure_code")
     ordering = ("-started",)
     autocomplete_fields = ["patient", "encounter", "referrer_practitioner"]
-    filter_horizontal = ("endpoint_organizations", "based_on_service_requests", "interpreter_practitioners")
+    filter_horizontal = (
+        "endpoint_organizations",
+        "based_on_service_requests",
+        "interpreter_practitioners",
+    )
 
     @admin.display(description="Imaging study", ordering="description")
     def study_label(self, obj):
@@ -631,9 +952,22 @@ class ImagingStudyAdmin(admin.ModelAdmin):
 
 @admin.register(MolecularSequence)
 class MolecularSequenceAdmin(admin.ModelAdmin):
-    list_display = ("id", "sequence_label", "patient", "sequence_type", "specimen", "performer_organization")
+    list_display = (
+        "id",
+        "sequence_label",
+        "patient",
+        "sequence_type",
+        "specimen",
+        "performer_organization",
+    )
     list_display_links = ("sequence_label",)
-    search_fields = ("sequence_type", "observed_sequence", "reference_sequence_summary", "variant_summary", "repository_summary")
+    search_fields = (
+        "sequence_type",
+        "observed_sequence",
+        "reference_sequence_summary",
+        "variant_summary",
+        "repository_summary",
+    )
     list_filter = ("patient", "sequence_type", "performer_organization")
     ordering = ("patient", "sequence_type")
     autocomplete_fields = ["patient", "specimen", "device", "performer_organization"]
@@ -647,7 +981,15 @@ class MolecularSequenceAdmin(admin.ModelAdmin):
 class MedicationKnowledgeAdmin(admin.ModelAdmin):
     list_display = ("id", "knowledge_label", "status", "dose_form", "product_type")
     list_display_links = ("knowledge_label",)
-    search_fields = ("code", "dose_form", "synonym", "product_type", "ingredient_summary", "contraindication_summary", "notes")
+    search_fields = (
+        "code",
+        "dose_form",
+        "synonym",
+        "product_type",
+        "ingredient_summary",
+        "contraindication_summary",
+        "notes",
+    )
     list_filter = ("status", "dose_form", "product_type")
     ordering = ("code",)
     autocomplete_fields = ["medication"]
@@ -660,31 +1002,68 @@ class MedicationKnowledgeAdmin(admin.ModelAdmin):
 
 @admin.register(ImmunizationEvaluation)
 class ImmunizationEvaluationAdmin(admin.ModelAdmin):
-    list_display = ("id", "evaluation_label", "patient", "status", "target_disease", "dose_status")
+    list_display = (
+        "id",
+        "evaluation_label",
+        "patient",
+        "status",
+        "target_disease",
+        "dose_status",
+    )
     list_display_links = ("evaluation_label",)
-    search_fields = ("target_disease", "dose_status", "dose_status_reason", "description", "series", "notes")
+    search_fields = (
+        "target_disease",
+        "dose_status",
+        "dose_status_reason",
+        "description",
+        "series",
+        "notes",
+    )
     list_filter = ("patient", "status", "target_disease", "dose_status", "authority")
     ordering = ("patient", "target_disease")
     autocomplete_fields = ["patient", "immunization", "authority"]
 
     @admin.display(description="Evaluation", ordering="target_disease")
     def evaluation_label(self, obj):
-        return obj.target_disease or obj.dose_status or f"Immunization Evaluation #{obj.pk}"
+        return (
+            obj.target_disease
+            or obj.dose_status
+            or f"Immunization Evaluation #{obj.pk}"
+        )
 
 
 @admin.register(VisionPrescription)
 class VisionPrescriptionAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "status", "date_written", "prescriber_practitioner")
+    list_display = (
+        "id",
+        "patient",
+        "status",
+        "date_written",
+        "prescriber_practitioner",
+    )
     list_display_links = ("status",)
     search_fields = ("status", "lens_summary", "notes")
     list_filter = ("patient", "status", "prescriber_practitioner")
     ordering = ("-date_written", "-created_datetime")
-    autocomplete_fields = ["patient", "encounter", "prescriber_practitioner", "prescriber_role"]
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "prescriber_practitioner",
+        "prescriber_role",
+    ]
 
 
 @admin.register(RequestGroup)
 class RequestGroupAdmin(admin.ModelAdmin):
-    list_display = ("id", "group_label", "patient", "status", "intent", "priority", "authored_on")
+    list_display = (
+        "id",
+        "group_label",
+        "patient",
+        "status",
+        "intent",
+        "priority",
+        "authored_on",
+    )
     list_display_links = ("group_label",)
     search_fields = ("code", "reason", "action_summary", "notes")
     list_filter = ("patient", "status", "intent", "priority")
@@ -701,7 +1080,14 @@ class RequestGroupAdmin(admin.ModelAdmin):
 class GuidanceResponseAdmin(admin.ModelAdmin):
     list_display = ("id", "guidance_label", "patient", "status", "occurrence_datetime")
     list_display_links = ("guidance_label",)
-    search_fields = ("module_uri", "status", "reason", "result_summary", "data_requirement_summary", "notes")
+    search_fields = (
+        "module_uri",
+        "status",
+        "reason",
+        "result_summary",
+        "data_requirement_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "performer_organization")
     ordering = ("-occurrence_datetime",)
     autocomplete_fields = ["patient", "encounter", "performer_organization"]
@@ -718,26 +1104,56 @@ class SupplyRequestAdmin(admin.ModelAdmin):
     search_fields = ("item", "category", "reason", "quantity", "notes")
     list_filter = ("patient", "status", "priority", "category")
     ordering = ("-authored_on",)
-    autocomplete_fields = ["patient", "requester_practitioner", "requester_organization", "supplier_organization", "deliver_to_location"]
+    autocomplete_fields = [
+        "patient",
+        "requester_practitioner",
+        "requester_organization",
+        "supplier_organization",
+        "deliver_to_location",
+    ]
     filter_horizontal = ("based_on_service_requests",)
 
 
 @admin.register(SupplyDelivery)
 class SupplyDeliveryAdmin(admin.ModelAdmin):
-    list_display = ("id", "item", "patient", "status", "delivery_type", "occurrence_start")
+    list_display = (
+        "id",
+        "item",
+        "patient",
+        "status",
+        "delivery_type",
+        "occurrence_start",
+    )
     list_display_links = ("item",)
     search_fields = ("item", "quantity", "delivery_type", "notes")
     list_filter = ("patient", "status", "delivery_type", "supplier_organization")
     ordering = ("-occurrence_start",)
-    autocomplete_fields = ["patient", "supplier_practitioner", "supplier_organization", "destination"]
+    autocomplete_fields = [
+        "patient",
+        "supplier_practitioner",
+        "supplier_organization",
+        "destination",
+    ]
     filter_horizontal = ("based_on_supply_requests", "part_of_deliveries", "receivers")
 
 
 @admin.register(Specimen)
 class SpecimenAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "specimen_type", "status", "accession_identifier", "collected_datetime")
+    list_display = (
+        "id",
+        "patient",
+        "specimen_type",
+        "status",
+        "accession_identifier",
+        "collected_datetime",
+    )
     list_display_links = ("specimen_type",)
-    search_fields = ("specimen_type", "accession_identifier", "body_site", "collector_display")
+    search_fields = (
+        "specimen_type",
+        "accession_identifier",
+        "body_site",
+        "collector_display",
+    )
     list_filter = ("patient", "status", "specimen_type")
     ordering = ("-collected_datetime", "-received_time")
     autocomplete_fields = ["patient"]
@@ -746,7 +1162,14 @@ class SpecimenAdmin(admin.ModelAdmin):
 
 @admin.register(Encounter)
 class EncounterAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "encounter_type", "provider_name", "facility_name", "display_start_time")
+    list_display = (
+        "id",
+        "patient",
+        "encounter_type",
+        "provider_name",
+        "facility_name",
+        "display_start_time",
+    )
     list_display_links = ("encounter_type",)
     search_fields = ("provider_name", "facility_name", "reason")
     list_filter = ("patient", "status")
@@ -758,7 +1181,11 @@ class EncounterAdmin(admin.ModelAdmin):
     def display_start_time(self, obj):
         if not obj.start_time:
             return "-"
-        if obj.start_time.hour == 0 and obj.start_time.minute == 0 and obj.start_time.second == 0:
+        if (
+            obj.start_time.hour == 0
+            and obj.start_time.minute == 0
+            and obj.start_time.second == 0
+        ):
             return obj.start_time.date()
         return obj.start_time
 
@@ -767,26 +1194,32 @@ class CareTeamParticipantInline(admin.StackedInline):
     model = CareTeamParticipant
     extra = 0
     fieldsets = (
-        (None, {
-            "fields": (
-                "role",
-                "practitioner",
-                "organization",
-                "location",
-                "related_person",
-            ),
-        }),
-        ("Source details", {
-            "fields": (
-                "member_display",
-                "member_reference",
-                "on_behalf_of_display",
-                "on_behalf_of_reference",
-                "start_date",
-                "end_date",
-            ),
-            "classes": ("collapse",),
-        }),
+        (
+            None,
+            {
+                "fields": (
+                    "role",
+                    "practitioner",
+                    "organization",
+                    "location",
+                    "related_person",
+                ),
+            },
+        ),
+        (
+            "Source details",
+            {
+                "fields": (
+                    "member_display",
+                    "member_reference",
+                    "on_behalf_of_display",
+                    "on_behalf_of_reference",
+                    "start_date",
+                    "end_date",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
     )
     autocomplete_fields = ["practitioner", "organization", "location", "related_person"]
 
@@ -816,7 +1249,15 @@ class CarePlanAdmin(admin.ModelAdmin):
 
 @admin.register(ServiceRequest)
 class ServiceRequestAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "name", "status", "intent", "priority", "authored_on")
+    list_display = (
+        "id",
+        "patient",
+        "name",
+        "status",
+        "intent",
+        "priority",
+        "authored_on",
+    )
     list_display_links = ("name",)
     search_fields = ("name", "category", "reason", "patient_instruction")
     list_filter = ("patient", "status", "intent", "priority", "category")
@@ -845,7 +1286,15 @@ class ServiceRequestAdmin(admin.ModelAdmin):
 
 @admin.register(EpisodeOfCare)
 class EpisodeOfCareAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "episode_type", "status", "managing_organization", "start_date", "end_date")
+    list_display = (
+        "id",
+        "patient",
+        "episode_type",
+        "status",
+        "managing_organization",
+        "start_date",
+        "end_date",
+    )
     list_display_links = ("episode_type",)
     search_fields = ("episode_type", "diagnosis_summary", "notes")
     list_filter = ("patient", "status", "episode_type", "managing_organization")
@@ -861,9 +1310,24 @@ class EpisodeOfCareAdmin(admin.ModelAdmin):
 
 @admin.register(AdverseEvent)
 class AdverseEventAdmin(admin.ModelAdmin):
-    list_display = ("id", "event_label", "patient", "actuality", "severity", "outcome", "event_date")
+    list_display = (
+        "id",
+        "event_label",
+        "patient",
+        "actuality",
+        "severity",
+        "outcome",
+        "event_date",
+    )
     list_display_links = ("event_label",)
-    search_fields = ("event", "category", "seriousness", "severity", "outcome", "suspect_entity_summary")
+    search_fields = (
+        "event",
+        "category",
+        "seriousness",
+        "severity",
+        "outcome",
+        "suspect_entity_summary",
+    )
     list_filter = ("patient", "actuality", "severity", "outcome", "category")
     ordering = ("-event_date", "-recorded_date")
     autocomplete_fields = [
@@ -899,19 +1363,25 @@ class FamilyMemberHistoryConditionInline(admin.StackedInline):
     extra = 0
     autocomplete_fields = ["condition"]
     fieldsets = (
-        (None, {
-            "fields": (
-                "condition",
-                "condition_text",
-                "outcome",
-                "contributed_to_death",
-                "onset_text",
-            ),
-        }),
-        ("Notes", {
-            "fields": ("notes",),
-            "classes": ("collapse",),
-        }),
+        (
+            None,
+            {
+                "fields": (
+                    "condition",
+                    "condition_text",
+                    "outcome",
+                    "contributed_to_death",
+                    "onset_text",
+                ),
+            },
+        ),
+        (
+            "Notes",
+            {
+                "fields": ("notes",),
+                "classes": ("collapse",),
+            },
+        ),
     )
     formfield_overrides = {
         models.TextField: {"widget": forms.Textarea(attrs={"rows": 3})},
@@ -921,9 +1391,22 @@ class FamilyMemberHistoryConditionInline(admin.StackedInline):
 @admin.register(FamilyMemberHistory)
 class FamilyMemberHistoryAdmin(admin.ModelAdmin):
     inlines = (FamilyMemberHistoryConditionInline,)
-    list_display = ("id", "patient", "relationship", "status", "sex", "age_text", "deceased")
+    list_display = (
+        "id",
+        "patient",
+        "relationship",
+        "status",
+        "sex",
+        "age_text",
+        "deceased",
+    )
     list_display_links = ("relationship",)
-    search_fields = ("relationship", "reason", "notes", "condition_links__condition_text")
+    search_fields = (
+        "relationship",
+        "reason",
+        "notes",
+        "condition_links__condition_text",
+    )
     list_filter = ("patient", "status", "relationship", "sex", "deceased")
     ordering = ("patient", "relationship")
     autocomplete_fields = ["patient"]
@@ -935,17 +1418,23 @@ class ClinicalImpressionFindingInline(admin.StackedInline):
     extra = 0
     autocomplete_fields = ["condition", "observation"]
     fieldsets = (
-        (None, {
-            "fields": (
-                "condition",
-                "observation",
-                "finding_text",
-            ),
-        }),
-        ("Basis", {
-            "fields": ("basis",),
-            "classes": ("collapse",),
-        }),
+        (
+            None,
+            {
+                "fields": (
+                    "condition",
+                    "observation",
+                    "finding_text",
+                ),
+            },
+        ),
+        (
+            "Basis",
+            {
+                "fields": ("basis",),
+                "classes": ("collapse",),
+            },
+        ),
     )
     formfield_overrides = {
         models.TextField: {"widget": forms.Textarea(attrs={"rows": 3})},
@@ -966,7 +1455,12 @@ class ClinicalImpressionAdmin(admin.ModelAdmin):
         "assessor_practitioner",
         "assessor_role",
     ]
-    filter_horizontal = ("conditions", "observations", "problems", "investigations_observations")
+    filter_horizontal = (
+        "conditions",
+        "observations",
+        "problems",
+        "investigations_observations",
+    )
 
     @admin.display(description="Impression", ordering="description")
     def impression_label(self, obj):
@@ -975,7 +1469,15 @@ class ClinicalImpressionAdmin(admin.ModelAdmin):
 
 @admin.register(Practitioner)
 class PractitionerAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "qualification", "phone", "email", "active", "care_team_count")
+    list_display = (
+        "id",
+        "name",
+        "qualification",
+        "phone",
+        "email",
+        "active",
+        "care_team_count",
+    )
     list_display_links = ("name",)
     search_fields = ("name", "npi", "qualification", "phone", "email")
     list_filter = ("active", "qualification")
@@ -988,7 +1490,14 @@ class PractitionerAdmin(admin.ModelAdmin):
 
 @admin.register(PractitionerRole)
 class PractitionerRoleAdmin(admin.ModelAdmin):
-    list_display = ("id", "role_label", "practitioner", "organization", "specialty", "active")
+    list_display = (
+        "id",
+        "role_label",
+        "practitioner",
+        "organization",
+        "specialty",
+        "active",
+    )
     list_display_links = ("role_label",)
     search_fields = ("role", "specialty", "practitioner__name", "organization__name")
     list_filter = ("active", "role", "specialty", "organization")
@@ -998,12 +1507,26 @@ class PractitionerRoleAdmin(admin.ModelAdmin):
 
     @admin.display(description="Role", ordering="role")
     def role_label(self, obj):
-        return obj.role or obj.specialty or str(obj.practitioner or obj.organization or f"Practitioner Role #{obj.pk}")
+        return (
+            obj.role
+            or obj.specialty
+            or str(
+                obj.practitioner or obj.organization or f"Practitioner Role #{obj.pk}"
+            )
+        )
 
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "display_name", "device_type", "status", "manufacturer", "owner")
+    list_display = (
+        "id",
+        "patient",
+        "display_name",
+        "device_type",
+        "status",
+        "manufacturer",
+        "owner",
+    )
     list_display_links = ("display_name",)
     search_fields = (
         "display_name",
@@ -1023,22 +1546,28 @@ class ProcedurePerformerInline(admin.StackedInline):
     model = ProcedurePerformer
     extra = 0
     fieldsets = (
-        (None, {
-            "fields": (
-                "role",
-                "practitioner",
-                "organization",
-            ),
-        }),
-        ("Source details", {
-            "fields": (
-                "actor_display",
-                "actor_reference",
-                "on_behalf_of_display",
-                "on_behalf_of_reference",
-            ),
-            "classes": ("collapse",),
-        }),
+        (
+            None,
+            {
+                "fields": (
+                    "role",
+                    "practitioner",
+                    "organization",
+                ),
+            },
+        ),
+        (
+            "Source details",
+            {
+                "fields": (
+                    "actor_display",
+                    "actor_reference",
+                    "on_behalf_of_display",
+                    "on_behalf_of_reference",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
     )
     autocomplete_fields = ["practitioner", "organization"]
 
@@ -1069,7 +1598,14 @@ class InsurancePlanAdmin(admin.ModelAdmin):
 class ProvenanceAdmin(admin.ModelAdmin):
     list_display = ("id", "activity", "patient", "recorded", "location")
     list_display_links = ("activity",)
-    search_fields = ("activity", "target_summary", "agent_summary", "entity_summary", "policy", "notes")
+    search_fields = (
+        "activity",
+        "target_summary",
+        "agent_summary",
+        "entity_summary",
+        "policy",
+        "notes",
+    )
     list_filter = ("patient", "activity", "location")
     ordering = ("-recorded",)
     autocomplete_fields = ["patient", "location"]
@@ -1079,7 +1615,13 @@ class ProvenanceAdmin(admin.ModelAdmin):
 class CompositionAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "patient", "status", "composition_type", "date")
     list_display_links = ("title",)
-    search_fields = ("title", "composition_type", "category", "section_summary", "notes")
+    search_fields = (
+        "title",
+        "composition_type",
+        "category",
+        "section_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "composition_type", "custodian")
     ordering = ("-date",)
     autocomplete_fields = ["patient", "encounter", "custodian"]
@@ -1090,7 +1632,13 @@ class CompositionAdmin(admin.ModelAdmin):
 class DocumentManifestAdmin(admin.ModelAdmin):
     list_display = ("id", "manifest_type", "patient", "status", "created_datetime")
     list_display_links = ("manifest_type",)
-    search_fields = ("manifest_type", "description", "content_summary", "related_summary", "source")
+    search_fields = (
+        "manifest_type",
+        "description",
+        "content_summary",
+        "related_summary",
+        "source",
+    )
     list_filter = ("patient", "status", "manifest_type")
     ordering = ("-created_datetime",)
     autocomplete_fields = ["patient", "author_practitioner"]
@@ -1126,7 +1674,15 @@ class HealthcareServiceAdmin(admin.ModelAdmin):
 
 @admin.register(OrganizationAffiliation)
 class OrganizationAffiliationAdmin(admin.ModelAdmin):
-    list_display = ("id", "role", "organization", "participating_organization", "active", "start_date", "end_date")
+    list_display = (
+        "id",
+        "role",
+        "organization",
+        "participating_organization",
+        "active",
+        "start_date",
+        "end_date",
+    )
     list_display_links = ("role",)
     search_fields = ("role", "specialty", "telecom", "notes")
     list_filter = ("active", "role", "organization", "participating_organization")
@@ -1138,13 +1694,26 @@ class OrganizationAffiliationAdmin(admin.ModelAdmin):
 class SubstanceAdmin(admin.ModelAdmin):
     list_display = ("id", "code", "status", "category")
     list_display_links = ("code",)
-    search_fields = ("code", "category", "description", "instance_summary", "ingredient_summary")
+    search_fields = (
+        "code",
+        "category",
+        "description",
+        "instance_summary",
+        "ingredient_summary",
+    )
     list_filter = ("status", "category")
 
 
 @admin.register(DeviceMetric)
 class DeviceMetricAdmin(admin.ModelAdmin):
-    list_display = ("id", "metric_type", "source", "category", "operational_status", "unit")
+    list_display = (
+        "id",
+        "metric_type",
+        "source",
+        "category",
+        "operational_status",
+        "unit",
+    )
     list_display_links = ("metric_type",)
     search_fields = ("metric_type", "unit", "category", "calibration_summary")
     list_filter = ("category", "operational_status", "source")
@@ -1153,31 +1722,66 @@ class DeviceMetricAdmin(admin.ModelAdmin):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ("id", "service_type", "patient", "active", "planning_horizon_start", "planning_horizon_end")
+    list_display = (
+        "id",
+        "service_type",
+        "patient",
+        "active",
+        "planning_horizon_start",
+        "planning_horizon_end",
+    )
     list_display_links = ("service_type",)
     search_fields = ("service_category", "service_type", "specialty", "comment")
     list_filter = ("patient", "active", "service_category", "service_type")
     autocomplete_fields = ["patient"]
-    filter_horizontal = ("actors_practitioners", "actors_locations", "actors_healthcare_services")
+    filter_horizontal = (
+        "actors_practitioners",
+        "actors_locations",
+        "actors_healthcare_services",
+    )
 
 
 @admin.register(Slot)
 class SlotAdmin(admin.ModelAdmin):
     list_display = ("id", "schedule", "status", "start_time", "end_time", "overbooked")
     list_display_links = ("schedule",)
-    search_fields = ("service_category", "service_type", "specialty", "appointment_type", "comment")
+    search_fields = (
+        "service_category",
+        "service_type",
+        "specialty",
+        "appointment_type",
+        "comment",
+    )
     list_filter = ("status", "overbooked", "schedule")
     autocomplete_fields = ["schedule"]
 
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
-    list_display = ("id", "description", "patient", "status", "appointment_type", "start_time")
+    list_display = (
+        "id",
+        "description",
+        "patient",
+        "status",
+        "appointment_type",
+        "start_time",
+    )
     list_display_links = ("description",)
-    search_fields = ("description", "appointment_type", "reason", "participant_summary", "comment")
+    search_fields = (
+        "description",
+        "appointment_type",
+        "reason",
+        "participant_summary",
+        "comment",
+    )
     list_filter = ("patient", "status", "appointment_type")
     autocomplete_fields = ["patient"]
-    filter_horizontal = ("slots", "participants_practitioners", "participants_locations", "based_on_service_requests")
+    filter_horizontal = (
+        "slots",
+        "participants_practitioners",
+        "participants_locations",
+        "based_on_service_requests",
+    )
 
 
 @admin.register(AppointmentResponse)
@@ -1186,32 +1790,75 @@ class AppointmentResponseAdmin(admin.ModelAdmin):
     list_display_links = ("appointment",)
     search_fields = ("participant_status", "participant_type", "comment")
     list_filter = ("patient", "participant_status", "appointment")
-    autocomplete_fields = ["appointment", "patient", "actor_practitioner", "actor_location"]
+    autocomplete_fields = [
+        "appointment",
+        "patient",
+        "actor_practitioner",
+        "actor_location",
+    ]
 
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "patient", "status", "intent", "priority", "authored_on")
+    list_display = (
+        "id",
+        "code",
+        "patient",
+        "status",
+        "intent",
+        "priority",
+        "authored_on",
+    )
     list_display_links = ("code",)
     search_fields = ("code", "description", "input_summary", "output_summary", "notes")
     list_filter = ("patient", "status", "intent", "priority")
     ordering = ("-authored_on",)
-    autocomplete_fields = ["patient", "encounter", "owner_practitioner", "owner_organization"]
+    autocomplete_fields = [
+        "patient",
+        "encounter",
+        "owner_practitioner",
+        "owner_organization",
+    ]
     filter_horizontal = ("based_on_service_requests",)
+
+
 @admin.register(AuditEvent)
 class AuditEventAdmin(admin.ModelAdmin):
     list_display = ("id", "audit_type", "patient", "action", "outcome", "recorded")
     list_display_links = ("audit_type",)
-    search_fields = ("audit_type", "subtype", "action", "outcome", "outcome_description", "agent_summary", "entity_summary")
+    search_fields = (
+        "audit_type",
+        "subtype",
+        "action",
+        "outcome",
+        "outcome_description",
+        "agent_summary",
+        "entity_summary",
+    )
     list_filter = ("patient", "action", "outcome", "audit_type")
     ordering = ("-recorded",)
     autocomplete_fields = ["patient"]
 
+
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ("id", "account_label", "patient", "status", "account_type", "owner", "service_period_start")
+    list_display = (
+        "id",
+        "account_label",
+        "patient",
+        "status",
+        "account_type",
+        "owner",
+        "service_period_start",
+    )
     list_display_links = ("account_label",)
-    search_fields = ("name", "account_type", "description", "guarantor_summary", "balance_summary")
+    search_fields = (
+        "name",
+        "account_type",
+        "description",
+        "guarantor_summary",
+        "balance_summary",
+    )
     list_filter = ("patient", "status", "account_type", "owner")
     autocomplete_fields = ["patient", "owner"]
     filter_horizontal = ("coverages",)
@@ -1223,12 +1870,32 @@ class AccountAdmin(admin.ModelAdmin):
 
 @admin.register(Claim)
 class ClaimAdmin(admin.ModelAdmin):
-    list_display = ("id", "claim_label", "patient", "status", "claim_type", "use", "created_date")
+    list_display = (
+        "id",
+        "claim_label",
+        "patient",
+        "status",
+        "claim_type",
+        "use",
+        "created_date",
+    )
     list_display_links = ("claim_label",)
-    search_fields = ("claim_type", "use", "priority", "diagnosis_summary", "item_summary", "insurance_summary")
+    search_fields = (
+        "claim_type",
+        "use",
+        "priority",
+        "diagnosis_summary",
+        "item_summary",
+        "insurance_summary",
+    )
     list_filter = ("patient", "status", "claim_type", "use", "insurer")
     ordering = ("-created_date", "-billable_period_start")
-    autocomplete_fields = ["patient", "insurer", "provider_practitioner", "provider_organization"]
+    autocomplete_fields = [
+        "patient",
+        "insurer",
+        "provider_practitioner",
+        "provider_organization",
+    ]
     filter_horizontal = ("coverages",)
 
     @admin.display(description="Claim", ordering="claim_type")
@@ -1238,9 +1905,25 @@ class ClaimAdmin(admin.ModelAdmin):
 
 @admin.register(ClaimResponse)
 class ClaimResponseAdmin(admin.ModelAdmin):
-    list_display = ("id", "response_label", "patient", "status", "response_type", "outcome", "created_date")
+    list_display = (
+        "id",
+        "response_label",
+        "patient",
+        "status",
+        "response_type",
+        "outcome",
+        "created_date",
+    )
     list_display_links = ("response_label",)
-    search_fields = ("response_type", "outcome", "disposition", "item_summary", "total_summary", "payment_summary", "error_summary")
+    search_fields = (
+        "response_type",
+        "outcome",
+        "disposition",
+        "item_summary",
+        "total_summary",
+        "payment_summary",
+        "error_summary",
+    )
     list_filter = ("patient", "status", "response_type", "outcome", "insurer")
     ordering = ("-created_date",)
     autocomplete_fields = ["patient", "request_claim", "insurer"]
@@ -1252,9 +1935,24 @@ class ClaimResponseAdmin(admin.ModelAdmin):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ("id", "invoice_label", "patient", "status", "invoice_type", "date", "total_gross")
+    list_display = (
+        "id",
+        "invoice_label",
+        "patient",
+        "status",
+        "invoice_type",
+        "date",
+        "total_gross",
+    )
     list_display_links = ("invoice_label",)
-    search_fields = ("invoice_type", "participant_summary", "line_item_summary", "total_net", "total_gross", "payment_terms")
+    search_fields = (
+        "invoice_type",
+        "participant_summary",
+        "line_item_summary",
+        "total_net",
+        "total_gross",
+        "payment_terms",
+    )
     list_filter = ("patient", "status", "invoice_type", "issuer_organization")
     ordering = ("-date",)
     autocomplete_fields = ["patient", "account", "issuer_organization"]
@@ -1266,9 +1964,23 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 @admin.register(ChargeItem)
 class ChargeItemAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "patient", "status", "encounter", "occurrence_datetime")
+    list_display = (
+        "id",
+        "code",
+        "patient",
+        "status",
+        "encounter",
+        "occurrence_datetime",
+    )
     list_display_links = ("code",)
-    search_fields = ("code", "quantity", "price_override", "total_price_component", "reason", "notes")
+    search_fields = (
+        "code",
+        "quantity",
+        "price_override",
+        "total_price_component",
+        "reason",
+        "notes",
+    )
     list_filter = ("patient", "status", "encounter", "account")
     ordering = ("-occurrence_datetime",)
     autocomplete_fields = ["patient", "encounter", "account"]
@@ -1277,7 +1989,15 @@ class ChargeItemAdmin(admin.ModelAdmin):
 
 @admin.register(ResearchStudy)
 class ResearchStudyAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "status", "phase", "sponsor", "period_start", "period_end")
+    list_display = (
+        "id",
+        "title",
+        "status",
+        "phase",
+        "sponsor",
+        "period_start",
+        "period_end",
+    )
     list_display_links = ("title",)
     search_fields = ("title", "phase", "category", "focus", "condition", "description")
     list_filter = ("status", "phase", "sponsor")
@@ -1288,7 +2008,15 @@ class ResearchStudyAdmin(admin.ModelAdmin):
 
 @admin.register(ResearchSubject)
 class ResearchSubjectAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "study", "status", "assigned_arm", "period_start", "period_end")
+    list_display = (
+        "id",
+        "patient",
+        "study",
+        "status",
+        "assigned_arm",
+        "period_start",
+        "period_end",
+    )
     list_display_links = ("patient",)
     search_fields = ("assigned_arm", "actual_arm", "notes", "study__title")
     list_filter = ("patient", "status", "study")
@@ -1297,18 +2025,43 @@ class ResearchSubjectAdmin(admin.ModelAdmin):
 
 @admin.register(DeviceDefinition)
 class DeviceDefinitionAdmin(admin.ModelAdmin):
-    list_display = ("id", "device_name", "device_type", "manufacturer", "model_number", "version")
+    list_display = (
+        "id",
+        "device_name",
+        "device_type",
+        "manufacturer",
+        "model_number",
+        "version",
+    )
     list_display_links = ("device_name",)
-    search_fields = ("device_name", "device_type", "model_number", "version", "udi_device_identifier")
+    search_fields = (
+        "device_name",
+        "device_type",
+        "model_number",
+        "version",
+        "udi_device_identifier",
+    )
     list_filter = ("device_type", "manufacturer")
     autocomplete_fields = ["manufacturer"]
 
 
 @admin.register(ObservationDefinition)
 class ObservationDefinitionAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "category", "permitted_data_type", "multiple_results_allowed")
+    list_display = (
+        "id",
+        "code",
+        "category",
+        "permitted_data_type",
+        "multiple_results_allowed",
+    )
     list_display_links = ("code",)
-    search_fields = ("code", "category", "method", "preferred_report_name", "qualified_interval_summary")
+    search_fields = (
+        "code",
+        "category",
+        "method",
+        "preferred_report_name",
+        "qualified_interval_summary",
+    )
     list_filter = ("category", "permitted_data_type", "multiple_results_allowed")
 
 
@@ -1316,14 +2069,30 @@ class ObservationDefinitionAdmin(admin.ModelAdmin):
 class QuestionnaireAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "status", "version", "publisher", "approval_date")
     list_display_links = ("title",)
-    search_fields = ("title", "name", "url", "publisher", "subject_type", "item_summary")
+    search_fields = (
+        "title",
+        "name",
+        "url",
+        "publisher",
+        "subject_type",
+        "item_summary",
+    )
     list_filter = ("status", "publisher", "subject_type")
     ordering = ("title",)
+
+
 @admin.register(Measure)
 class MeasureAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "status", "measure_type", "scoring", "publisher")
     list_display_links = ("title",)
-    search_fields = ("title", "name", "url", "publisher", "description", "group_summary")
+    search_fields = (
+        "title",
+        "name",
+        "url",
+        "publisher",
+        "description",
+        "group_summary",
+    )
     list_filter = ("status", "measure_type", "scoring", "publisher")
     ordering = ("title",)
 
@@ -1342,7 +2111,14 @@ class MeasureReportAdmin(admin.ModelAdmin):
 class TestScriptAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "status", "version", "publisher", "date")
     list_display_links = ("title",)
-    search_fields = ("title", "name", "url", "publisher", "fixture_summary", "test_summary")
+    search_fields = (
+        "title",
+        "name",
+        "url",
+        "publisher",
+        "fixture_summary",
+        "test_summary",
+    )
     list_filter = ("status", "publisher")
     ordering = ("title",)
 
@@ -1360,7 +2136,13 @@ class TestReportAdmin(admin.ModelAdmin):
 @admin.register(CoverageEligibilityRequest)
 class CoverageEligibilityRequestAdmin(admin.ModelAdmin):
     list_display = ("id", "patient", "status", "purpose", "insurer", "created_date")
-    search_fields = ("purpose", "priority", "insurance_summary", "item_summary", "notes")
+    search_fields = (
+        "purpose",
+        "priority",
+        "insurance_summary",
+        "item_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "purpose", "insurer")
     ordering = ("-created_date",)
     autocomplete_fields = ["patient", "insurer", "provider_organization"]
@@ -1369,7 +2151,13 @@ class CoverageEligibilityRequestAdmin(admin.ModelAdmin):
 @admin.register(CoverageEligibilityResponse)
 class CoverageEligibilityResponseAdmin(admin.ModelAdmin):
     list_display = ("id", "patient", "status", "purpose", "outcome", "created_date")
-    search_fields = ("purpose", "outcome", "disposition", "insurance_summary", "error_summary")
+    search_fields = (
+        "purpose",
+        "outcome",
+        "disposition",
+        "insurance_summary",
+        "error_summary",
+    )
     list_filter = ("patient", "status", "purpose", "outcome", "insurer")
     ordering = ("-created_date",)
     autocomplete_fields = ["patient", "request", "insurer"]
@@ -1386,7 +2174,14 @@ class EnrollmentRequestAdmin(admin.ModelAdmin):
 
 @admin.register(EnrollmentResponse)
 class EnrollmentResponseAdmin(admin.ModelAdmin):
-    list_display = ("id", "request", "status", "outcome", "organization", "created_date")
+    list_display = (
+        "id",
+        "request",
+        "status",
+        "outcome",
+        "organization",
+        "created_date",
+    )
     search_fields = ("outcome", "disposition", "notes")
     list_filter = ("status", "outcome", "organization")
     ordering = ("-created_date",)
@@ -1395,8 +2190,21 @@ class EnrollmentResponseAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentNotice)
 class PaymentNoticeAdmin(admin.ModelAdmin):
-    list_display = ("id", "patient", "status", "payment_status", "amount", "payment_date")
-    search_fields = ("payment_status", "amount", "request_summary", "response_summary", "notes")
+    list_display = (
+        "id",
+        "patient",
+        "status",
+        "payment_status",
+        "amount",
+        "payment_date",
+    )
+    search_fields = (
+        "payment_status",
+        "amount",
+        "request_summary",
+        "response_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "payment_status", "recipient")
     ordering = ("-payment_date", "-created_date")
     autocomplete_fields = ["patient", "recipient"]
@@ -1404,12 +2212,24 @@ class PaymentNoticeAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentReconciliation)
 class PaymentReconciliationAdmin(admin.ModelAdmin):
-    list_display = ("id", "payment_issuer", "status", "outcome", "payment_amount", "payment_date")
-    search_fields = ("outcome", "disposition", "payment_amount", "detail_summary", "process_note_summary")
+    list_display = (
+        "id",
+        "payment_issuer",
+        "status",
+        "outcome",
+        "payment_amount",
+        "payment_date",
+    )
+    search_fields = (
+        "outcome",
+        "disposition",
+        "payment_amount",
+        "detail_summary",
+        "process_note_summary",
+    )
     list_filter = ("status", "outcome", "payment_issuer")
     ordering = ("-payment_date", "-created_date")
     autocomplete_fields = ["payment_issuer"]
-
 
 
 class CanonicalMetadataAdmin(admin.ModelAdmin):
@@ -1418,10 +2238,21 @@ class CanonicalMetadataAdmin(admin.ModelAdmin):
     search_fields = ("url", "name", "title", "publisher", "description", "notes")
     list_filter = ("status", "publisher")
     ordering = ("title", "version")
+
+
 class CompactFHIRResourceAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "status", "version", "publisher", "date")
     list_display_links = ("title",)
-    search_fields = ("url", "name", "title", "status", "publisher", "description", "summary", "notes")
+    search_fields = (
+        "url",
+        "name",
+        "title",
+        "status",
+        "publisher",
+        "description",
+        "summary",
+        "notes",
+    )
     list_filter = ("status", "publisher")
     ordering = ("title", "name", "id")
 
@@ -1462,41 +2293,73 @@ for compact_model in (
     VerificationResult,
 ):
     admin.site.register(compact_model, CompactFHIRResourceAdmin)
+
+
 @admin.register(CapabilityStatement)
 class CapabilityStatementAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("kind", "fhir_version", "format_summary", "rest_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "kind",
+        "fhir_version",
+        "format_summary",
+        "rest_summary",
+    )
     list_filter = ("status", "kind", "publisher")
 
 
 @admin.register(StructureDefinition)
 class StructureDefinitionAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("kind", "type_code", "base_definition", "derivation", "element_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "kind",
+        "type_code",
+        "base_definition",
+        "derivation",
+        "element_summary",
+    )
     list_filter = ("status", "kind", "derivation", "publisher")
 
 
 @admin.register(ImplementationGuide)
 class ImplementationGuideAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("package_id", "fhir_version_summary", "definition_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "package_id",
+        "fhir_version_summary",
+        "definition_summary",
+    )
     list_filter = ("status", "publisher")
 
 
 @admin.register(SearchParameter)
 class SearchParameterAdmin(CanonicalMetadataAdmin):
     list_display = ("id", "title", "code", "search_type", "status", "publisher")
-    search_fields = CanonicalMetadataAdmin.search_fields + ("code", "base_summary", "search_type", "expression")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "code",
+        "base_summary",
+        "search_type",
+        "expression",
+    )
     list_filter = ("status", "search_type", "publisher")
 
 
 @admin.register(MessageDefinition)
 class MessageDefinitionAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("event", "category", "response_required", "focus_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "event",
+        "category",
+        "response_required",
+        "focus_summary",
+    )
     list_filter = ("status", "category", "response_required", "publisher")
 
 
 @admin.register(OperationDefinition)
 class OperationDefinitionAdmin(CanonicalMetadataAdmin):
     list_display = ("id", "title", "kind", "code", "status", "publisher")
-    search_fields = CanonicalMetadataAdmin.search_fields + ("kind", "code", "resource_summary", "parameter_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "kind",
+        "code",
+        "resource_summary",
+        "parameter_summary",
+    )
     list_filter = ("status", "kind", "system", "type_level", "instance", "publisher")
 
 
@@ -1509,18 +2372,29 @@ class CompartmentDefinitionAdmin(CanonicalMetadataAdmin):
 
 @admin.register(StructureMap)
 class StructureMapAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("structure_summary", "group_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "structure_summary",
+        "group_summary",
+    )
 
 
 @admin.register(GraphDefinition)
 class GraphDefinitionAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("start", "profile", "link_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "start",
+        "profile",
+        "link_summary",
+    )
     list_filter = ("status", "start", "publisher")
 
 
 @admin.register(ExampleScenario)
 class ExampleScenarioAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("actor_summary", "instance_summary", "process_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "actor_summary",
+        "instance_summary",
+        "process_summary",
+    )
 
 
 @admin.register(NamingSystem)
@@ -1534,13 +2408,23 @@ class NamingSystemAdmin(admin.ModelAdmin):
 
 @admin.register(TerminologyCapabilities)
 class TerminologyCapabilitiesAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("kind", "code_system_summary", "expansion_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "kind",
+        "code_system_summary",
+        "expansion_summary",
+    )
     list_filter = ("status", "kind", "publisher")
 
 
 @admin.register(ActivityDefinition)
 class ActivityDefinitionAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("activity_kind", "intent", "priority", "code", "participant_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "activity_kind",
+        "intent",
+        "priority",
+        "code",
+        "participant_summary",
+    )
     list_filter = ("status", "activity_kind", "intent", "priority", "publisher")
 
 
@@ -1551,14 +2435,26 @@ class EventDefinitionAdmin(CanonicalMetadataAdmin):
 
 @admin.register(SpecimenDefinition)
 class SpecimenDefinitionAdmin(CanonicalMetadataAdmin):
-    search_fields = CanonicalMetadataAdmin.search_fields + ("specimen_type", "collection_summary", "type_tested_summary")
+    search_fields = CanonicalMetadataAdmin.search_fields + (
+        "specimen_type",
+        "collection_summary",
+        "type_tested_summary",
+    )
     list_filter = ("status", "specimen_type", "publisher")
+
 
 @admin.register(CodeSystem)
 class CodeSystemAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "status", "version", "publisher", "content", "date")
     list_display_links = ("title",)
-    search_fields = ("url", "name", "title", "publisher", "description", "concept_summary")
+    search_fields = (
+        "url",
+        "name",
+        "title",
+        "publisher",
+        "description",
+        "concept_summary",
+    )
     list_filter = ("status", "content", "publisher")
     ordering = ("title", "version")
 
@@ -1567,7 +2463,15 @@ class CodeSystemAdmin(admin.ModelAdmin):
 class ValueSetAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "status", "version", "publisher", "date")
     list_display_links = ("title",)
-    search_fields = ("url", "name", "title", "publisher", "description", "compose_summary", "expansion_summary")
+    search_fields = (
+        "url",
+        "name",
+        "title",
+        "publisher",
+        "description",
+        "compose_summary",
+        "expansion_summary",
+    )
     list_filter = ("status", "publisher", "immutable")
     ordering = ("title", "version")
 
@@ -1576,36 +2480,104 @@ class ValueSetAdmin(admin.ModelAdmin):
 class ConceptMapAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "status", "version", "publisher", "date")
     list_display_links = ("title",)
-    search_fields = ("url", "name", "title", "publisher", "description", "source_uri", "target_uri", "group_summary")
+    search_fields = (
+        "url",
+        "name",
+        "title",
+        "publisher",
+        "description",
+        "source_uri",
+        "target_uri",
+        "group_summary",
+    )
     list_filter = ("status", "publisher")
     ordering = ("title", "version")
 
 
 @admin.register(Library)
 class LibraryAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "status", "library_type", "version", "publisher", "date")
+    list_display = (
+        "id",
+        "title",
+        "status",
+        "library_type",
+        "version",
+        "publisher",
+        "date",
+    )
     list_display_links = ("title",)
-    search_fields = ("url", "name", "title", "publisher", "description", "library_type", "subject", "content_summary")
+    search_fields = (
+        "url",
+        "name",
+        "title",
+        "publisher",
+        "description",
+        "library_type",
+        "subject",
+        "content_summary",
+    )
     list_filter = ("status", "library_type", "publisher")
     ordering = ("title", "version")
 
 
 @admin.register(PlanDefinition)
 class PlanDefinitionAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "status", "plan_type", "version", "publisher", "date")
+    list_display = (
+        "id",
+        "title",
+        "status",
+        "plan_type",
+        "version",
+        "publisher",
+        "date",
+    )
     list_display_links = ("title",)
-    search_fields = ("url", "name", "title", "publisher", "description", "plan_type", "subject", "goal_summary", "action_summary")
+    search_fields = (
+        "url",
+        "name",
+        "title",
+        "publisher",
+        "description",
+        "plan_type",
+        "subject",
+        "goal_summary",
+        "action_summary",
+    )
     list_filter = ("status", "plan_type", "publisher")
     ordering = ("title", "version")
 
+
 @admin.register(Coverage)
 class CoverageAdmin(admin.ModelAdmin):
-    list_display = ("id", "coverage_label", "patient", "status", "coverage_type", "payor_organization", "period_start", "period_end")
+    list_display = (
+        "id",
+        "coverage_label",
+        "patient",
+        "status",
+        "coverage_type",
+        "payor_organization",
+        "period_start",
+        "period_end",
+    )
     list_display_links = ("coverage_label",)
-    search_fields = ("coverage_type", "subscriber_id", "dependent", "relationship", "network", "class_summary", "notes")
+    search_fields = (
+        "coverage_type",
+        "subscriber_id",
+        "dependent",
+        "relationship",
+        "network",
+        "class_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "coverage_type", "payor_organization")
     ordering = ("patient", "order", "-period_start")
-    autocomplete_fields = ["patient", "insurer_plan", "payor_organization", "policy_holder_patient", "subscriber_patient"]
+    autocomplete_fields = [
+        "patient",
+        "insurer_plan",
+        "payor_organization",
+        "policy_holder_patient",
+        "subscriber_patient",
+    ]
 
     @admin.display(description="Coverage", ordering="coverage_type")
     def coverage_label(self, obj):
@@ -1614,12 +2586,33 @@ class CoverageAdmin(admin.ModelAdmin):
 
 @admin.register(ExplanationOfBenefit)
 class ExplanationOfBenefitAdmin(admin.ModelAdmin):
-    list_display = ("id", "eob_label", "patient", "status", "eob_type", "outcome", "created_date")
+    list_display = (
+        "id",
+        "eob_label",
+        "patient",
+        "status",
+        "eob_type",
+        "outcome",
+        "created_date",
+    )
     list_display_links = ("eob_label",)
-    search_fields = ("eob_type", "outcome", "disposition", "total_summary", "diagnosis_summary", "item_summary", "payment_summary")
+    search_fields = (
+        "eob_type",
+        "outcome",
+        "disposition",
+        "total_summary",
+        "diagnosis_summary",
+        "item_summary",
+        "payment_summary",
+    )
     list_filter = ("patient", "status", "eob_type", "outcome", "insurer")
     ordering = ("-created_date", "-billable_period_start")
-    autocomplete_fields = ["patient", "insurer", "provider_practitioner", "provider_organization"]
+    autocomplete_fields = [
+        "patient",
+        "insurer",
+        "provider_practitioner",
+        "provider_organization",
+    ]
     filter_horizontal = ("coverages", "encounters")
 
     @admin.display(description="Explanation of benefit", ordering="eob_type")
@@ -1629,13 +2622,36 @@ class ExplanationOfBenefitAdmin(admin.ModelAdmin):
 
 @admin.register(Consent)
 class ConsentAdmin(admin.ModelAdmin):
-    list_display = ("id", "consent_label", "patient", "status", "scope", "category", "decision", "start_date", "end_date")
+    list_display = (
+        "id",
+        "consent_label",
+        "patient",
+        "status",
+        "scope",
+        "category",
+        "decision",
+        "start_date",
+        "end_date",
+    )
     list_display_links = ("consent_label",)
-    search_fields = ("scope", "category", "policy_rule", "decision", "provision_summary", "verification_summary", "notes")
+    search_fields = (
+        "scope",
+        "category",
+        "policy_rule",
+        "decision",
+        "provision_summary",
+        "verification_summary",
+        "notes",
+    )
     list_filter = ("patient", "status", "scope", "category", "decision", "organization")
     ordering = ("-start_date", "-updated_at")
     autocomplete_fields = ["patient", "organization"]
-    filter_horizontal = ("performer_practitioners", "source_documents", "related_immunizations", "questionnaire_responses")
+    filter_horizontal = (
+        "performer_practitioners",
+        "source_documents",
+        "related_immunizations",
+        "questionnaire_responses",
+    )
 
     @admin.display(description="Consent", ordering="category")
     def consent_label(self, obj):
@@ -1644,7 +2660,15 @@ class ConsentAdmin(admin.ModelAdmin):
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "organization_type", "phone", "email", "active", "care_team_count")
+    list_display = (
+        "id",
+        "name",
+        "organization_type",
+        "phone",
+        "email",
+        "active",
+        "care_team_count",
+    )
     list_display_links = ("name",)
     search_fields = ("name", "organization_type", "phone", "email")
     list_filter = ("active", "organization_type")
@@ -1659,7 +2683,15 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "status", "mode", "location_type", "managing_organization", "care_team_count")
+    list_display = (
+        "id",
+        "name",
+        "status",
+        "mode",
+        "location_type",
+        "managing_organization",
+        "care_team_count",
+    )
     list_display_links = ("name",)
     search_fields = ("name", "location_type", "managing_organization", "phone", "email")
     list_filter = ("status", "mode", "location_type")
@@ -1668,9 +2700,3 @@ class LocationAdmin(admin.ModelAdmin):
     @admin.display(description="Care teams")
     def care_team_count(self, obj):
         return obj.care_team_participations.count()
-
-
-
-
-
-

@@ -5,42 +5,150 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0004_alter_patientprofile_options'),
-        ('clinical', '0010_diagnosticreport_detectedissue'),
+        ("patients", "0004_alter_patientprofile_options"),
+        ("clinical", "0010_diagnosticreport_detectedissue"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='RelatedPerson',
+            name="RelatedPerson",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('active', models.BooleanField(default=True, help_text='FHIR active: whether this related person record is in active use.')),
-                ('name', models.CharField(blank=True, help_text='FHIR name: name associated with the related person.', max_length=255)),
-                ('relationship', models.CharField(blank=True, help_text='FHIR relationship: spouse, parent, guardian, caregiver, friend, etc.', max_length=255)),
-                ('gender', models.CharField(blank=True, help_text='FHIR gender: administrative gender.', max_length=30)),
-                ('birth_date', models.DateField(blank=True, help_text='FHIR birthDate: date the related person was born.', null=True)),
-                ('phone', models.CharField(blank=True, help_text='FHIR telecom: phone contact.', max_length=30)),
-                ('email', models.EmailField(blank=True, help_text='FHIR telecom: email contact.', max_length=254)),
-                ('address', models.TextField(blank=True, help_text='FHIR address: contact or visit address.')),
-                ('language', models.CharField(blank=True, help_text='FHIR communication.language: language used for health communication.', max_length=255)),
-                ('language_preferred', models.BooleanField(blank=True, help_text='FHIR communication.preferred: whether this language is preferred.', null=True)),
-                ('period_start', models.DateField(blank=True, help_text='FHIR period.start: when this relationship became valid.', null=True)),
-                ('period_end', models.DateField(blank=True, help_text='FHIR period.end: when this relationship stopped being valid.', null=True)),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this related person.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('patient', models.ForeignKey(help_text='FHIR patient: the patient this person is related to.', on_delete=django.db.models.deletion.CASCADE, related_name='related_people', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="FHIR active: whether this related person record is in active use.",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: name associated with the related person.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "relationship",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR relationship: spouse, parent, guardian, caregiver, friend, etc.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "gender",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR gender: administrative gender.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "birth_date",
+                    models.DateField(
+                        blank=True,
+                        help_text="FHIR birthDate: date the related person was born.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "phone",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR telecom: phone contact.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True,
+                        help_text="FHIR telecom: email contact.",
+                        max_length=254,
+                    ),
+                ),
+                (
+                    "address",
+                    models.TextField(
+                        blank=True, help_text="FHIR address: contact or visit address."
+                    ),
+                ),
+                (
+                    "language",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR communication.language: language used for health communication.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "language_preferred",
+                    models.BooleanField(
+                        blank=True,
+                        help_text="FHIR communication.preferred: whether this language is preferred.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "period_start",
+                    models.DateField(
+                        blank=True,
+                        help_text="FHIR period.start: when this relationship became valid.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "period_end",
+                    models.DateField(
+                        blank=True,
+                        help_text="FHIR period.end: when this relationship stopped being valid.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this related person.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        help_text="FHIR patient: the patient this person is related to.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="related_people",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Related Person',
-                'verbose_name_plural': 'Related People',
+                "verbose_name": "Related Person",
+                "verbose_name_plural": "Related People",
             },
         ),
         migrations.AddField(
-            model_name='careteamparticipant',
-            name='related_person',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='care_team_participations', to='clinical.relatedperson'),
+            model_name="careteamparticipant",
+            name="related_person",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="care_team_participations",
+                to="clinical.relatedperson",
+            ),
         ),
     ]

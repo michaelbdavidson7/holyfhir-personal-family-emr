@@ -15,7 +15,9 @@ from .models import SystemSettings
 class AppLockTests(TestCase):
     def setUp(self):
         User = get_user_model()
-        self.user = User.objects.create_user(username="owner", password="correct-password")
+        self.user = User.objects.create_user(
+            username="owner", password="correct-password"
+        )
 
     def test_lock_redirects_to_unlock_and_blocks_admin(self):
         self.client.force_login(self.user)
@@ -71,9 +73,13 @@ class SystemSettingsTests(TestCase):
     def test_env_sync_backs_up_existing_env_before_writing(self):
         with TemporaryDirectory() as temp_dir:
             env_path = Path(temp_dir) / ".env"
-            env_path.write_text("TIME_ZONE=America/New_York\nSECRET_KEY=keep-me\n", encoding="utf-8")
+            env_path.write_text(
+                "TIME_ZONE=America/New_York\nSECRET_KEY=keep-me\n", encoding="utf-8"
+            )
 
-            with patch.dict("os.environ", {"DJANGO_ENV_FILE": str(env_path)}, clear=True):
+            with patch.dict(
+                "os.environ", {"DJANGO_ENV_FILE": str(env_path)}, clear=True
+            ):
                 self.assertTrue(update_env_value("TIME_ZONE", "America/Chicago"))
 
             backups = list(Path(temp_dir).glob(".env.backup.*"))
@@ -81,4 +87,6 @@ class SystemSettingsTests(TestCase):
             backup_content = backups[0].read_text(encoding="utf-8") if backups else ""
 
         self.assertEqual(backup_count, 1)
-        self.assertEqual(backup_content, "TIME_ZONE=America/New_York\nSECRET_KEY=keep-me\n")
+        self.assertEqual(
+            backup_content, "TIME_ZONE=America/New_York\nSECRET_KEY=keep-me\n"
+        )

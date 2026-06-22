@@ -44,7 +44,9 @@ def list_fhir_import_database_backups():
                 path=path,
                 name=path.name,
                 size_bytes=stat.st_size,
-                created_at=timezone.datetime.fromtimestamp(stat.st_mtime, tz=timezone.get_current_timezone()),
+                created_at=timezone.datetime.fromtimestamp(
+                    stat.st_mtime, tz=timezone.get_current_timezone()
+                ),
             )
         )
 

@@ -5,167 +5,545 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0004_alter_patientprofile_options'),
-        ('clinical', '0012_fhirgroup_person_personlink_fhirgroupmember_and_more'),
+        ("patients", "0004_alter_patientprofile_options"),
+        ("clinical", "0012_fhirgroup_person_personlink_fhirgroupmember_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DeviceRequest',
+            name="DeviceRequest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, max_length=30)),
-                ('intent', models.CharField(blank=True, max_length=30)),
-                ('priority', models.CharField(blank=True, max_length=30)),
-                ('code', models.CharField(max_length=255)),
-                ('authored_on', models.DateTimeField(blank=True, null=True)),
-                ('occurrence_start', models.DateTimeField(blank=True, null=True)),
-                ('occurrence_end', models.DateTimeField(blank=True, null=True)),
-                ('reason', models.CharField(blank=True, max_length=255)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('care_plans', models.ManyToManyField(blank=True, related_name='device_requests', to='clinical.careplan')),
-                ('conditions', models.ManyToManyField(blank=True, related_name='device_requests', to='clinical.condition')),
-                ('devices', models.ManyToManyField(blank=True, related_name='device_requests', to='clinical.device')),
-                ('diagnostic_reports', models.ManyToManyField(blank=True, related_name='device_requests', to='clinical.diagnosticreport')),
-                ('encounter', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='device_requests', to='clinical.encounter')),
-                ('observations', models.ManyToManyField(blank=True, related_name='device_requests', to='clinical.observation')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='device_requests', to='patients.patientprofile')),
-                ('performers_organizations', models.ManyToManyField(blank=True, related_name='device_request_performances', to='clinical.organization')),
-                ('performers_practitioners', models.ManyToManyField(blank=True, related_name='device_request_performances', to='clinical.practitioner')),
-                ('performers_roles', models.ManyToManyField(blank=True, related_name='device_request_performances', to='clinical.practitionerrole')),
-                ('replaces', models.ManyToManyField(blank=True, related_name='replacement_device_requests', to='clinical.devicerequest')),
-                ('requester_practitioner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='requested_devices', to='clinical.practitioner')),
-                ('requester_role', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='requested_devices', to='clinical.practitionerrole')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("status", models.CharField(blank=True, max_length=30)),
+                ("intent", models.CharField(blank=True, max_length=30)),
+                ("priority", models.CharField(blank=True, max_length=30)),
+                ("code", models.CharField(max_length=255)),
+                ("authored_on", models.DateTimeField(blank=True, null=True)),
+                ("occurrence_start", models.DateTimeField(blank=True, null=True)),
+                ("occurrence_end", models.DateTimeField(blank=True, null=True)),
+                ("reason", models.CharField(blank=True, max_length=255)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "care_plans",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_requests",
+                        to="clinical.careplan",
+                    ),
+                ),
+                (
+                    "conditions",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_requests",
+                        to="clinical.condition",
+                    ),
+                ),
+                (
+                    "devices",
+                    models.ManyToManyField(
+                        blank=True, related_name="device_requests", to="clinical.device"
+                    ),
+                ),
+                (
+                    "diagnostic_reports",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_requests",
+                        to="clinical.diagnosticreport",
+                    ),
+                ),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="device_requests",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "observations",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_requests",
+                        to="clinical.observation",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="device_requests",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "performers_organizations",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_request_performances",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "performers_practitioners",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_request_performances",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "performers_roles",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_request_performances",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
+                (
+                    "replaces",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="replacement_device_requests",
+                        to="clinical.devicerequest",
+                    ),
+                ),
+                (
+                    "requester_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="requested_devices",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "requester_role",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="requested_devices",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Device Request',
-                'verbose_name_plural': 'Device Requests',
+                "verbose_name": "Device Request",
+                "verbose_name_plural": "Device Requests",
             },
         ),
         migrations.CreateModel(
-            name='RiskAssessment',
+            name="RiskAssessment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, max_length=30)),
-                ('code', models.CharField(blank=True, max_length=255)),
-                ('method', models.CharField(blank=True, max_length=255)),
-                ('occurrence_datetime', models.DateTimeField(blank=True, null=True)),
-                ('authored_on', models.DateTimeField(blank=True, null=True)),
-                ('prediction_summary', models.TextField(blank=True)),
-                ('mitigation', models.TextField(blank=True)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('conditions', models.ManyToManyField(blank=True, related_name='risk_assessments', to='clinical.condition')),
-                ('diagnostic_reports', models.ManyToManyField(blank=True, related_name='risk_assessments', to='clinical.diagnosticreport')),
-                ('encounter', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='risk_assessments', to='clinical.encounter')),
-                ('observations', models.ManyToManyField(blank=True, related_name='risk_assessments', to='clinical.observation')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='risk_assessments', to='patients.patientprofile')),
-                ('performer_device', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='performed_risk_assessments', to='clinical.device')),
-                ('performer_organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='performed_risk_assessments', to='clinical.organization')),
-                ('performer_practitioner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='performed_risk_assessments', to='clinical.practitioner')),
-                ('performer_role', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='performed_risk_assessments', to='clinical.practitionerrole')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("status", models.CharField(blank=True, max_length=30)),
+                ("code", models.CharField(blank=True, max_length=255)),
+                ("method", models.CharField(blank=True, max_length=255)),
+                ("occurrence_datetime", models.DateTimeField(blank=True, null=True)),
+                ("authored_on", models.DateTimeField(blank=True, null=True)),
+                ("prediction_summary", models.TextField(blank=True)),
+                ("mitigation", models.TextField(blank=True)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "conditions",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="risk_assessments",
+                        to="clinical.condition",
+                    ),
+                ),
+                (
+                    "diagnostic_reports",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="risk_assessments",
+                        to="clinical.diagnosticreport",
+                    ),
+                ),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="risk_assessments",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "observations",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="risk_assessments",
+                        to="clinical.observation",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="risk_assessments",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "performer_device",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="performed_risk_assessments",
+                        to="clinical.device",
+                    ),
+                ),
+                (
+                    "performer_organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="performed_risk_assessments",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "performer_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="performed_risk_assessments",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "performer_role",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="performed_risk_assessments",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Risk Assessment',
-                'verbose_name_plural': 'Risk Assessments',
+                "verbose_name": "Risk Assessment",
+                "verbose_name_plural": "Risk Assessments",
             },
         ),
         migrations.CreateModel(
-            name='Goal',
+            name="Goal",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('lifecycle_status', models.CharField(blank=True, max_length=30)),
-                ('achievement_status', models.CharField(blank=True, max_length=255)),
-                ('category', models.CharField(blank=True, max_length=255)),
-                ('priority', models.CharField(blank=True, max_length=255)),
-                ('description', models.CharField(max_length=255)),
-                ('start_date', models.DateField(blank=True, null=True)),
-                ('status_date', models.DateField(blank=True, null=True)),
-                ('status_reason', models.TextField(blank=True)),
-                ('target_summary', models.TextField(blank=True)),
-                ('outcome_summary', models.TextField(blank=True)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('addresses_conditions', models.ManyToManyField(blank=True, related_name='goals', to='clinical.condition')),
-                ('addresses_medications', models.ManyToManyField(blank=True, related_name='goals', to='clinical.medication')),
-                ('addresses_observations', models.ManyToManyField(blank=True, related_name='goals', to='clinical.observation')),
-                ('addresses_risk_assessments', models.ManyToManyField(blank=True, related_name='goals', to='clinical.riskassessment')),
-                ('addresses_service_requests', models.ManyToManyField(blank=True, related_name='goals', to='clinical.servicerequest')),
-                ('expressed_by_practitioner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='expressed_goals', to='clinical.practitioner')),
-                ('expressed_by_related_person', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='expressed_goals', to='clinical.relatedperson')),
-                ('expressed_by_role', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='expressed_goals', to='clinical.practitionerrole')),
-                ('outcome_observations', models.ManyToManyField(blank=True, related_name='goal_outcomes', to='clinical.observation')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='goals', to='patients.patientprofile')),
-                ('subject_group', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='goals', to='clinical.fhirgroup')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("lifecycle_status", models.CharField(blank=True, max_length=30)),
+                ("achievement_status", models.CharField(blank=True, max_length=255)),
+                ("category", models.CharField(blank=True, max_length=255)),
+                ("priority", models.CharField(blank=True, max_length=255)),
+                ("description", models.CharField(max_length=255)),
+                ("start_date", models.DateField(blank=True, null=True)),
+                ("status_date", models.DateField(blank=True, null=True)),
+                ("status_reason", models.TextField(blank=True)),
+                ("target_summary", models.TextField(blank=True)),
+                ("outcome_summary", models.TextField(blank=True)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "addresses_conditions",
+                    models.ManyToManyField(
+                        blank=True, related_name="goals", to="clinical.condition"
+                    ),
+                ),
+                (
+                    "addresses_medications",
+                    models.ManyToManyField(
+                        blank=True, related_name="goals", to="clinical.medication"
+                    ),
+                ),
+                (
+                    "addresses_observations",
+                    models.ManyToManyField(
+                        blank=True, related_name="goals", to="clinical.observation"
+                    ),
+                ),
+                (
+                    "addresses_risk_assessments",
+                    models.ManyToManyField(
+                        blank=True, related_name="goals", to="clinical.riskassessment"
+                    ),
+                ),
+                (
+                    "addresses_service_requests",
+                    models.ManyToManyField(
+                        blank=True, related_name="goals", to="clinical.servicerequest"
+                    ),
+                ),
+                (
+                    "expressed_by_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="expressed_goals",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "expressed_by_related_person",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="expressed_goals",
+                        to="clinical.relatedperson",
+                    ),
+                ),
+                (
+                    "expressed_by_role",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="expressed_goals",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
+                (
+                    "outcome_observations",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="goal_outcomes",
+                        to="clinical.observation",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="goals",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "subject_group",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="goals",
+                        to="clinical.fhirgroup",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Goal',
-                'verbose_name_plural': 'Goals',
+                "verbose_name": "Goal",
+                "verbose_name_plural": "Goals",
             },
         ),
         migrations.CreateModel(
-            name='DeviceUseStatement',
+            name="DeviceUseStatement",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, max_length=30)),
-                ('timing_start', models.DateTimeField(blank=True, null=True)),
-                ('timing_end', models.DateTimeField(blank=True, null=True)),
-                ('recorded_on', models.DateTimeField(blank=True, null=True)),
-                ('body_site', models.CharField(blank=True, max_length=255)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('based_on_device_requests', models.ManyToManyField(blank=True, related_name='device_use_statements', to='clinical.devicerequest')),
-                ('based_on_service_requests', models.ManyToManyField(blank=True, related_name='device_use_statements', to='clinical.servicerequest')),
-                ('device', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='use_statements', to='clinical.device')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='device_use_statements', to='patients.patientprofile')),
-                ('reason_conditions', models.ManyToManyField(blank=True, related_name='device_use_statements', to='clinical.condition')),
-                ('reason_diagnostic_reports', models.ManyToManyField(blank=True, related_name='device_use_statements', to='clinical.diagnosticreport')),
-                ('reason_observations', models.ManyToManyField(blank=True, related_name='device_use_statements', to='clinical.observation')),
-                ('reason_risk_assessments', models.ManyToManyField(blank=True, related_name='device_use_statements', to='clinical.riskassessment')),
-                ('source_practitioner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='device_use_statements', to='clinical.practitioner')),
-                ('source_related_person', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='device_use_statements', to='clinical.relatedperson')),
-                ('source_role', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='device_use_statements', to='clinical.practitionerrole')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("status", models.CharField(blank=True, max_length=30)),
+                ("timing_start", models.DateTimeField(blank=True, null=True)),
+                ("timing_end", models.DateTimeField(blank=True, null=True)),
+                ("recorded_on", models.DateTimeField(blank=True, null=True)),
+                ("body_site", models.CharField(blank=True, max_length=255)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "based_on_device_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_use_statements",
+                        to="clinical.devicerequest",
+                    ),
+                ),
+                (
+                    "based_on_service_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_use_statements",
+                        to="clinical.servicerequest",
+                    ),
+                ),
+                (
+                    "device",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="use_statements",
+                        to="clinical.device",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="device_use_statements",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "reason_conditions",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_use_statements",
+                        to="clinical.condition",
+                    ),
+                ),
+                (
+                    "reason_diagnostic_reports",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_use_statements",
+                        to="clinical.diagnosticreport",
+                    ),
+                ),
+                (
+                    "reason_observations",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_use_statements",
+                        to="clinical.observation",
+                    ),
+                ),
+                (
+                    "reason_risk_assessments",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="device_use_statements",
+                        to="clinical.riskassessment",
+                    ),
+                ),
+                (
+                    "source_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="device_use_statements",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "source_related_person",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="device_use_statements",
+                        to="clinical.relatedperson",
+                    ),
+                ),
+                (
+                    "source_role",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="device_use_statements",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Device Use Statement',
-                'verbose_name_plural': 'Device Use Statements',
+                "verbose_name": "Device Use Statement",
+                "verbose_name_plural": "Device Use Statements",
             },
         ),
         migrations.AddField(
-            model_name='devicerequest',
-            name='risk_assessments',
-            field=models.ManyToManyField(blank=True, related_name='device_requests', to='clinical.riskassessment'),
+            model_name="devicerequest",
+            name="risk_assessments",
+            field=models.ManyToManyField(
+                blank=True, related_name="device_requests", to="clinical.riskassessment"
+            ),
         ),
         migrations.AddField(
-            model_name='devicerequest',
-            name='service_requests',
-            field=models.ManyToManyField(blank=True, related_name='device_requests', to='clinical.servicerequest'),
+            model_name="devicerequest",
+            name="service_requests",
+            field=models.ManyToManyField(
+                blank=True, related_name="device_requests", to="clinical.servicerequest"
+            ),
         ),
         migrations.CreateModel(
-            name='BodyStructure',
+            name="BodyStructure",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('active', models.BooleanField(default=True)),
-                ('morphology', models.CharField(blank=True, max_length=255)),
-                ('location', models.CharField(blank=True, max_length=255)),
-                ('location_qualifier', models.CharField(blank=True, max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('image_summary', models.TextField(blank=True)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='body_structures', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("active", models.BooleanField(default=True)),
+                ("morphology", models.CharField(blank=True, max_length=255)),
+                ("location", models.CharField(blank=True, max_length=255)),
+                ("location_qualifier", models.CharField(blank=True, max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("image_summary", models.TextField(blank=True)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="body_structures",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Body Structure',
-                'verbose_name_plural': 'Body Structures',
+                "verbose_name": "Body Structure",
+                "verbose_name_plural": "Body Structures",
             },
         ),
     ]

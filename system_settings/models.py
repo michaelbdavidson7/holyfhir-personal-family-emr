@@ -10,7 +10,9 @@ def default_time_zone():
 
 
 class SystemSettings(models.Model):
-    singleton_id = models.PositiveSmallIntegerField(default=1, unique=True, editable=False)
+    singleton_id = models.PositiveSmallIntegerField(
+        default=1, unique=True, editable=False
+    )
     time_zone = models.CharField(
         max_length=64,
         default=default_time_zone,

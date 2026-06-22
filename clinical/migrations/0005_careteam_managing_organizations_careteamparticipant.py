@@ -5,36 +5,84 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('clinical', '0004_location_organization_practitioner'),
+        ("clinical", "0004_location_organization_practitioner"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='careteam',
-            name='managing_organizations',
-            field=models.ManyToManyField(blank=True, related_name='managed_care_teams', to='clinical.organization'),
+            model_name="careteam",
+            name="managing_organizations",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="managed_care_teams",
+                to="clinical.organization",
+            ),
         ),
         migrations.CreateModel(
-            name='CareTeamParticipant',
+            name="CareTeamParticipant",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(blank=True, max_length=255)),
-                ('member_display', models.CharField(blank=True, max_length=255)),
-                ('member_reference', models.CharField(blank=True, max_length=255)),
-                ('on_behalf_of_display', models.CharField(blank=True, max_length=255)),
-                ('on_behalf_of_reference', models.CharField(blank=True, max_length=255)),
-                ('start_date', models.DateField(blank=True, null=True)),
-                ('end_date', models.DateField(blank=True, null=True)),
-                ('care_team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='participant_links', to='clinical.careteam')),
-                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='care_team_participations', to='clinical.location')),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='care_team_participations', to='clinical.organization')),
-                ('practitioner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='care_team_participations', to='clinical.practitioner')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("role", models.CharField(blank=True, max_length=255)),
+                ("member_display", models.CharField(blank=True, max_length=255)),
+                ("member_reference", models.CharField(blank=True, max_length=255)),
+                ("on_behalf_of_display", models.CharField(blank=True, max_length=255)),
+                (
+                    "on_behalf_of_reference",
+                    models.CharField(blank=True, max_length=255),
+                ),
+                ("start_date", models.DateField(blank=True, null=True)),
+                ("end_date", models.DateField(blank=True, null=True)),
+                (
+                    "care_team",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="participant_links",
+                        to="clinical.careteam",
+                    ),
+                ),
+                (
+                    "location",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="care_team_participations",
+                        to="clinical.location",
+                    ),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="care_team_participations",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="care_team_participations",
+                        to="clinical.practitioner",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Care Team Participant',
-                'verbose_name_plural': 'Care Team Participants',
+                "verbose_name": "Care Team Participant",
+                "verbose_name_plural": "Care Team Participants",
             },
         ),
     ]

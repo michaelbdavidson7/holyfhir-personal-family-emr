@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
@@ -6,7 +5,9 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from .fhir_explorer_registry import build_fhir_explorer_sections
-from .personal_emr_resource_registry_alphabetized import build_personal_emr_resource_sections
+from .personal_emr_resource_registry_alphabetized import (
+    build_personal_emr_resource_sections,
+)
 
 
 from clinical.models import (
@@ -121,7 +122,11 @@ from clinical.models import (
     VisionPrescription,
 )
 from documents.models import ClinicalDocument
-from fhir.backups import database_path, fhir_import_backup_dir, list_fhir_import_database_backups
+from fhir.backups import (
+    database_path,
+    fhir_import_backup_dir,
+    list_fhir_import_database_backups,
+)
 from fhir.models import FHIRResourceSnapshot
 from patients.models import PatientProfile
 from patients.models import RecoveryCredential
@@ -134,7 +139,9 @@ def settings_hub(request):
     recovery_credential = None
 
     if request.user.is_authenticated:
-        recovery_credential = RecoveryCredential.objects.filter(user=request.user).first()
+        recovery_credential = RecoveryCredential.objects.filter(
+            user=request.user
+        ).first()
 
     if recovery_credential:
         recovery_status = {
@@ -157,7 +164,9 @@ def settings_hub(request):
         {
             "title": "App Settings",
             "description": f"Manage local time, lock-screen behavior, and desktop preferences. Current time zone: {system_settings.time_zone}.",
-            "url": reverse("admin:system_settings_systemsettings_change", args=[system_settings.pk]),
+            "url": reverse(
+                "admin:system_settings_systemsettings_change", args=[system_settings.pk]
+            ),
             "icon": "fas fa-sliders-h",
         },
         {
@@ -374,7 +383,9 @@ def clinical_resources_directory(request):
                 {
                     "title": "Medication Administrations",
                     "description": "Medication events where a dose was administered to a patient.",
-                    "url": reverse("admin:clinical_medicationadministration_changelist"),
+                    "url": reverse(
+                        "admin:clinical_medicationadministration_changelist"
+                    ),
                     "icon": "fas fa-prescription-bottle",
                     "count": MedicationAdministration.objects.count(),
                     "count_label": "record",
@@ -398,7 +409,9 @@ def clinical_resources_directory(request):
                 {
                     "title": "Immunization Recommendations",
                     "description": "Vaccine forecasts, recommended timing, and supporting immunization history.",
-                    "url": reverse("admin:clinical_immunizationrecommendation_changelist"),
+                    "url": reverse(
+                        "admin:clinical_immunizationrecommendation_changelist"
+                    ),
                     "icon": "fas fa-calendar-check",
                     "count": ImmunizationRecommendation.objects.count(),
                     "count_label": "record",
@@ -656,7 +669,9 @@ def clinical_resources_directory(request):
                 {
                     "title": "Coverage Eligibility Requests",
                     "description": "Eligibility checks for benefits, validation, discovery, and authorizations.",
-                    "url": reverse("admin:clinical_coverageeligibilityrequest_changelist"),
+                    "url": reverse(
+                        "admin:clinical_coverageeligibilityrequest_changelist"
+                    ),
                     "icon": "fas fa-clipboard-check",
                     "count": CoverageEligibilityRequest.objects.count(),
                     "count_label": "record",
@@ -664,7 +679,9 @@ def clinical_resources_directory(request):
                 {
                     "title": "Coverage Eligibility Responses",
                     "description": "Eligibility outcomes, benefits, dispositions, and processing errors.",
-                    "url": reverse("admin:clinical_coverageeligibilityresponse_changelist"),
+                    "url": reverse(
+                        "admin:clinical_coverageeligibilityresponse_changelist"
+                    ),
                     "icon": "fas fa-clipboard-list",
                     "count": CoverageEligibilityResponse.objects.count(),
                     "count_label": "record",
@@ -830,7 +847,8 @@ def clinical_resources_directory(request):
                     "icon": "fas fa-project-diagram",
                     "count": PlanDefinition.objects.count(),
                     "count_label": "record",
-                },                {
+                },
+                {
                     "title": "Measures",
                     "description": "Quality measure definitions, scoring, groups, populations, and stratifiers.",
                     "url": reverse("admin:clinical_measure_changelist"),
@@ -986,7 +1004,8 @@ def clinical_resources_directory(request):
                     "icon": "fas fa-vials",
                     "count": SpecimenDefinition.objects.count(),
                     "count_label": "record",
-                },                {
+                },
+                {
                     "title": "Code Systems",
                     "description": "Terminology systems with codes, displays, definitions, and hierarchy metadata.",
                     "url": reverse("admin:clinical_codesystem_changelist"),
@@ -1009,7 +1028,8 @@ def clinical_resources_directory(request):
                     "icon": "fas fa-exchange-alt",
                     "count": ConceptMap.objects.count(),
                     "count_label": "record",
-                },                {
+                },
+                {
                     "title": "Questionnaires",
                     "description": "Reusable form definitions used by questionnaire responses.",
                     "url": reverse("admin:clinical_questionnaire_changelist"),
@@ -1211,6 +1231,7 @@ def clinical_resources_directory(request):
     }
     return render(request, "admin/clinical_resource_browser.html", context)
 
+
 def patient_resources_directory(request, patient_id):
     patient = get_object_or_404(PatientProfile, pk=patient_id)
 
@@ -1229,103 +1250,505 @@ def patient_resources_directory(request, patient_id):
         {
             "title": "Core Chart",
             "cards": [
-                card("Conditions", Condition, "clinical_condition", "Problems, diagnoses, and condition history.", "fas fa-heartbeat"),
-                card("Allergies", Allergy, "clinical_allergy", "Allergies, intolerances, reactions, and severity.", "fas fa-exclamation-triangle"),
-                card("Medications", Medication, "clinical_medication", "Medication requests/statements and dosage text.", "fas fa-pills"),
-                card("Immunizations", Immunization, "clinical_immunization", "Vaccines, dates, lots, and performers.", "fas fa-syringe"),
-                card("Vitals & Labs", Observation, "clinical_observation", "Observations, vital signs, lab values, and results.", "fas fa-chart-line"),
-                card("Diagnostic Reports", DiagnosticReport, "clinical_diagnosticreport", "Lab, pathology, imaging, and diagnostic reports.", "fas fa-file-medical-alt"),
-                card("Documents", ClinicalDocument, "documents_clinicaldocument", "Clinical documents and imported document references.", "fas fa-file-pdf"),
+                card(
+                    "Conditions",
+                    Condition,
+                    "clinical_condition",
+                    "Problems, diagnoses, and condition history.",
+                    "fas fa-heartbeat",
+                ),
+                card(
+                    "Allergies",
+                    Allergy,
+                    "clinical_allergy",
+                    "Allergies, intolerances, reactions, and severity.",
+                    "fas fa-exclamation-triangle",
+                ),
+                card(
+                    "Medications",
+                    Medication,
+                    "clinical_medication",
+                    "Medication requests/statements and dosage text.",
+                    "fas fa-pills",
+                ),
+                card(
+                    "Immunizations",
+                    Immunization,
+                    "clinical_immunization",
+                    "Vaccines, dates, lots, and performers.",
+                    "fas fa-syringe",
+                ),
+                card(
+                    "Vitals & Labs",
+                    Observation,
+                    "clinical_observation",
+                    "Observations, vital signs, lab values, and results.",
+                    "fas fa-chart-line",
+                ),
+                card(
+                    "Diagnostic Reports",
+                    DiagnosticReport,
+                    "clinical_diagnosticreport",
+                    "Lab, pathology, imaging, and diagnostic reports.",
+                    "fas fa-file-medical-alt",
+                ),
+                card(
+                    "Documents",
+                    ClinicalDocument,
+                    "documents_clinicaldocument",
+                    "Clinical documents and imported document references.",
+                    "fas fa-file-pdf",
+                ),
             ],
         },
         {
             "title": "Care & Events",
             "cards": [
-                card("Visits & Actions", Encounter, "clinical_encounter", "Encounters, visits, facilities, providers, and summaries.", "fas fa-stethoscope"),
-                card("Episodes of Care", EpisodeOfCare, "clinical_episodeofcare", "Longer care intervals and care responsibility.", "fas fa-project-diagram"),
-                card("Care Teams", CareTeam, "clinical_careteam", "Care teams and structured participants.", "fas fa-user-friends"),
-                card("Care Plans", CarePlan, "clinical_careplan", "Care plans connected to concerns and teams.", "fas fa-clipboard-list"),
-                card("Goals", Goal, "clinical_goal", "Care goals, targets, outcomes, and status.", "fas fa-bullseye"),
-                card("Service Requests", ServiceRequest, "clinical_servicerequest", "Orders, referrals, requested services, and reasons.", "fas fa-tasks"),
-                card("Tasks", Task, "clinical_task", "Workflow tasks, owners, focus records, and status.", "fas fa-tasks"),
-                card("Appointments", Appointment, "clinical_appointment", "Appointments, participants, timing, and reasons.", "fas fa-calendar-check"),
-                card("Appointment Responses", AppointmentResponse, "clinical_appointmentresponse", "Participant appointment responses and comments.", "fas fa-calendar-alt"),
-                card("Schedules", Schedule, "clinical_schedule", "Availability schedules connected to this patient when applicable.", "fas fa-calendar"),
-                card("Procedures", Procedure, "clinical_procedure", "Completed procedures, actions, performers, and reasons.", "fas fa-procedures"),
-                card("Specimens", Specimen, "clinical_specimen", "Lab specimens, collection details, and parent specimens.", "fas fa-vial"),
+                card(
+                    "Visits & Actions",
+                    Encounter,
+                    "clinical_encounter",
+                    "Encounters, visits, facilities, providers, and summaries.",
+                    "fas fa-stethoscope",
+                ),
+                card(
+                    "Episodes of Care",
+                    EpisodeOfCare,
+                    "clinical_episodeofcare",
+                    "Longer care intervals and care responsibility.",
+                    "fas fa-project-diagram",
+                ),
+                card(
+                    "Care Teams",
+                    CareTeam,
+                    "clinical_careteam",
+                    "Care teams and structured participants.",
+                    "fas fa-user-friends",
+                ),
+                card(
+                    "Care Plans",
+                    CarePlan,
+                    "clinical_careplan",
+                    "Care plans connected to concerns and teams.",
+                    "fas fa-clipboard-list",
+                ),
+                card(
+                    "Goals",
+                    Goal,
+                    "clinical_goal",
+                    "Care goals, targets, outcomes, and status.",
+                    "fas fa-bullseye",
+                ),
+                card(
+                    "Service Requests",
+                    ServiceRequest,
+                    "clinical_servicerequest",
+                    "Orders, referrals, requested services, and reasons.",
+                    "fas fa-tasks",
+                ),
+                card(
+                    "Tasks",
+                    Task,
+                    "clinical_task",
+                    "Workflow tasks, owners, focus records, and status.",
+                    "fas fa-tasks",
+                ),
+                card(
+                    "Appointments",
+                    Appointment,
+                    "clinical_appointment",
+                    "Appointments, participants, timing, and reasons.",
+                    "fas fa-calendar-check",
+                ),
+                card(
+                    "Appointment Responses",
+                    AppointmentResponse,
+                    "clinical_appointmentresponse",
+                    "Participant appointment responses and comments.",
+                    "fas fa-calendar-alt",
+                ),
+                card(
+                    "Schedules",
+                    Schedule,
+                    "clinical_schedule",
+                    "Availability schedules connected to this patient when applicable.",
+                    "fas fa-calendar",
+                ),
+                card(
+                    "Procedures",
+                    Procedure,
+                    "clinical_procedure",
+                    "Completed procedures, actions, performers, and reasons.",
+                    "fas fa-procedures",
+                ),
+                card(
+                    "Specimens",
+                    Specimen,
+                    "clinical_specimen",
+                    "Lab specimens, collection details, and parent specimens.",
+                    "fas fa-vial",
+                ),
             ],
         },
         {
             "title": "Safety, Risk & Context",
             "cards": [
-                card("Adverse Events", AdverseEvent, "clinical_adverseevent", "Actual or potential harm events and suspect entities.", "fas fa-exclamation-circle"),
-                card("Detected Issues", DetectedIssue, "clinical_detectedissue", "Clinical safety or quality issues.", "fas fa-shield-alt"),
-                card("Risk Assessments", RiskAssessment, "clinical_riskassessment", "Risk estimates, predictions, basis records, and mitigation.", "fas fa-chart-pie"),
-                card("Clinical Impressions", ClinicalImpression, "clinical_clinicalimpression", "Clinical assessments, findings, and investigations.", "fas fa-notes-medical"),
-                card("Family History", FamilyMemberHistory, "clinical_familymemberhistory", "Family member relationships, conditions, and outcomes.", "fas fa-people-arrows"),
-                card("Body Structures", BodyStructure, "clinical_bodystructure", "Anatomical locations, morphology, and body-site detail.", "fas fa-diagnoses"),
-                card("Flags", Flag, "clinical_flag", "Patient alerts, warnings, and awareness notes.", "fas fa-flag"),
-                card("Consents", Consent, "clinical_consent", "Treatment, privacy, vaccine, and other consent records.", "fas fa-file-signature"),
+                card(
+                    "Adverse Events",
+                    AdverseEvent,
+                    "clinical_adverseevent",
+                    "Actual or potential harm events and suspect entities.",
+                    "fas fa-exclamation-circle",
+                ),
+                card(
+                    "Detected Issues",
+                    DetectedIssue,
+                    "clinical_detectedissue",
+                    "Clinical safety or quality issues.",
+                    "fas fa-shield-alt",
+                ),
+                card(
+                    "Risk Assessments",
+                    RiskAssessment,
+                    "clinical_riskassessment",
+                    "Risk estimates, predictions, basis records, and mitigation.",
+                    "fas fa-chart-pie",
+                ),
+                card(
+                    "Clinical Impressions",
+                    ClinicalImpression,
+                    "clinical_clinicalimpression",
+                    "Clinical assessments, findings, and investigations.",
+                    "fas fa-notes-medical",
+                ),
+                card(
+                    "Family History",
+                    FamilyMemberHistory,
+                    "clinical_familymemberhistory",
+                    "Family member relationships, conditions, and outcomes.",
+                    "fas fa-people-arrows",
+                ),
+                card(
+                    "Body Structures",
+                    BodyStructure,
+                    "clinical_bodystructure",
+                    "Anatomical locations, morphology, and body-site detail.",
+                    "fas fa-diagnoses",
+                ),
+                card(
+                    "Flags",
+                    Flag,
+                    "clinical_flag",
+                    "Patient alerts, warnings, and awareness notes.",
+                    "fas fa-flag",
+                ),
+                card(
+                    "Consents",
+                    Consent,
+                    "clinical_consent",
+                    "Treatment, privacy, vaccine, and other consent records.",
+                    "fas fa-file-signature",
+                ),
             ],
         },
         {
             "title": "Insurance & Billing",
             "cards": [
-                card("Coverages", Coverage, "clinical_coverage", "Insurance coverage, subscriber IDs, payer details, and benefit classifications.", "fas fa-id-card-alt"),
-                card("Explanations of Benefits", ExplanationOfBenefit, "clinical_explanationofbenefit", "Adjudicated claims, payer statements, totals, and payments.", "fas fa-file-invoice-dollar"),
-                card("Coverage Eligibility Requests", CoverageEligibilityRequest, "clinical_coverageeligibilityrequest", "Eligibility checks and requested benefits/validation purposes.", "fas fa-clipboard-check"),
-                card("Coverage Eligibility Responses", CoverageEligibilityResponse, "clinical_coverageeligibilityresponse", "Eligibility outcomes, benefits, dispositions, and errors.", "fas fa-clipboard-list"),
-                card("Enrollment Requests", EnrollmentRequest, "clinical_enrollmentrequest", "Coverage enrollment requests and coverage links.", "fas fa-user-plus"),
-                card("Payment Notices", PaymentNotice, "clinical_paymentnotice", "Payment notifications tied to this patient when resolvable.", "fas fa-money-check-alt"),
-                card("Claims", Claim, "clinical_claim", "Submitted claims, service lines, diagnoses, and coverages.", "fas fa-file-invoice"),
-                card("Claim Responses", ClaimResponse, "clinical_claimresponse", "Claim adjudication responses, outcomes, totals, and payments.", "fas fa-receipt"),
-                card("Accounts", Account, "clinical_account", "Billing/account groupings, guarantors, balances, and coverages.", "fas fa-wallet"),
-                card("Invoices", Invoice, "clinical_invoice", "Invoices, line items, payment terms, and totals.", "fas fa-file-invoice-dollar"),
-                card("Charge Items", ChargeItem, "clinical_chargeitem", "Billable charge lines linked to visits, accounts, and services.", "fas fa-tags"),
+                card(
+                    "Coverages",
+                    Coverage,
+                    "clinical_coverage",
+                    "Insurance coverage, subscriber IDs, payer details, and benefit classifications.",
+                    "fas fa-id-card-alt",
+                ),
+                card(
+                    "Explanations of Benefits",
+                    ExplanationOfBenefit,
+                    "clinical_explanationofbenefit",
+                    "Adjudicated claims, payer statements, totals, and payments.",
+                    "fas fa-file-invoice-dollar",
+                ),
+                card(
+                    "Coverage Eligibility Requests",
+                    CoverageEligibilityRequest,
+                    "clinical_coverageeligibilityrequest",
+                    "Eligibility checks and requested benefits/validation purposes.",
+                    "fas fa-clipboard-check",
+                ),
+                card(
+                    "Coverage Eligibility Responses",
+                    CoverageEligibilityResponse,
+                    "clinical_coverageeligibilityresponse",
+                    "Eligibility outcomes, benefits, dispositions, and errors.",
+                    "fas fa-clipboard-list",
+                ),
+                card(
+                    "Enrollment Requests",
+                    EnrollmentRequest,
+                    "clinical_enrollmentrequest",
+                    "Coverage enrollment requests and coverage links.",
+                    "fas fa-user-plus",
+                ),
+                card(
+                    "Payment Notices",
+                    PaymentNotice,
+                    "clinical_paymentnotice",
+                    "Payment notifications tied to this patient when resolvable.",
+                    "fas fa-money-check-alt",
+                ),
+                card(
+                    "Claims",
+                    Claim,
+                    "clinical_claim",
+                    "Submitted claims, service lines, diagnoses, and coverages.",
+                    "fas fa-file-invoice",
+                ),
+                card(
+                    "Claim Responses",
+                    ClaimResponse,
+                    "clinical_claimresponse",
+                    "Claim adjudication responses, outcomes, totals, and payments.",
+                    "fas fa-receipt",
+                ),
+                card(
+                    "Accounts",
+                    Account,
+                    "clinical_account",
+                    "Billing/account groupings, guarantors, balances, and coverages.",
+                    "fas fa-wallet",
+                ),
+                card(
+                    "Invoices",
+                    Invoice,
+                    "clinical_invoice",
+                    "Invoices, line items, payment terms, and totals.",
+                    "fas fa-file-invoice-dollar",
+                ),
+                card(
+                    "Charge Items",
+                    ChargeItem,
+                    "clinical_chargeitem",
+                    "Billable charge lines linked to visits, accounts, and services.",
+                    "fas fa-tags",
+                ),
             ],
         },
         {
             "title": "Devices, Nutrition & Communication",
             "cards": [
-                card("Devices", Device, "clinical_device", "Patient devices, implanted devices, and identifiers.", "fas fa-laptop-medical"),
-                card("Device Requests", DeviceRequest, "clinical_devicerequest", "Orders and requests for devices.", "fas fa-toolbox"),
-                card("Device Use", DeviceUseStatement, "clinical_deviceusestatement", "Statements that a patient uses or used a device.", "fas fa-notes-medical"),
-                card("Medication Administrations", MedicationAdministration, "clinical_medicationadministration", "Medication doses administered to the patient.", "fas fa-prescription-bottle"),
-                card("Medication Dispenses", MedicationDispense, "clinical_medicationdispense", "Medication dispensed or supplied to the patient.", "fas fa-prescription-bottle-alt"),
-                card("Nutrition Orders", NutritionOrder, "clinical_nutritionorder", "Diet, supplement, oral, and enteral nutrition orders.", "fas fa-utensils"),
-                card("Communications", Communication, "clinical_communication", "Messages or information sent about the patient.", "fas fa-comments"),
-                card("Communication Requests", CommunicationRequest, "clinical_communicationrequest", "Requests to convey information.", "fas fa-paper-plane"),
+                card(
+                    "Devices",
+                    Device,
+                    "clinical_device",
+                    "Patient devices, implanted devices, and identifiers.",
+                    "fas fa-laptop-medical",
+                ),
+                card(
+                    "Device Requests",
+                    DeviceRequest,
+                    "clinical_devicerequest",
+                    "Orders and requests for devices.",
+                    "fas fa-toolbox",
+                ),
+                card(
+                    "Device Use",
+                    DeviceUseStatement,
+                    "clinical_deviceusestatement",
+                    "Statements that a patient uses or used a device.",
+                    "fas fa-notes-medical",
+                ),
+                card(
+                    "Medication Administrations",
+                    MedicationAdministration,
+                    "clinical_medicationadministration",
+                    "Medication doses administered to the patient.",
+                    "fas fa-prescription-bottle",
+                ),
+                card(
+                    "Medication Dispenses",
+                    MedicationDispense,
+                    "clinical_medicationdispense",
+                    "Medication dispensed or supplied to the patient.",
+                    "fas fa-prescription-bottle-alt",
+                ),
+                card(
+                    "Nutrition Orders",
+                    NutritionOrder,
+                    "clinical_nutritionorder",
+                    "Diet, supplement, oral, and enteral nutrition orders.",
+                    "fas fa-utensils",
+                ),
+                card(
+                    "Communications",
+                    Communication,
+                    "clinical_communication",
+                    "Messages or information sent about the patient.",
+                    "fas fa-comments",
+                ),
+                card(
+                    "Communication Requests",
+                    CommunicationRequest,
+                    "clinical_communicationrequest",
+                    "Requests to convey information.",
+                    "fas fa-paper-plane",
+                ),
             ],
         },
         {
             "title": "Forms, Lists & FHIR",
             "cards": [
-                card("Questionnaire Responses", QuestionnaireResponse, "clinical_questionnaireresponse", "Completed forms, assessments, and patient-entered answers.", "fas fa-clipboard-list"),
-                card("FHIR Lists", FHIRList, "clinical_fhirlist", "Curated FHIR lists of records for this patient.", "fas fa-list"),
-                card("Compositions", Composition, "clinical_composition", "Structured clinical documents and sections.", "fas fa-file-alt"),
-                card("Document Manifests", DocumentManifest, "clinical_documentmanifest", "Document package/index records.", "fas fa-folder-open"),
-                card("Binary Resources", BinaryResource, "clinical_binaryresource", "Raw FHIR Binary payloads connected to this patient.", "fas fa-file-code"),
-                card("Provenance", Provenance, "clinical_provenance", "Source, authorship, and record trust/history.", "fas fa-history"),
-                card("Audit Events", AuditEvent, "clinical_auditevent", "Security/system audit events linked to this patient.", "fas fa-user-shield"),
-                card("Immunization Recommendations", ImmunizationRecommendation, "clinical_immunizationrecommendation", "Vaccine forecasts and recommended timing.", "fas fa-calendar-check"),
-                card("Related People", RelatedPerson, "clinical_relatedperson", "Family, caregivers, proxies, and patient-related contacts.", "fas fa-address-book"),
-                card("FHIR Snapshots", FHIRResourceSnapshot, "fhir_fhirresourcesnapshot", "Raw imported FHIR resources preserved for this patient.", "fas fa-database"),
-                card("Measure Reports", MeasureReport, "clinical_measurereport", "Patient-linked quality measure reports.", "fas fa-poll"),
-                card("Research Subjects", ResearchSubject, "clinical_researchsubject", "Research participation, study arm, period, status, and consent.", "fas fa-user-graduate"),
+                card(
+                    "Questionnaire Responses",
+                    QuestionnaireResponse,
+                    "clinical_questionnaireresponse",
+                    "Completed forms, assessments, and patient-entered answers.",
+                    "fas fa-clipboard-list",
+                ),
+                card(
+                    "FHIR Lists",
+                    FHIRList,
+                    "clinical_fhirlist",
+                    "Curated FHIR lists of records for this patient.",
+                    "fas fa-list",
+                ),
+                card(
+                    "Compositions",
+                    Composition,
+                    "clinical_composition",
+                    "Structured clinical documents and sections.",
+                    "fas fa-file-alt",
+                ),
+                card(
+                    "Document Manifests",
+                    DocumentManifest,
+                    "clinical_documentmanifest",
+                    "Document package/index records.",
+                    "fas fa-folder-open",
+                ),
+                card(
+                    "Binary Resources",
+                    BinaryResource,
+                    "clinical_binaryresource",
+                    "Raw FHIR Binary payloads connected to this patient.",
+                    "fas fa-file-code",
+                ),
+                card(
+                    "Provenance",
+                    Provenance,
+                    "clinical_provenance",
+                    "Source, authorship, and record trust/history.",
+                    "fas fa-history",
+                ),
+                card(
+                    "Audit Events",
+                    AuditEvent,
+                    "clinical_auditevent",
+                    "Security/system audit events linked to this patient.",
+                    "fas fa-user-shield",
+                ),
+                card(
+                    "Immunization Recommendations",
+                    ImmunizationRecommendation,
+                    "clinical_immunizationrecommendation",
+                    "Vaccine forecasts and recommended timing.",
+                    "fas fa-calendar-check",
+                ),
+                card(
+                    "Related People",
+                    RelatedPerson,
+                    "clinical_relatedperson",
+                    "Family, caregivers, proxies, and patient-related contacts.",
+                    "fas fa-address-book",
+                ),
+                card(
+                    "FHIR Snapshots",
+                    FHIRResourceSnapshot,
+                    "fhir_fhirresourcesnapshot",
+                    "Raw imported FHIR resources preserved for this patient.",
+                    "fas fa-database",
+                ),
+                card(
+                    "Measure Reports",
+                    MeasureReport,
+                    "clinical_measurereport",
+                    "Patient-linked quality measure reports.",
+                    "fas fa-poll",
+                ),
+                card(
+                    "Research Subjects",
+                    ResearchSubject,
+                    "clinical_researchsubject",
+                    "Research participation, study arm, period, status, and consent.",
+                    "fas fa-user-graduate",
+                ),
             ],
         },
         {
             "title": "Advanced Clinical",
             "cards": [
-                card("Media", Media, "clinical_media", "Clinical images, videos, audio, and attached media metadata.", "fas fa-photo-video"),
-                card("Imaging Studies", ImagingStudy, "clinical_imagingstudy", "DICOM study, series, instance, modality, and imaging metadata.", "fas fa-x-ray"),
-                card("Molecular Sequences", MolecularSequence, "clinical_molecularsequence", "Genomic sequence, variant, repository, and quality details.", "fas fa-dna"),
-                card("Immunization Evaluations", ImmunizationEvaluation, "clinical_immunizationevaluation", "Dose validity evaluations for immunization events.", "fas fa-check-circle"),
-                card("Vision Prescriptions", VisionPrescription, "clinical_visionprescription", "Glasses and contact lens prescriptions.", "fas fa-glasses"),
-                card("Request Groups", RequestGroup, "clinical_requestgroup", "Grouped or conditional care requests and planned actions.", "fas fa-stream"),
-                card("Guidance Responses", GuidanceResponse, "clinical_guidanceresponse", "Decision-support responses and outputs.", "fas fa-route"),
-                card("Supply Requests", SupplyRequest, "clinical_supplyrequest", "Requests for medication, device, or supply movement.", "fas fa-box-open"),
-                card("Supply Deliveries", SupplyDelivery, "clinical_supplydelivery", "Supply dispense or delivery events.", "fas fa-truck"),
+                card(
+                    "Media",
+                    Media,
+                    "clinical_media",
+                    "Clinical images, videos, audio, and attached media metadata.",
+                    "fas fa-photo-video",
+                ),
+                card(
+                    "Imaging Studies",
+                    ImagingStudy,
+                    "clinical_imagingstudy",
+                    "DICOM study, series, instance, modality, and imaging metadata.",
+                    "fas fa-x-ray",
+                ),
+                card(
+                    "Molecular Sequences",
+                    MolecularSequence,
+                    "clinical_molecularsequence",
+                    "Genomic sequence, variant, repository, and quality details.",
+                    "fas fa-dna",
+                ),
+                card(
+                    "Immunization Evaluations",
+                    ImmunizationEvaluation,
+                    "clinical_immunizationevaluation",
+                    "Dose validity evaluations for immunization events.",
+                    "fas fa-check-circle",
+                ),
+                card(
+                    "Vision Prescriptions",
+                    VisionPrescription,
+                    "clinical_visionprescription",
+                    "Glasses and contact lens prescriptions.",
+                    "fas fa-glasses",
+                ),
+                card(
+                    "Request Groups",
+                    RequestGroup,
+                    "clinical_requestgroup",
+                    "Grouped or conditional care requests and planned actions.",
+                    "fas fa-stream",
+                ),
+                card(
+                    "Guidance Responses",
+                    GuidanceResponse,
+                    "clinical_guidanceresponse",
+                    "Decision-support responses and outputs.",
+                    "fas fa-route",
+                ),
+                card(
+                    "Supply Requests",
+                    SupplyRequest,
+                    "clinical_supplyrequest",
+                    "Requests for medication, device, or supply movement.",
+                    "fas fa-box-open",
+                ),
+                card(
+                    "Supply Deliveries",
+                    SupplyDelivery,
+                    "clinical_supplydelivery",
+                    "Supply dispense or delivery events.",
+                    "fas fa-truck",
+                ),
             ],
         },
     ]
@@ -1337,6 +1760,7 @@ def patient_resources_directory(request, patient_id):
         "directory_sections": sections,
     }
     return render(request, "admin/patient_resources_directory.html", context)
+
 
 def fhir_explorer(request):
     context = {
@@ -1353,7 +1777,40 @@ def new_clinical_resources_directory(request):
         "title": "All Clinical Resources",
         "directory_sections": build_personal_emr_resource_sections(),
     }
-    return render(request, "admin/clinical_resource_browser_core_highlight.html", context)
+    return render(
+        request, "admin/clinical_resource_browser_core_highlight.html", context
+    )
+
+
+def paramedic_patient_view(request, patient_id):
+    patient = get_object_or_404(PatientProfile, pk=patient_id)
+
+    context = {
+        **admin.site.each_context(request),
+        "title": f"Paramedic View: {patient}",
+        "patient": patient,
+        "allergies": Allergy.objects.filter(patient=patient),
+        "conditions": Condition.objects.filter(patient=patient),
+        "medications": Medication.objects.filter(patient=patient),
+        "observations": Observation.objects.filter(patient=patient).order_by(
+            "-effective_datetime"
+        )[:12],
+        "encounters": Encounter.objects.filter(patient=patient).order_by("-start_time")[
+            :5
+        ],
+        "procedures": Procedure.objects.filter(patient=patient).order_by(
+            "-performed_start"
+        )[:8],
+        "devices": Device.objects.filter(patient=patient),
+        "flags": Flag.objects.filter(patient=patient),
+        "related_people": RelatedPerson.objects.filter(patient=patient),
+        "documents": ClinicalDocument.objects.filter(patient=patient).order_by(
+            "-created_at"
+        )[:8],
+    }
+
+    return render(request, "admin/paramedic_patient_view.html", context)
+
 
 def fhir_interop_hub(request):
     cards = [
@@ -1374,7 +1831,7 @@ def fhir_interop_hub(request):
             "description": "Browse all 143+ FHIR resources, profiles, and definitions across the system.",
             "url": reverse("fhir_explorer"),
             "icon": "fas fa-search",
-        }
+        },
     ]
 
     context = {
@@ -1383,8 +1840,3 @@ def fhir_interop_hub(request):
         "interop_cards": cards,
     }
     return render(request, "admin/fhir_interop_hub.html", context)
-
-
-
-
-

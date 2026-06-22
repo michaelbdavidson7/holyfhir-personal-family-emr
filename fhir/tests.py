@@ -98,9 +98,17 @@ from clinical.models import (
 from documents.models import ClinicalDocument
 from patients.models import PatientProfile
 
-from .backups import create_pre_import_database_backup, list_fhir_import_database_backups
+from .backups import (
+    create_pre_import_database_backup,
+    list_fhir_import_database_backups,
+)
 from .forms import FHIRImportForm
-from .importer import import_fhir_json, import_fhir_payloads, loads_fhir_documents, loads_fhir_json
+from .importer import (
+    import_fhir_json,
+    import_fhir_payloads,
+    loads_fhir_documents,
+    loads_fhir_json,
+)
 from .models import FHIRLink, FHIRResourceSnapshot
 
 
@@ -120,7 +128,9 @@ class FHIRImportTests(TestCase):
                             {"system": "phone", "value": "555-0100"},
                             {"system": "email", "value": "maya@example.test"},
                         ],
-                        "address": [{"line": ["1 Main St"], "city": "Boston", "state": "MA"}],
+                        "address": [
+                            {"line": ["1 Main St"], "city": "Boston", "state": "MA"}
+                        ],
                     }
                 },
                 {
@@ -130,9 +140,16 @@ class FHIRImportTests(TestCase):
                         "subject": {"reference": "Patient/pat-1"},
                         "code": {
                             "text": "Asthma",
-                            "coding": [{"system": "http://hl7.org/fhir/sid/icd-10-cm", "code": "J45.909"}],
+                            "coding": [
+                                {
+                                    "system": "http://hl7.org/fhir/sid/icd-10-cm",
+                                    "code": "J45.909",
+                                }
+                            ],
                         },
-                        "clinicalStatus": {"coding": [{"code": "active", "display": "Active"}]},
+                        "clinicalStatus": {
+                            "coding": [{"code": "active", "display": "Active"}]
+                        },
                         "onsetDateTime": "2020-01-02",
                     }
                 },
@@ -195,9 +212,27 @@ class FHIRImportTests(TestCase):
         payload = {
             "resourceType": "Bundle",
             "entry": [
-                {"resource": {"resourceType": "Patient", "id": "pat-extended", "name": [{"family": "Chen", "given": ["Ari"]}]}},
-                {"resource": {"resourceType": "Organization", "id": "org-1", "name": "Good Health"}},
-                {"resource": {"resourceType": "Practitioner", "id": "prac-1", "name": [{"text": "Dr. Stone"}]}},
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "id": "pat-extended",
+                        "name": [{"family": "Chen", "given": ["Ari"]}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Organization",
+                        "id": "org-1",
+                        "name": "Good Health",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Practitioner",
+                        "id": "prac-1",
+                        "name": [{"text": "Dr. Stone"}],
+                    }
+                },
                 {
                     "resource": {
                         "resourceType": "Medication",
@@ -206,7 +241,12 @@ class FHIRImportTests(TestCase):
                         "status": "active",
                         "manufacturer": {"reference": "Organization/org-1"},
                         "form": {"text": "Tablet"},
-                        "ingredient": [{"itemCodeableConcept": {"text": "Acetaminophen"}, "isActive": True}],
+                        "ingredient": [
+                            {
+                                "itemCodeableConcept": {"text": "Acetaminophen"},
+                                "isActive": True,
+                            }
+                        ],
                     }
                 },
                 {
@@ -251,11 +291,17 @@ class FHIRImportTests(TestCase):
                         "id": "medadmin-1",
                         "subject": {"reference": "Patient/pat-extended"},
                         "status": "completed",
-                        "medicationReference": {"reference": "Medication/medcat-1", "display": "Acetaminophen"},
+                        "medicationReference": {
+                            "reference": "Medication/medcat-1",
+                            "display": "Acetaminophen",
+                        },
                         "request": {"reference": "ServiceRequest/sr-ext"},
                         "effectiveDateTime": "2024-01-02T10:00:00Z",
                         "performer": [{"actor": {"reference": "Practitioner/prac-1"}}],
-                        "dosage": {"text": "One tablet", "dose": {"value": 325, "unit": "mg"}},
+                        "dosage": {
+                            "text": "One tablet",
+                            "dose": {"value": 325, "unit": "mg"},
+                        },
                     }
                 },
                 {
@@ -264,7 +310,10 @@ class FHIRImportTests(TestCase):
                         "id": "meddisp-1",
                         "subject": {"reference": "Patient/pat-extended"},
                         "status": "completed",
-                        "medicationReference": {"reference": "Medication/medcat-1", "display": "Acetaminophen"},
+                        "medicationReference": {
+                            "reference": "Medication/medcat-1",
+                            "display": "Acetaminophen",
+                        },
                         "performer": [{"actor": {"reference": "Organization/org-1"}}],
                         "quantity": {"value": 30, "unit": "tablet"},
                         "whenHandedOver": "2024-01-02T11:00:00Z",
@@ -340,7 +389,13 @@ class FHIRImportTests(TestCase):
                         "questionnaire": "http://example.test/forms/intake",
                         "authored": "2024-01-05T09:00:00Z",
                         "basedOn": [{"reference": "ServiceRequest/sr-ext"}],
-                        "item": [{"linkId": "symptoms", "text": "Symptoms", "answer": [{"valueString": "Fever"}]}],
+                        "item": [
+                            {
+                                "linkId": "symptoms",
+                                "text": "Symptoms",
+                                "answer": [{"valueString": "Fever"}],
+                            }
+                        ],
                     }
                 },
                 {
@@ -355,8 +410,12 @@ class FHIRImportTests(TestCase):
                                 "vaccineCode": [{"text": "COVID-19 vaccine"}],
                                 "targetDisease": {"text": "COVID-19"},
                                 "forecastStatus": {"text": "Due"},
-                                "supportingImmunization": [{"reference": "Immunization/imm-ext"}],
-                                "supportingPatientInformation": [{"reference": "Observation/obs-ext"}],
+                                "supportingImmunization": [
+                                    {"reference": "Immunization/imm-ext"}
+                                ],
+                                "supportingPatientInformation": [
+                                    {"reference": "Observation/obs-ext"}
+                                ],
                             }
                         ],
                     }
@@ -367,23 +426,58 @@ class FHIRImportTests(TestCase):
         result = import_fhir_json(payload)
 
         self.assertEqual(result.errors, [])
-        self.assertEqual(MedicationCatalog.objects.get().manufacturer.name, "Good Health")
-        self.assertEqual(MedicationAdministration.objects.get().medication_catalog.name, "Acetaminophen 325 MG Oral Tablet")
-        self.assertEqual(MedicationDispense.objects.get().performer_organization.name, "Good Health")
-        self.assertEqual(NutritionOrder.objects.get().oral_diet_summary, "Low sodium diet")
-        self.assertEqual(Communication.objects.get().recipients_organizations.get().name, "Good Health")
-        self.assertEqual(CommunicationRequest.objects.get().based_on_service_requests.get().name, "Follow up call")
+        self.assertEqual(
+            MedicationCatalog.objects.get().manufacturer.name, "Good Health"
+        )
+        self.assertEqual(
+            MedicationAdministration.objects.get().medication_catalog.name,
+            "Acetaminophen 325 MG Oral Tablet",
+        )
+        self.assertEqual(
+            MedicationDispense.objects.get().performer_organization.name, "Good Health"
+        )
+        self.assertEqual(
+            NutritionOrder.objects.get().oral_diet_summary, "Low sodium diet"
+        )
+        self.assertEqual(
+            Communication.objects.get().recipients_organizations.get().name,
+            "Good Health",
+        )
+        self.assertEqual(
+            CommunicationRequest.objects.get().based_on_service_requests.get().name,
+            "Follow up call",
+        )
         self.assertEqual(Flag.objects.get().code, "Interpreter requested")
         self.assertEqual(FHIRList.objects.get().conditions.get().name, "Fever")
-        self.assertEqual(QuestionnaireResponse.objects.get().based_on_service_requests.get().name, "Follow up call")
-        self.assertEqual(ImmunizationRecommendation.objects.get().supporting_immunizations.get().vaccine_name, "Influenza vaccine")
+        self.assertEqual(
+            QuestionnaireResponse.objects.get().based_on_service_requests.get().name,
+            "Follow up call",
+        )
+        self.assertEqual(
+            ImmunizationRecommendation.objects.get()
+            .supporting_immunizations.get()
+            .vaccine_name,
+            "Influenza vaccine",
+        )
 
     def test_imports_insurance_and_consent_resources(self):
         payload = {
             "resourceType": "Bundle",
             "entry": [
-                {"resource": {"resourceType": "Patient", "id": "pat-fin", "name": [{"family": "Rivera", "given": ["Maya"]}]}},
-                {"resource": {"resourceType": "Organization", "id": "payer-1", "name": "Acme Health Plan"}},
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "id": "pat-fin",
+                        "name": [{"family": "Rivera", "given": ["Maya"]}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Organization",
+                        "id": "payer-1",
+                        "name": "Acme Health Plan",
+                    }
+                },
                 {
                     "resource": {
                         "resourceType": "InsurancePlan",
@@ -404,7 +498,13 @@ class FHIRImportTests(TestCase):
                         "type": {"text": "Medical"},
                         "subscriberId": "SUB123",
                         "period": {"start": "2024-01-01"},
-                        "class": [{"type": {"text": "plan"}, "value": "Gold", "name": "Gold Plan"}],
+                        "class": [
+                            {
+                                "type": {"text": "plan"},
+                                "value": "Gold",
+                                "name": "Gold Plan",
+                            }
+                        ],
                     }
                 },
                 {
@@ -428,9 +528,22 @@ class FHIRImportTests(TestCase):
                         "use": "claim",
                         "outcome": "complete",
                         "created": "2024-02-01",
-                        "insurance": [{"coverage": {"reference": "Coverage/coverage-1"}}],
-                        "item": [{"sequence": 1, "encounter": [{"reference": "Encounter/enc-fin"}], "productOrService": {"text": "Office visit"}}],
-                        "total": [{"category": {"text": "Submitted"}, "amount": {"value": 100, "currency": "USD"}}],
+                        "insurance": [
+                            {"coverage": {"reference": "Coverage/coverage-1"}}
+                        ],
+                        "item": [
+                            {
+                                "sequence": 1,
+                                "encounter": [{"reference": "Encounter/enc-fin"}],
+                                "productOrService": {"text": "Office visit"},
+                            }
+                        ],
+                        "total": [
+                            {
+                                "category": {"text": "Submitted"},
+                                "amount": {"value": 100, "currency": "USD"},
+                            }
+                        ],
                     }
                 },
                 {
@@ -460,11 +573,15 @@ class FHIRImportTests(TestCase):
                         "category": [{"text": "Vaccine consent"}],
                         "patient": {"reference": "Patient/pat-fin"},
                         "organization": [{"reference": "Organization/payer-1"}],
-                        "sourceReference": {"reference": "QuestionnaireResponse/qr-consent"},
+                        "sourceReference": {
+                            "reference": "QuestionnaireResponse/qr-consent"
+                        },
                         "provision": {
                             "type": "permit",
                             "period": {"start": "2024-10-01T09:00:00Z"},
-                            "data": [{"reference": {"reference": "Immunization/imm-consent"}}],
+                            "data": [
+                                {"reference": {"reference": "Immunization/imm-consent"}}
+                            ],
                         },
                     }
                 },
@@ -476,10 +593,20 @@ class FHIRImportTests(TestCase):
         self.assertEqual(result.errors, [])
         self.assertEqual(InsurancePlan.objects.get().owned_by.name, "Acme Health Plan")
         self.assertEqual(Coverage.objects.get().subscriber_id, "SUB123")
-        self.assertEqual(ExplanationOfBenefit.objects.get().coverages.get(), Coverage.objects.get())
-        self.assertEqual(ExplanationOfBenefit.objects.get().encounters.get(), Encounter.objects.get())
-        self.assertEqual(Consent.objects.get().related_immunizations.get().vaccine_name, "Influenza vaccine")
-        self.assertEqual(Consent.objects.get().questionnaire_responses.get().questionnaire, "http://example.test/vaccine-consent")
+        self.assertEqual(
+            ExplanationOfBenefit.objects.get().coverages.get(), Coverage.objects.get()
+        )
+        self.assertEqual(
+            ExplanationOfBenefit.objects.get().encounters.get(), Encounter.objects.get()
+        )
+        self.assertEqual(
+            Consent.objects.get().related_immunizations.get().vaccine_name,
+            "Influenza vaccine",
+        )
+        self.assertEqual(
+            Consent.objects.get().questionnaire_responses.get().questionnaire,
+            "http://example.test/vaccine-consent",
+        )
 
     def test_reimport_updates_linked_resources(self):
         payload = {
@@ -599,10 +726,15 @@ class FHIRImportTests(TestCase):
         self.assertEqual(care_team.end_date, date(2023, 12, 31))
         self.assertEqual(care_team.reason, "Ongoing care coordination")
         self.assertEqual(care_team.notes, "Call office before medication changes.")
-        self.assertIn("Primary care physician: Dr. Ada Lovelace (2021-01-01)", care_team.participants)
+        self.assertIn(
+            "Primary care physician: Dr. Ada Lovelace (2021-01-01)",
+            care_team.participants,
+        )
         self.assertIn("Cardiology: Practitioner/prac-1", care_team.participants)
         self.assertEqual(care_team.participant_links.count(), 2)
-        unresolved_participant = CareTeamParticipant.objects.get(member_reference="Practitioner/prac-1")
+        unresolved_participant = CareTeamParticipant.objects.get(
+            member_reference="Practitioner/prac-1"
+        )
         self.assertEqual(unresolved_participant.care_team, care_team)
         self.assertEqual(unresolved_participant.role, "Cardiology")
         self.assertIsNone(unresolved_participant.practitioner)
@@ -636,7 +768,9 @@ class FHIRImportTests(TestCase):
                             {"system": "phone", "value": "555-0101"},
                             {"system": "email", "value": "ada@example.test"},
                         ],
-                        "address": [{"line": ["1 Clinic Way"], "city": "Boston", "state": "MA"}],
+                        "address": [
+                            {"line": ["1 Clinic Way"], "city": "Boston", "state": "MA"}
+                        ],
                     }
                 },
                 {
@@ -647,7 +781,13 @@ class FHIRImportTests(TestCase):
                         "name": "Example Health",
                         "type": [{"text": "Hospital"}],
                         "telecom": [{"system": "phone", "value": "555-0102"}],
-                        "address": [{"line": ["2 Hospital Ave"], "city": "Boston", "state": "MA"}],
+                        "address": [
+                            {
+                                "line": ["2 Hospital Ave"],
+                                "city": "Boston",
+                                "state": "MA",
+                            }
+                        ],
                     }
                 },
                 {
@@ -660,7 +800,11 @@ class FHIRImportTests(TestCase):
                         "type": [{"text": "Campus"}],
                         "managingOrganization": {"reference": "Organization/org-1"},
                         "telecom": [{"system": "phone", "value": "555-0103"}],
-                        "address": {"line": ["3 Care St"], "city": "Boston", "state": "MA"},
+                        "address": {
+                            "line": ["3 Care St"],
+                            "city": "Boston",
+                            "state": "MA",
+                        },
                     }
                 },
             ],
@@ -718,13 +862,22 @@ class FHIRImportTests(TestCase):
                         "participant": [
                             {
                                 "role": [{"text": "Endocrinologist"}],
-                                "member": {"reference": "Practitioner/prac-1", "display": "Dr. Grace Hopper"},
-                                "onBehalfOf": {"reference": "Organization/org-1", "display": "Example Health"},
+                                "member": {
+                                    "reference": "Practitioner/prac-1",
+                                    "display": "Dr. Grace Hopper",
+                                },
+                                "onBehalfOf": {
+                                    "reference": "Organization/org-1",
+                                    "display": "Example Health",
+                                },
                                 "period": {"start": "2022-01-01", "end": "2024-01-01"},
                             },
                             {
                                 "role": [{"text": "Clinic"}],
-                                "member": {"reference": "Location/loc-1", "display": "Main Clinic"},
+                                "member": {
+                                    "reference": "Location/loc-1",
+                                    "display": "Main Clinic",
+                                },
                             },
                         ],
                         "managingOrganization": [{"reference": "Organization/org-1"}],
@@ -766,12 +919,18 @@ class FHIRImportTests(TestCase):
 
         self.assertEqual(list(care_team.managing_organizations.all()), [organization])
 
-        practitioner_participant = CareTeamParticipant.objects.get(role="Endocrinologist")
+        practitioner_participant = CareTeamParticipant.objects.get(
+            role="Endocrinologist"
+        )
         self.assertEqual(practitioner_participant.care_team, care_team)
         self.assertEqual(practitioner_participant.practitioner, practitioner)
         self.assertEqual(practitioner_participant.organization, organization)
-        self.assertEqual(practitioner_participant.member_reference, "Practitioner/prac-1")
-        self.assertEqual(practitioner_participant.on_behalf_of_reference, "Organization/org-1")
+        self.assertEqual(
+            practitioner_participant.member_reference, "Practitioner/prac-1"
+        )
+        self.assertEqual(
+            practitioner_participant.on_behalf_of_reference, "Organization/org-1"
+        )
         self.assertEqual(practitioner_participant.start_date, date(2022, 1, 1))
         self.assertEqual(practitioner_participant.end_date, date(2024, 1, 1))
 
@@ -800,7 +959,10 @@ class FHIRImportTests(TestCase):
             ],
         }
 
-        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+        with (
+            tempfile.TemporaryDirectory() as media_root,
+            override_settings(MEDIA_ROOT=media_root),
+        ):
             result = import_fhir_json(payload, target_patient=patient)
             document = ClinicalDocument.objects.get()
 
@@ -897,8 +1059,14 @@ class FHIRImportTests(TestCase):
                         "performer": [
                             {
                                 "function": {"text": "Surgeon"},
-                                "actor": {"reference": "Practitioner/prac-1", "display": "Dr. Ada Lovelace"},
-                                "onBehalfOf": {"reference": "Organization/org-1", "display": "Example Health"},
+                                "actor": {
+                                    "reference": "Practitioner/prac-1",
+                                    "display": "Dr. Ada Lovelace",
+                                },
+                                "onBehalfOf": {
+                                    "reference": "Organization/org-1",
+                                    "display": "Example Health",
+                                },
                             }
                         ],
                     }
@@ -975,14 +1143,30 @@ class FHIRImportTests(TestCase):
         specimen = Specimen.objects.get(accession_identifier="A-123")
         self.assertEqual(specimen.specimen_type, "Blood specimen")
         self.assertEqual(specimen.collection_method, "Venipuncture")
-        self.assertEqual(specimen.parent_specimens.get().specimen_type, "Parent specimen")
+        self.assertEqual(
+            specimen.parent_specimens.get().specimen_type, "Parent specimen"
+        )
         self.assertEqual(Observation.objects.get().specimen, specimen)
 
-        self.assertTrue(FHIRLink.objects.filter(resource_type="CarePlan", django_model="clinical.CarePlan").exists())
-        self.assertTrue(FHIRLink.objects.filter(resource_type="Procedure", django_model="clinical.Procedure").exists())
-        self.assertTrue(FHIRLink.objects.filter(resource_type="Specimen", django_model="clinical.Specimen").exists())
+        self.assertTrue(
+            FHIRLink.objects.filter(
+                resource_type="CarePlan", django_model="clinical.CarePlan"
+            ).exists()
+        )
+        self.assertTrue(
+            FHIRLink.objects.filter(
+                resource_type="Procedure", django_model="clinical.Procedure"
+            ).exists()
+        )
+        self.assertTrue(
+            FHIRLink.objects.filter(
+                resource_type="Specimen", django_model="clinical.Specimen"
+            ).exists()
+        )
 
-    def test_imports_service_request_episode_device_and_practitioner_role_relationships(self):
+    def test_imports_service_request_episode_device_and_practitioner_role_relationships(
+        self,
+    ):
         payload = {
             "resourceType": "Bundle",
             "entry": [
@@ -1154,7 +1338,14 @@ class FHIRImportTests(TestCase):
                         "author": [{"reference": "Practitioner/prac-1"}],
                         "custodian": {"reference": "Organization/org-1"},
                         "context": {"encounter": [{"reference": "Encounter/enc-1"}]},
-                        "content": [{"attachment": {"contentType": "text/plain", "title": "Progress note"}}],
+                        "content": [
+                            {
+                                "attachment": {
+                                    "contentType": "text/plain",
+                                    "title": "Progress note",
+                                }
+                            }
+                        ],
                     }
                 },
             ],
@@ -1186,9 +1377,15 @@ class FHIRImportTests(TestCase):
         self.assertEqual(service_request.requester_role, role)
         self.assertEqual(service_request.care_plans.get(), CarePlan.objects.get())
         self.assertEqual(service_request.replaces.get().name, "Old order")
-        self.assertEqual(service_request.performers_practitioners.get(), Practitioner.objects.get())
-        self.assertEqual(service_request.performers_organizations.get(), Organization.objects.get())
-        self.assertEqual(service_request.performers_care_teams.get(), CareTeam.objects.get())
+        self.assertEqual(
+            service_request.performers_practitioners.get(), Practitioner.objects.get()
+        )
+        self.assertEqual(
+            service_request.performers_organizations.get(), Organization.objects.get()
+        )
+        self.assertEqual(
+            service_request.performers_care_teams.get(), CareTeam.objects.get()
+        )
         self.assertEqual(service_request.performers_devices.get(), device)
         self.assertEqual(service_request.locations.get(), Location.objects.get())
         self.assertEqual(service_request.conditions.get(), Condition.objects.get())
@@ -1307,7 +1504,14 @@ class FHIRImportTests(TestCase):
                         "status": "current",
                         "subject": {"reference": "Patient/pat-1"},
                         "type": {"text": "Adverse event note"},
-                        "content": [{"attachment": {"contentType": "text/plain", "title": "Adverse event note"}}],
+                        "content": [
+                            {
+                                "attachment": {
+                                    "contentType": "text/plain",
+                                    "title": "Adverse event note",
+                                }
+                            }
+                        ],
                     }
                 },
                 {
@@ -1343,7 +1547,9 @@ class FHIRImportTests(TestCase):
                         "effectiveDateTime": "2024-01-02T10:00:00Z",
                         "date": "2024-01-02T10:30:00Z",
                         "problem": [{"reference": "Condition/cond-1"}],
-                        "investigation": [{"item": [{"reference": "Observation/obs-1"}]}],
+                        "investigation": [
+                            {"item": [{"reference": "Observation/obs-1"}]}
+                        ],
                         "finding": [
                             {
                                 "itemReference": {"reference": "Condition/cond-1"},
@@ -1410,28 +1616,59 @@ class FHIRImportTests(TestCase):
 
         clinical_impression = ClinicalImpression.objects.get()
         self.assertEqual(clinical_impression.encounter, Encounter.objects.get())
-        self.assertEqual(clinical_impression.assessor_role, PractitionerRole.objects.get())
+        self.assertEqual(
+            clinical_impression.assessor_role, PractitionerRole.objects.get()
+        )
         self.assertEqual(clinical_impression.problems.get(), Condition.objects.get())
-        self.assertEqual(clinical_impression.investigations_observations.get(), Observation.objects.get())
+        self.assertEqual(
+            clinical_impression.investigations_observations.get(),
+            Observation.objects.get(),
+        )
         self.assertEqual(ClinicalImpressionFinding.objects.count(), 2)
         self.assertEqual(clinical_impression.conditions.get(), Condition.objects.get())
-        self.assertEqual(clinical_impression.observations.get(), Observation.objects.get())
+        self.assertEqual(
+            clinical_impression.observations.get(), Observation.objects.get()
+        )
 
         adverse_event = AdverseEvent.objects.get()
         self.assertEqual(adverse_event.encounter, Encounter.objects.get())
         self.assertEqual(adverse_event.location, Location.objects.get())
-        self.assertEqual(adverse_event.recorder_practitioner, Practitioner.objects.get())
-        self.assertEqual(adverse_event.resulting_conditions.get(), Condition.objects.get())
-        self.assertEqual(adverse_event.contributor_roles.get(), PractitionerRole.objects.get())
+        self.assertEqual(
+            adverse_event.recorder_practitioner, Practitioner.objects.get()
+        )
+        self.assertEqual(
+            adverse_event.resulting_conditions.get(), Condition.objects.get()
+        )
+        self.assertEqual(
+            adverse_event.contributor_roles.get(), PractitionerRole.objects.get()
+        )
         self.assertEqual(adverse_event.contributor_devices.get(), Device.objects.get())
-        self.assertEqual(adverse_event.suspect_procedures.get(), Procedure.objects.get())
-        self.assertEqual(adverse_event.suspect_immunizations.get(), Immunization.objects.get())
+        self.assertEqual(
+            adverse_event.suspect_procedures.get(), Procedure.objects.get()
+        )
+        self.assertEqual(
+            adverse_event.suspect_immunizations.get(), Immunization.objects.get()
+        )
         self.assertEqual(adverse_event.suspect_devices.get(), Device.objects.get())
-        self.assertEqual(adverse_event.reference_documents.get(), ClinicalDocument.objects.get())
-        self.assertEqual(adverse_event.subject_medical_history_conditions.get(), Condition.objects.get())
-        self.assertEqual(adverse_event.subject_medical_history_observations.get(), Observation.objects.get())
-        self.assertEqual(adverse_event.subject_medical_history_immunizations.get(), Immunization.objects.get())
-        self.assertEqual(adverse_event.subject_medical_history_procedures.get(), Procedure.objects.get())
+        self.assertEqual(
+            adverse_event.reference_documents.get(), ClinicalDocument.objects.get()
+        )
+        self.assertEqual(
+            adverse_event.subject_medical_history_conditions.get(),
+            Condition.objects.get(),
+        )
+        self.assertEqual(
+            adverse_event.subject_medical_history_observations.get(),
+            Observation.objects.get(),
+        )
+        self.assertEqual(
+            adverse_event.subject_medical_history_immunizations.get(),
+            Immunization.objects.get(),
+        )
+        self.assertEqual(
+            adverse_event.subject_medical_history_procedures.get(),
+            Procedure.objects.get(),
+        )
 
     def test_imports_diagnostic_report_and_detected_issue_relationships(self):
         report_text = b64encode(b"diagnostic report").decode("ascii")
@@ -1609,22 +1846,45 @@ class FHIRImportTests(TestCase):
             diagnostic_report = DiagnosticReport.objects.get()
             self.assertEqual(diagnostic_report.encounter, Encounter.objects.get())
             self.assertEqual(diagnostic_report.care_plans.get(), CarePlan.objects.get())
-            self.assertEqual(diagnostic_report.service_requests.get(), ServiceRequest.objects.get())
+            self.assertEqual(
+                diagnostic_report.service_requests.get(), ServiceRequest.objects.get()
+            )
             self.assertEqual(diagnostic_report.specimens.get(), Specimen.objects.get())
-            self.assertEqual(diagnostic_report.observations.get(), Observation.objects.get())
-            self.assertEqual(diagnostic_report.performers_roles.get(), PractitionerRole.objects.get())
-            self.assertEqual(diagnostic_report.performers_organizations.get(), Organization.objects.get())
-            self.assertEqual(diagnostic_report.interpreter_practitioners.get(), Practitioner.objects.get())
+            self.assertEqual(
+                diagnostic_report.observations.get(), Observation.objects.get()
+            )
+            self.assertEqual(
+                diagnostic_report.performers_roles.get(), PractitionerRole.objects.get()
+            )
+            self.assertEqual(
+                diagnostic_report.performers_organizations.get(),
+                Organization.objects.get(),
+            )
+            self.assertEqual(
+                diagnostic_report.interpreter_practitioners.get(),
+                Practitioner.objects.get(),
+            )
             self.assertEqual(diagnostic_report.presented_documents.count(), 1)
             self.assertEqual(ClinicalDocument.objects.get().title, "CBC report text")
 
             detected_issue = DetectedIssue.objects.get()
             self.assertEqual(detected_issue.author_device, Device.objects.get())
-            self.assertEqual(detected_issue.implicated_service_requests.get(), ServiceRequest.objects.get())
-            self.assertEqual(detected_issue.implicated_diagnostic_reports.get(), diagnostic_report)
-            self.assertEqual(detected_issue.implicated_conditions.get(), Condition.objects.get())
-            self.assertEqual(detected_issue.evidence_observations.get(), Observation.objects.get())
-        self.assertEqual(detected_issue.evidence_diagnostic_reports.get(), diagnostic_report)
+            self.assertEqual(
+                detected_issue.implicated_service_requests.get(),
+                ServiceRequest.objects.get(),
+            )
+            self.assertEqual(
+                detected_issue.implicated_diagnostic_reports.get(), diagnostic_report
+            )
+            self.assertEqual(
+                detected_issue.implicated_conditions.get(), Condition.objects.get()
+            )
+            self.assertEqual(
+                detected_issue.evidence_observations.get(), Observation.objects.get()
+            )
+        self.assertEqual(
+            detected_issue.evidence_diagnostic_reports.get(), diagnostic_report
+        )
         self.assertIn("Reviewed by clinician", detected_issue.mitigation_summary)
 
     def test_imports_related_person(self):
@@ -1646,7 +1906,10 @@ class FHIRImportTests(TestCase):
                             "id": "rp-1",
                             "patient": {"reference": "Patient/pat-1"},
                             "active": True,
-                            "relationship": [{"text": "Guardian"}, {"text": "Emergency contact"}],
+                            "relationship": [
+                                {"text": "Guardian"},
+                                {"text": "Emergency contact"},
+                            ],
                             "name": [{"family": "Rivera", "given": ["Alex"]}],
                             "telecom": [
                                 {"system": "phone", "value": "555-1212"},
@@ -1654,7 +1917,13 @@ class FHIRImportTests(TestCase):
                             ],
                             "gender": "other",
                             "birthDate": "1980-04-05",
-                            "address": [{"line": ["100 Main St"], "city": "Boston", "state": "MA"}],
+                            "address": [
+                                {
+                                    "line": ["100 Main St"],
+                                    "city": "Boston",
+                                    "state": "MA",
+                                }
+                            ],
                             "period": {"start": "2020-01-01"},
                             "communication": [
                                 {
@@ -1694,8 +1963,13 @@ class FHIRImportTests(TestCase):
         self.assertTrue(related_person.language_preferred)
         self.assertIsNotNone(related_person.person)
         self.assertEqual(related_person.person.name, "Alex Rivera")
-        self.assertEqual(PersonLink.objects.get(related_person=related_person).person, related_person.person)
-        self.assertEqual(CareTeamParticipant.objects.get().related_person, related_person)
+        self.assertEqual(
+            PersonLink.objects.get(related_person=related_person).person,
+            related_person.person,
+        )
+        self.assertEqual(
+            CareTeamParticipant.objects.get().related_person, related_person
+        )
 
     def test_imports_person_and_group(self):
         result = import_fhir_json(
@@ -1751,8 +2025,14 @@ class FHIRImportTests(TestCase):
                             "birthDate": "1980-04-05",
                             "managingOrganization": {"reference": "Organization/org-1"},
                             "link": [
-                                {"target": {"reference": "RelatedPerson/rp-1"}, "assurance": "level3"},
-                                {"target": {"reference": "Practitioner/prac-1"}, "assurance": "level1"},
+                                {
+                                    "target": {"reference": "RelatedPerson/rp-1"},
+                                    "assurance": "level3",
+                                },
+                                {
+                                    "target": {"reference": "Practitioner/prac-1"},
+                                    "assurance": "level1",
+                                },
                             ],
                         }
                     },
@@ -1776,7 +2056,10 @@ class FHIRImportTests(TestCase):
                             ],
                             "member": [
                                 {"entity": {"reference": "Patient/pat-1"}},
-                                {"entity": {"reference": "Device/device-1"}, "inactive": False},
+                                {
+                                    "entity": {"reference": "Device/device-1"},
+                                    "inactive": False,
+                                },
                             ],
                         }
                     },
@@ -1790,30 +2073,95 @@ class FHIRImportTests(TestCase):
         self.assertEqual(related_person.person, person)
         self.assertEqual(person.managing_organization, Organization.objects.get())
         self.assertEqual(person.link_records.count(), 2)
-        self.assertEqual(PersonLink.objects.get(related_person=related_person).assurance, "level3")
-        self.assertEqual(PersonLink.objects.get(practitioner=Practitioner.objects.get()).assurance, "level1")
+        self.assertEqual(
+            PersonLink.objects.get(related_person=related_person).assurance, "level3"
+        )
+        self.assertEqual(
+            PersonLink.objects.get(practitioner=Practitioner.objects.get()).assurance,
+            "level1",
+        )
 
         group = FHIRGroup.objects.get()
         self.assertEqual(group.name, "Rivera household")
         self.assertEqual(group.managing_related_person, related_person)
         self.assertIn("Lives together", group.characteristic_summary)
         self.assertEqual(group.member_links.count(), 2)
-        self.assertEqual(FHIRGroupMember.objects.get(patient=PatientProfile.objects.get()).group, group)
-        self.assertEqual(FHIRGroupMember.objects.get(device=Device.objects.get()).group, group)
+        self.assertEqual(
+            FHIRGroupMember.objects.get(patient=PatientProfile.objects.get()).group,
+            group,
+        )
+        self.assertEqual(
+            FHIRGroupMember.objects.get(device=Device.objects.get()).group, group
+        )
 
     def test_imports_goal_risk_body_structure_and_device_resources(self):
         payload = {
             "resourceType": "Bundle",
             "type": "collection",
             "entry": [
-                {"resource": {"resourceType": "Patient", "id": "pat-1", "name": [{"family": "Rivera", "given": ["Maya"]}]}},
-                {"resource": {"resourceType": "Practitioner", "id": "prac-1", "name": [{"family": "Nguyen", "given": ["Ari"]}]}},
-                {"resource": {"resourceType": "Organization", "id": "org-1", "name": "Example Clinic"}},
-                {"resource": {"resourceType": "Encounter", "id": "enc-1", "subject": {"reference": "Patient/pat-1"}}},
-                {"resource": {"resourceType": "Condition", "id": "cond-1", "subject": {"reference": "Patient/pat-1"}, "code": {"text": "Fall risk"}}},
-                {"resource": {"resourceType": "Observation", "id": "obs-1", "subject": {"reference": "Patient/pat-1"}, "code": {"text": "Gait score"}, "valueString": "Unsteady"}},
-                {"resource": {"resourceType": "Device", "id": "device-1", "patient": {"reference": "Patient/pat-1"}, "type": {"text": "Walker"}}},
-                {"resource": {"resourceType": "ServiceRequest", "id": "sr-1", "subject": {"reference": "Patient/pat-1"}, "status": "active", "intent": "order", "code": {"text": "PT evaluation"}}},
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "id": "pat-1",
+                        "name": [{"family": "Rivera", "given": ["Maya"]}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Practitioner",
+                        "id": "prac-1",
+                        "name": [{"family": "Nguyen", "given": ["Ari"]}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Organization",
+                        "id": "org-1",
+                        "name": "Example Clinic",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Encounter",
+                        "id": "enc-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Condition",
+                        "id": "cond-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "code": {"text": "Fall risk"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Observation",
+                        "id": "obs-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "code": {"text": "Gait score"},
+                        "valueString": "Unsteady",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Device",
+                        "id": "device-1",
+                        "patient": {"reference": "Patient/pat-1"},
+                        "type": {"text": "Walker"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ServiceRequest",
+                        "id": "sr-1",
+                        "subject": {"reference": "Patient/pat-1"},
+                        "status": "active",
+                        "intent": "order",
+                        "code": {"text": "PT evaluation"},
+                    }
+                },
                 {
                     "resource": {
                         "resourceType": "DiagnosticReport",
@@ -1837,7 +2185,13 @@ class FHIRImportTests(TestCase):
                             {"reference": "Observation/obs-1"},
                             {"reference": "DiagnosticReport/dr-1"},
                         ],
-                        "prediction": [{"outcome": {"text": "Fall"}, "probabilityDecimal": 0.2, "qualitativeRisk": {"text": "moderate"}}],
+                        "prediction": [
+                            {
+                                "outcome": {"text": "Fall"},
+                                "probabilityDecimal": 0.2,
+                                "qualitativeRisk": {"text": "moderate"},
+                            }
+                        ],
                         "mitigation": "Use walker.",
                     }
                 },
@@ -1855,7 +2209,13 @@ class FHIRImportTests(TestCase):
                             {"reference": "Observation/obs-1"},
                             {"reference": "RiskAssessment/risk-1"},
                         ],
-                        "target": [{"measure": {"text": "Falls"}, "detailInteger": 0, "dueDate": "2024-05-01"}],
+                        "target": [
+                            {
+                                "measure": {"text": "Falls"},
+                                "detailInteger": 0,
+                                "dueDate": "2024-05-01",
+                            }
+                        ],
                         "outcomeReference": [{"reference": "Observation/obs-1"}],
                     }
                 },
@@ -1927,19 +2287,27 @@ class FHIRImportTests(TestCase):
         self.assertEqual(goal.addresses_risk_assessments.get(), risk)
         self.assertEqual(goal.outcome_observations.get(), Observation.objects.get())
 
-        self.assertEqual(BodyStructure.objects.get().description, "Left knee surgical site")
+        self.assertEqual(
+            BodyStructure.objects.get().description, "Left knee surgical site"
+        )
 
         device_request = DeviceRequest.objects.get()
         self.assertEqual(device_request.devices.get(), Device.objects.get())
-        self.assertEqual(device_request.service_requests.get(), ServiceRequest.objects.get())
+        self.assertEqual(
+            device_request.service_requests.get(), ServiceRequest.objects.get()
+        )
         self.assertEqual(device_request.conditions.get(), Condition.objects.get())
         self.assertEqual(device_request.risk_assessments.get(), risk)
-        self.assertEqual(device_request.performers_organizations.get(), Organization.objects.get())
+        self.assertEqual(
+            device_request.performers_organizations.get(), Organization.objects.get()
+        )
 
         device_use = DeviceUseStatement.objects.get()
         self.assertEqual(device_use.device, Device.objects.get())
         self.assertEqual(device_use.source_practitioner, Practitioner.objects.get())
-        self.assertEqual(device_use.based_on_service_requests.get(), ServiceRequest.objects.get())
+        self.assertEqual(
+            device_use.based_on_service_requests.get(), ServiceRequest.objects.get()
+        )
         self.assertEqual(device_use.based_on_device_requests.get(), device_request)
         self.assertEqual(device_use.reason_conditions.get(), Condition.objects.get())
         self.assertEqual(device_use.reason_risk_assessments.get(), risk)
@@ -1948,19 +2316,143 @@ class FHIRImportTests(TestCase):
         payload = {
             "resourceType": "Bundle",
             "entry": [
-                {"resource": {"resourceType": "Patient", "id": "pat-quality", "name": [{"family": "Rivera", "given": ["Maya"]}]}},
-                {"resource": {"resourceType": "Organization", "id": "payer-1", "name": "Acme Health Plan"}},
-                {"resource": {"resourceType": "Coverage", "id": "coverage-1", "beneficiary": {"reference": "Patient/pat-quality"}, "payor": [{"reference": "Organization/payer-1"}], "status": "active"}},
-                {"resource": {"resourceType": "Measure", "id": "measure-1", "title": "Screening Measure", "status": "active", "scoring": {"text": "proportion"}}},
-                {"resource": {"resourceType": "MeasureReport", "id": "measure-report-1", "status": "complete", "type": "individual", "subject": {"reference": "Patient/pat-quality"}, "measure": "Measure/measure-1"}},
-                {"resource": {"resourceType": "TestScript", "id": "testscript-1", "title": "FHIR Smoke Test", "status": "active"}},
-                {"resource": {"resourceType": "TestReport", "id": "testreport-1", "name": "FHIR Smoke Report", "status": "completed", "result": "pass", "testScript": {"reference": "TestScript/testscript-1"}}},
-                {"resource": {"resourceType": "CoverageEligibilityRequest", "id": "eligibility-request-1", "status": "active", "purpose": ["benefits"], "patient": {"reference": "Patient/pat-quality"}, "insurer": {"reference": "Organization/payer-1"}, "insurance": [{"coverage": {"reference": "Coverage/coverage-1"}}], "item": [{"category": {"text": "medical"}, "productOrService": {"text": "office visit"}}]}},
-                {"resource": {"resourceType": "CoverageEligibilityResponse", "id": "eligibility-response-1", "status": "active", "purpose": ["benefits"], "outcome": "complete", "patient": {"reference": "Patient/pat-quality"}, "request": {"reference": "CoverageEligibilityRequest/eligibility-request-1"}, "insurer": {"reference": "Organization/payer-1"}}},
-                {"resource": {"resourceType": "EnrollmentRequest", "id": "enrollment-request-1", "status": "active", "candidate": {"reference": "Patient/pat-quality"}, "insurer": {"reference": "Organization/payer-1"}, "coverage": {"reference": "Coverage/coverage-1"}}},
-                {"resource": {"resourceType": "EnrollmentResponse", "id": "enrollment-response-1", "status": "active", "outcome": "complete", "request": {"reference": "EnrollmentRequest/enrollment-request-1"}, "organization": {"reference": "Organization/payer-1"}}},
-                {"resource": {"resourceType": "PaymentNotice", "id": "payment-notice-1", "status": "active", "recipient": {"reference": "Organization/payer-1"}, "amount": {"value": 10, "currency": "USD"}, "request": {"reference": "CoverageEligibilityRequest/eligibility-request-1"}}},
-                {"resource": {"resourceType": "PaymentReconciliation", "id": "payment-reconciliation-1", "status": "active", "outcome": "complete", "paymentIssuer": {"reference": "Organization/payer-1"}, "paymentAmount": {"value": 10, "currency": "USD"}}},
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "id": "pat-quality",
+                        "name": [{"family": "Rivera", "given": ["Maya"]}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Organization",
+                        "id": "payer-1",
+                        "name": "Acme Health Plan",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Coverage",
+                        "id": "coverage-1",
+                        "beneficiary": {"reference": "Patient/pat-quality"},
+                        "payor": [{"reference": "Organization/payer-1"}],
+                        "status": "active",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Measure",
+                        "id": "measure-1",
+                        "title": "Screening Measure",
+                        "status": "active",
+                        "scoring": {"text": "proportion"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "MeasureReport",
+                        "id": "measure-report-1",
+                        "status": "complete",
+                        "type": "individual",
+                        "subject": {"reference": "Patient/pat-quality"},
+                        "measure": "Measure/measure-1",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "TestScript",
+                        "id": "testscript-1",
+                        "title": "FHIR Smoke Test",
+                        "status": "active",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "TestReport",
+                        "id": "testreport-1",
+                        "name": "FHIR Smoke Report",
+                        "status": "completed",
+                        "result": "pass",
+                        "testScript": {"reference": "TestScript/testscript-1"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "CoverageEligibilityRequest",
+                        "id": "eligibility-request-1",
+                        "status": "active",
+                        "purpose": ["benefits"],
+                        "patient": {"reference": "Patient/pat-quality"},
+                        "insurer": {"reference": "Organization/payer-1"},
+                        "insurance": [
+                            {"coverage": {"reference": "Coverage/coverage-1"}}
+                        ],
+                        "item": [
+                            {
+                                "category": {"text": "medical"},
+                                "productOrService": {"text": "office visit"},
+                            }
+                        ],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "CoverageEligibilityResponse",
+                        "id": "eligibility-response-1",
+                        "status": "active",
+                        "purpose": ["benefits"],
+                        "outcome": "complete",
+                        "patient": {"reference": "Patient/pat-quality"},
+                        "request": {
+                            "reference": "CoverageEligibilityRequest/eligibility-request-1"
+                        },
+                        "insurer": {"reference": "Organization/payer-1"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "EnrollmentRequest",
+                        "id": "enrollment-request-1",
+                        "status": "active",
+                        "candidate": {"reference": "Patient/pat-quality"},
+                        "insurer": {"reference": "Organization/payer-1"},
+                        "coverage": {"reference": "Coverage/coverage-1"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "EnrollmentResponse",
+                        "id": "enrollment-response-1",
+                        "status": "active",
+                        "outcome": "complete",
+                        "request": {
+                            "reference": "EnrollmentRequest/enrollment-request-1"
+                        },
+                        "organization": {"reference": "Organization/payer-1"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "PaymentNotice",
+                        "id": "payment-notice-1",
+                        "status": "active",
+                        "recipient": {"reference": "Organization/payer-1"},
+                        "amount": {"value": 10, "currency": "USD"},
+                        "request": {
+                            "reference": "CoverageEligibilityRequest/eligibility-request-1"
+                        },
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "PaymentReconciliation",
+                        "id": "payment-reconciliation-1",
+                        "status": "active",
+                        "outcome": "complete",
+                        "paymentIssuer": {"reference": "Organization/payer-1"},
+                        "paymentAmount": {"value": 10, "currency": "USD"},
+                    }
+                },
             ],
         }
 
@@ -1968,24 +2460,111 @@ class FHIRImportTests(TestCase):
 
         self.assertEqual(result.errors, [])
         self.assertEqual(Measure.objects.get().title, "Screening Measure")
-        self.assertEqual(MeasureReport.objects.get().patient, PatientProfile.objects.get())
+        self.assertEqual(
+            MeasureReport.objects.get().patient, PatientProfile.objects.get()
+        )
         self.assertEqual(TestReport.objects.get().test_script, TestScript.objects.get())
-        self.assertEqual(CoverageEligibilityRequest.objects.get().patient, PatientProfile.objects.get())
-        self.assertEqual(CoverageEligibilityResponse.objects.get().request, CoverageEligibilityRequest.objects.get())
-        self.assertEqual(EnrollmentRequest.objects.get().coverage, Coverage.objects.get())
-        self.assertEqual(EnrollmentResponse.objects.get().request, EnrollmentRequest.objects.get())
-        self.assertEqual(PaymentNotice.objects.get().recipient, Organization.objects.get())
-        self.assertEqual(PaymentReconciliation.objects.get().payment_issuer, Organization.objects.get())
+        self.assertEqual(
+            CoverageEligibilityRequest.objects.get().patient,
+            PatientProfile.objects.get(),
+        )
+        self.assertEqual(
+            CoverageEligibilityResponse.objects.get().request,
+            CoverageEligibilityRequest.objects.get(),
+        )
+        self.assertEqual(
+            EnrollmentRequest.objects.get().coverage, Coverage.objects.get()
+        )
+        self.assertEqual(
+            EnrollmentResponse.objects.get().request, EnrollmentRequest.objects.get()
+        )
+        self.assertEqual(
+            PaymentNotice.objects.get().recipient, Organization.objects.get()
+        )
+        self.assertEqual(
+            PaymentReconciliation.objects.get().payment_issuer,
+            Organization.objects.get(),
+        )
 
     def test_imports_terminology_and_knowledge_resources(self):
         payload = {
             "resourceType": "Bundle",
             "entry": [
-                {"resource": {"resourceType": "CodeSystem", "id": "codesystem-1", "title": "Local Codes", "status": "active", "content": "complete", "concept": [{"code": "abc", "display": "ABC"}]}},
-                {"resource": {"resourceType": "ValueSet", "id": "valueset-1", "title": "Local Value Set", "status": "active", "compose": {"include": [{"system": "http://example.test/codes", "concept": [{"code": "abc"}]}]}}},
-                {"resource": {"resourceType": "ConceptMap", "id": "conceptmap-1", "title": "Local Map", "status": "active", "sourceUri": "http://example.test/source", "targetUri": "http://example.test/target", "group": [{"source": "source", "target": "target", "element": [{"code": "abc", "target": [{"code": "xyz", "equivalence": "equivalent"}]}]}]}},
-                {"resource": {"resourceType": "Library", "id": "library-1", "title": "Logic Library", "status": "active", "type": {"text": "logic-library"}, "content": [{"contentType": "text/cql", "title": "logic.cql"}]}},
-                {"resource": {"resourceType": "PlanDefinition", "id": "plandefinition-1", "title": "Care Protocol", "status": "active", "type": {"text": "clinical-protocol"}, "action": [{"title": "Review chart", "description": "Review relevant records"}]}},
+                {
+                    "resource": {
+                        "resourceType": "CodeSystem",
+                        "id": "codesystem-1",
+                        "title": "Local Codes",
+                        "status": "active",
+                        "content": "complete",
+                        "concept": [{"code": "abc", "display": "ABC"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ValueSet",
+                        "id": "valueset-1",
+                        "title": "Local Value Set",
+                        "status": "active",
+                        "compose": {
+                            "include": [
+                                {
+                                    "system": "http://example.test/codes",
+                                    "concept": [{"code": "abc"}],
+                                }
+                            ]
+                        },
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ConceptMap",
+                        "id": "conceptmap-1",
+                        "title": "Local Map",
+                        "status": "active",
+                        "sourceUri": "http://example.test/source",
+                        "targetUri": "http://example.test/target",
+                        "group": [
+                            {
+                                "source": "source",
+                                "target": "target",
+                                "element": [
+                                    {
+                                        "code": "abc",
+                                        "target": [
+                                            {"code": "xyz", "equivalence": "equivalent"}
+                                        ],
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "Library",
+                        "id": "library-1",
+                        "title": "Logic Library",
+                        "status": "active",
+                        "type": {"text": "logic-library"},
+                        "content": [{"contentType": "text/cql", "title": "logic.cql"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "PlanDefinition",
+                        "id": "plandefinition-1",
+                        "title": "Care Protocol",
+                        "status": "active",
+                        "type": {"text": "clinical-protocol"},
+                        "action": [
+                            {
+                                "title": "Review chart",
+                                "description": "Review relevant records",
+                            }
+                        ],
+                    }
+                },
             ],
         }
 
@@ -1995,31 +2574,177 @@ class FHIRImportTests(TestCase):
         self.assertEqual(CodeSystem.objects.get().title, "Local Codes")
         self.assertIn("abc", CodeSystem.objects.get().concept_summary)
         self.assertEqual(ValueSet.objects.get().title, "Local Value Set")
-        self.assertIn("http://example.test/codes", ValueSet.objects.get().compose_summary)
-        self.assertEqual(ConceptMap.objects.get().source_uri, "http://example.test/source")
+        self.assertIn(
+            "http://example.test/codes", ValueSet.objects.get().compose_summary
+        )
+        self.assertEqual(
+            ConceptMap.objects.get().source_uri, "http://example.test/source"
+        )
         self.assertEqual(Library.objects.get().library_type, "logic-library")
         self.assertIn("logic.cql", Library.objects.get().content_summary)
         self.assertEqual(PlanDefinition.objects.get().plan_type, "clinical-protocol")
         self.assertIn("Review chart", PlanDefinition.objects.get().action_summary)
+
     def test_imports_metadata_definition_resources(self):
         payload = {
             "resourceType": "Bundle",
             "entry": [
-                {"resource": {"resourceType": "CapabilityStatement", "id": "capability-1", "title": "Server Capabilities", "status": "active", "kind": "capability", "fhirVersion": "4.0.1", "format": ["json"]}},
-                {"resource": {"resourceType": "StructureDefinition", "id": "structure-1", "title": "Patient Profile", "status": "active", "kind": "resource", "type": "Patient", "abstract": False}},
-                {"resource": {"resourceType": "ImplementationGuide", "id": "ig-1", "title": "Local IG", "status": "active", "packageId": "local.fhir", "fhirVersion": ["4.0.1"]}},
-                {"resource": {"resourceType": "SearchParameter", "id": "search-1", "name": "PatientName", "status": "active", "code": "name", "base": ["Patient"], "type": "string", "expression": "Patient.name"}},
-                {"resource": {"resourceType": "MessageDefinition", "id": "message-1", "title": "ADT Message", "status": "active", "eventUri": "http://example.test/event", "category": "notification"}},
-                {"resource": {"resourceType": "OperationDefinition", "id": "operation-1", "title": "Everything", "status": "active", "kind": "operation", "code": "everything", "system": True}},
-                {"resource": {"resourceType": "CompartmentDefinition", "id": "compartment-1", "name": "Patient", "status": "active", "code": "Patient", "search": True}},
-                {"resource": {"resourceType": "StructureMap", "id": "map-1", "title": "Patient Map", "status": "active", "structure": [{"url": "StructureDefinition/Patient", "mode": "source"}]}},
-                {"resource": {"resourceType": "GraphDefinition", "id": "graph-1", "title": "Patient Graph", "status": "active", "start": "Patient", "link": [{"path": "Patient.generalPractitioner"}]}},
-                {"resource": {"resourceType": "ExampleScenario", "id": "scenario-1", "title": "Scheduling Scenario", "status": "active", "actor": [{"actorId": "patient", "name": "Patient"}]}},
-                {"resource": {"resourceType": "NamingSystem", "id": "naming-1", "name": "Local IDs", "status": "active", "kind": "identifier", "uniqueId": [{"type": "uri", "value": "http://example.test/ids"}]}},
-                {"resource": {"resourceType": "TerminologyCapabilities", "id": "termcap-1", "title": "Terminology Capabilities", "status": "active", "kind": "capability", "codeSystem": [{"uri": "http://loinc.org"}]}},
-                {"resource": {"resourceType": "ActivityDefinition", "id": "activity-1", "title": "Order Lab", "status": "active", "kind": "ServiceRequest", "intent": "order", "code": {"text": "CBC"}}},
-                {"resource": {"resourceType": "EventDefinition", "id": "event-1", "title": "Patient Arrived", "status": "active", "trigger": [{"type": "named-event", "name": "patient-arrived"}]}},
-                {"resource": {"resourceType": "SpecimenDefinition", "id": "specdef-1", "url": "http://example.test/specimen", "status": "active", "typeCollected": {"text": "Blood"}}},
+                {
+                    "resource": {
+                        "resourceType": "CapabilityStatement",
+                        "id": "capability-1",
+                        "title": "Server Capabilities",
+                        "status": "active",
+                        "kind": "capability",
+                        "fhirVersion": "4.0.1",
+                        "format": ["json"],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "StructureDefinition",
+                        "id": "structure-1",
+                        "title": "Patient Profile",
+                        "status": "active",
+                        "kind": "resource",
+                        "type": "Patient",
+                        "abstract": False,
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ImplementationGuide",
+                        "id": "ig-1",
+                        "title": "Local IG",
+                        "status": "active",
+                        "packageId": "local.fhir",
+                        "fhirVersion": ["4.0.1"],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "SearchParameter",
+                        "id": "search-1",
+                        "name": "PatientName",
+                        "status": "active",
+                        "code": "name",
+                        "base": ["Patient"],
+                        "type": "string",
+                        "expression": "Patient.name",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "MessageDefinition",
+                        "id": "message-1",
+                        "title": "ADT Message",
+                        "status": "active",
+                        "eventUri": "http://example.test/event",
+                        "category": "notification",
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "OperationDefinition",
+                        "id": "operation-1",
+                        "title": "Everything",
+                        "status": "active",
+                        "kind": "operation",
+                        "code": "everything",
+                        "system": True,
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "CompartmentDefinition",
+                        "id": "compartment-1",
+                        "name": "Patient",
+                        "status": "active",
+                        "code": "Patient",
+                        "search": True,
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "StructureMap",
+                        "id": "map-1",
+                        "title": "Patient Map",
+                        "status": "active",
+                        "structure": [
+                            {"url": "StructureDefinition/Patient", "mode": "source"}
+                        ],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "GraphDefinition",
+                        "id": "graph-1",
+                        "title": "Patient Graph",
+                        "status": "active",
+                        "start": "Patient",
+                        "link": [{"path": "Patient.generalPractitioner"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ExampleScenario",
+                        "id": "scenario-1",
+                        "title": "Scheduling Scenario",
+                        "status": "active",
+                        "actor": [{"actorId": "patient", "name": "Patient"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "NamingSystem",
+                        "id": "naming-1",
+                        "name": "Local IDs",
+                        "status": "active",
+                        "kind": "identifier",
+                        "uniqueId": [
+                            {"type": "uri", "value": "http://example.test/ids"}
+                        ],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "TerminologyCapabilities",
+                        "id": "termcap-1",
+                        "title": "Terminology Capabilities",
+                        "status": "active",
+                        "kind": "capability",
+                        "codeSystem": [{"uri": "http://loinc.org"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "ActivityDefinition",
+                        "id": "activity-1",
+                        "title": "Order Lab",
+                        "status": "active",
+                        "kind": "ServiceRequest",
+                        "intent": "order",
+                        "code": {"text": "CBC"},
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "EventDefinition",
+                        "id": "event-1",
+                        "title": "Patient Arrived",
+                        "status": "active",
+                        "trigger": [{"type": "named-event", "name": "patient-arrived"}],
+                    }
+                },
+                {
+                    "resource": {
+                        "resourceType": "SpecimenDefinition",
+                        "id": "specdef-1",
+                        "url": "http://example.test/specimen",
+                        "status": "active",
+                        "typeCollected": {"text": "Blood"},
+                    }
+                },
             ],
         }
 
@@ -2030,17 +2755,24 @@ class FHIRImportTests(TestCase):
         self.assertEqual(StructureDefinition.objects.get().type_code, "Patient")
         self.assertEqual(ImplementationGuide.objects.get().package_id, "local.fhir")
         self.assertEqual(SearchParameter.objects.get().code, "name")
-        self.assertEqual(MessageDefinition.objects.get().event, "http://example.test/event")
+        self.assertEqual(
+            MessageDefinition.objects.get().event, "http://example.test/event"
+        )
         self.assertEqual(OperationDefinition.objects.get().code, "everything")
         self.assertEqual(CompartmentDefinition.objects.get().code, "Patient")
-        self.assertIn("StructureDefinition/Patient", StructureMap.objects.get().structure_summary)
+        self.assertIn(
+            "StructureDefinition/Patient", StructureMap.objects.get().structure_summary
+        )
         self.assertEqual(GraphDefinition.objects.get().start, "Patient")
         self.assertIn("patient", ExampleScenario.objects.get().actor_summary)
         self.assertEqual(NamingSystem.objects.get().kind, "identifier")
         self.assertEqual(TerminologyCapabilities.objects.get().kind, "capability")
-        self.assertEqual(ActivityDefinition.objects.get().activity_kind, "ServiceRequest")
+        self.assertEqual(
+            ActivityDefinition.objects.get().activity_kind, "ServiceRequest"
+        )
         self.assertIn("patient-arrived", EventDefinition.objects.get().trigger_summary)
         self.assertEqual(SpecimenDefinition.objects.get().specimen_type, "Blood")
+
     def test_missing_patient_reference_is_snapshotted_as_invalid(self):
         result = import_fhir_json(
             {
@@ -2055,8 +2787,12 @@ class FHIRImportTests(TestCase):
         self.assertEqual(len(result.errors), 1)
         snapshot = FHIRResourceSnapshot.objects.get()
         self.assertFalse(snapshot.is_valid)
-        self.assertEqual(snapshot.import_status, FHIRResourceSnapshot.IMPORT_STATUS_INVALID)
-        self.assertEqual(snapshot.validation_errors, ["Missing or unknown patient reference."])
+        self.assertEqual(
+            snapshot.import_status, FHIRResourceSnapshot.IMPORT_STATUS_INVALID
+        )
+        self.assertEqual(
+            snapshot.validation_errors, ["Missing or unknown patient reference."]
+        )
 
     def test_unsupported_resource_is_preserved_as_valid_snapshot_only(self):
         result = import_fhir_json(
@@ -2073,7 +2809,9 @@ class FHIRImportTests(TestCase):
         self.assertEqual(result.errors, [])
         snapshot = FHIRResourceSnapshot.objects.get()
         self.assertTrue(snapshot.is_valid)
-        self.assertEqual(snapshot.import_status, FHIRResourceSnapshot.IMPORT_STATUS_SNAPSHOT_ONLY)
+        self.assertEqual(
+            snapshot.import_status, FHIRResourceSnapshot.IMPORT_STATUS_SNAPSHOT_ONLY
+        )
         self.assertEqual(snapshot.validation_errors, [])
         self.assertEqual(snapshot.resource_type, "CustomUnsupported")
 
@@ -2092,7 +2830,9 @@ class FHIRImportTests(TestCase):
             "export.ndjson",
         )
 
-        self.assertEqual([payload["resourceType"] for payload in payloads], ["Patient", "Condition"])
+        self.assertEqual(
+            [payload["resourceType"] for payload in payloads], ["Patient", "Condition"]
+        )
 
     def test_form_accepts_mychart_zip_export(self):
         archive_content = BytesIO()
@@ -2220,14 +2960,19 @@ class FHIRImportTests(TestCase):
             database_path.write_bytes(b"encrypted database bytes")
             fake_connections = {"default": Mock()}
 
-            with patch("fhir.backups.settings.DATABASES", {"default": {"NAME": str(database_path)}}):
+            with patch(
+                "fhir.backups.settings.DATABASES",
+                {"default": {"NAME": str(database_path)}},
+            ):
                 with patch("fhir.backups.connections", fake_connections):
                     backup_path = create_pre_import_database_backup()
 
             self.assertIsNotNone(backup_path)
             self.assertTrue(backup_path.exists())
             self.assertEqual(backup_path.read_bytes(), b"encrypted database bytes")
-            self.assertEqual(backup_path.parent, database_path.parent / "backups" / "fhir-imports")
+            self.assertEqual(
+                backup_path.parent, database_path.parent / "backups" / "fhir-imports"
+            )
             self.assertIn(".pre-fhir-import.", backup_path.name)
             fake_connections["default"].close.assert_called_once()
 
@@ -2237,17 +2982,28 @@ class FHIRImportTests(TestCase):
             database_path.write_bytes(b"live")
             backup_dir = Path(temp_dir) / "backups" / "fhir-imports"
             backup_dir.mkdir(parents=True)
-            older = backup_dir / "holyfhir.encrypted.pre-fhir-import.20260426-120000.sqlite3"
-            newer = backup_dir / "holyfhir.encrypted.pre-fhir-import.20260426-130000.sqlite3"
+            older = (
+                backup_dir
+                / "holyfhir.encrypted.pre-fhir-import.20260426-120000.sqlite3"
+            )
+            newer = (
+                backup_dir
+                / "holyfhir.encrypted.pre-fhir-import.20260426-130000.sqlite3"
+            )
             ignored = backup_dir / "notes.txt"
             older.write_bytes(b"older")
             newer.write_bytes(b"newer")
             ignored.write_text("not a backup")
 
-            with patch("fhir.backups.settings.DATABASES", {"default": {"NAME": str(database_path)}}):
+            with patch(
+                "fhir.backups.settings.DATABASES",
+                {"default": {"NAME": str(database_path)}},
+            ):
                 backups = list_fhir_import_database_backups()
 
-            self.assertEqual([backup.name for backup in backups], [newer.name, older.name])
+            self.assertEqual(
+                [backup.name for backup in backups], [newer.name, older.name]
+            )
             self.assertEqual(backups[0].size_bytes, 5)
 
     def test_import_page_creates_pre_import_backup(self):
@@ -2264,7 +3020,10 @@ class FHIRImportTests(TestCase):
             "name": [{"family": "Rivera", "given": ["Maya"]}],
         }
 
-        with patch("fhir.views.create_pre_import_database_backup", return_value=Path("backup.sqlite3")) as backup:
+        with patch(
+            "fhir.views.create_pre_import_database_backup",
+            return_value=Path("backup.sqlite3"),
+        ) as backup:
             response = self.client.post(
                 reverse("fhir_import"),
                 {"action": "import_fhir", "fhir_json": json.dumps(payload)},
@@ -2273,9 +3032,19 @@ class FHIRImportTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         backup.assert_called_once()
-        self.assertEqual(PatientProfile.objects.filter(first_name="Maya", last_name="Rivera").count(), 1)
+        self.assertEqual(
+            PatientProfile.objects.filter(
+                first_name="Maya", last_name="Rivera"
+            ).count(),
+            1,
+        )
         messages = [str(message) for message in get_messages(response.wsgi_request)]
-        self.assertTrue(any("Pre-import database backup created: backup.sqlite3" in message for message in messages))
+        self.assertTrue(
+            any(
+                "Pre-import database backup created: backup.sqlite3" in message
+                for message in messages
+            )
+        )
 
     def test_import_page_stops_if_pre_import_backup_fails(self):
         User = get_user_model()
@@ -2291,19 +3060,23 @@ class FHIRImportTests(TestCase):
             "name": [{"family": "Rivera", "given": ["Maya"]}],
         }
 
-        with patch("fhir.views.create_pre_import_database_backup", side_effect=OSError("disk is full")):
+        with patch(
+            "fhir.views.create_pre_import_database_backup",
+            side_effect=OSError("disk is full"),
+        ):
             response = self.client.post(
                 reverse("fhir_import"),
                 {"action": "import_fhir", "fhir_json": json.dumps(payload)},
             )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(PatientProfile.objects.filter(first_name="Maya", last_name="Rivera").count(), 0)
+        self.assertEqual(
+            PatientProfile.objects.filter(
+                first_name="Maya", last_name="Rivera"
+            ).count(),
+            0,
+        )
         messages = [str(message) for message in get_messages(response.wsgi_request)]
-        self.assertTrue(any("database backup failed" in message for message in messages))
-
-
-
-
-
-
+        self.assertTrue(
+            any("database backup failed" in message for message in messages)
+        )

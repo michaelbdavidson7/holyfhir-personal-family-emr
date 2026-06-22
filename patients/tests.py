@@ -23,7 +23,11 @@ from config.env import load_env, parse_env_file
 from patients.models import LoginLockout
 from patients.forms import RecoveryKeyPasswordResetForm
 from patients.models import PatientProfile, RecoveryCredential
-from patients.recovery import check_recovery_key, generate_recovery_key, hash_recovery_key
+from patients.recovery import (
+    check_recovery_key,
+    generate_recovery_key,
+    hash_recovery_key,
+)
 from clinical.models import CareTeam, RelatedPerson
 
 
@@ -45,13 +49,20 @@ class DatabaseConfigTests(SimpleTestCase):
 
         self.assertEqual(databases["default"]["ENGINE"], "config.db.backends.sqlcipher")
         self.assertEqual(databases["default"]["OPTIONS"]["passphrase"], "super-secret")
-        self.assertEqual(databases["default"]["OPTIONS"]["cipher_page_size"], DEFAULT_DATABASE_CIPHER_PAGE_SIZE)
-        self.assertEqual(databases["default"]["OPTIONS"]["kdf_iter"], DEFAULT_DATABASE_KDF_ITER)
+        self.assertEqual(
+            databases["default"]["OPTIONS"]["cipher_page_size"],
+            DEFAULT_DATABASE_CIPHER_PAGE_SIZE,
+        )
+        self.assertEqual(
+            databases["default"]["OPTIONS"]["kdf_iter"], DEFAULT_DATABASE_KDF_ITER
+        )
         self.assertEqual(
             databases["default"]["OPTIONS"]["cipher_compatibility"],
             DEFAULT_DATABASE_CIPHER_COMPATIBILITY,
         )
-        self.assertEqual(databases["default"]["OPTIONS"]["timeout"], DEFAULT_DATABASE_TIMEOUT)
+        self.assertEqual(
+            databases["default"]["OPTIONS"]["timeout"], DEFAULT_DATABASE_TIMEOUT
+        )
 
     def test_can_override_database_defaults(self):
         with patch.dict(
@@ -86,6 +97,7 @@ class DatabaseConfigTests(SimpleTestCase):
             database_path = Path(temp_dir) / "missing.sqlite3"
 
             self.assertFalse(_is_plaintext_sqlite_database(database_path))
+
 
 class EnvFileTests(SimpleTestCase):
     def test_env_example_contains_supported_settings_keys(self):
@@ -137,8 +149,12 @@ class EnvFileTests(SimpleTestCase):
     def test_load_env_requires_env_to_match_example_keys(self):
         with TemporaryDirectory() as temp_dir:
             base_dir = Path(temp_dir)
-            (base_dir / ".env.example").write_text("DATABASE_NAME=db.sqlite3\nDATABASE_TIMEOUT=20.0\n", encoding="utf-8")
-            (base_dir / ".env").write_text("DATABASE_NAME=db.sqlite3\n", encoding="utf-8")
+            (base_dir / ".env.example").write_text(
+                "DATABASE_NAME=db.sqlite3\nDATABASE_TIMEOUT=20.0\n", encoding="utf-8"
+            )
+            (base_dir / ".env").write_text(
+                "DATABASE_NAME=db.sqlite3\n", encoding="utf-8"
+            )
 
             with patch.dict("os.environ", {}, clear=True):
                 with self.assertRaises(ImproperlyConfigured):
@@ -147,10 +163,17 @@ class EnvFileTests(SimpleTestCase):
     def test_load_env_sets_values_without_overriding_process_environment(self):
         with TemporaryDirectory() as temp_dir:
             base_dir = Path(temp_dir)
-            (base_dir / ".env.example").write_text("DATABASE_NAME=db.sqlite3\nDATABASE_TIMEOUT=20.0\n", encoding="utf-8")
-            (base_dir / ".env").write_text("DATABASE_NAME=from-file.sqlite3\nDATABASE_TIMEOUT=30.0\n", encoding="utf-8")
+            (base_dir / ".env.example").write_text(
+                "DATABASE_NAME=db.sqlite3\nDATABASE_TIMEOUT=20.0\n", encoding="utf-8"
+            )
+            (base_dir / ".env").write_text(
+                "DATABASE_NAME=from-file.sqlite3\nDATABASE_TIMEOUT=30.0\n",
+                encoding="utf-8",
+            )
 
-            with patch.dict("os.environ", {"DATABASE_NAME": "from-shell.sqlite3"}, clear=True):
+            with patch.dict(
+                "os.environ", {"DATABASE_NAME": "from-shell.sqlite3"}, clear=True
+            ):
                 load_env(base_dir)
 
                 self.assertEqual(os.environ["DATABASE_NAME"], "from-shell.sqlite3")
@@ -159,7 +182,9 @@ class EnvFileTests(SimpleTestCase):
     def test_load_env_allows_required_key_from_process_environment(self):
         with TemporaryDirectory() as temp_dir:
             base_dir = Path(temp_dir)
-            (base_dir / ".env.example").write_text("TIME_ZONE=America/New_York\n", encoding="utf-8")
+            (base_dir / ".env.example").write_text(
+                "TIME_ZONE=America/New_York\n", encoding="utf-8"
+            )
             (base_dir / ".env").write_text("", encoding="utf-8")
 
             with patch.dict("os.environ", {"TIME_ZONE": "America/Chicago"}, clear=True):
@@ -170,7 +195,9 @@ class EnvFileTests(SimpleTestCase):
     def test_load_env_allows_missing_env_file(self):
         with TemporaryDirectory() as temp_dir:
             base_dir = Path(temp_dir)
-            (base_dir / ".env.example").write_text("DATABASE_NAME=db.sqlite3\n", encoding="utf-8")
+            (base_dir / ".env.example").write_text(
+                "DATABASE_NAME=db.sqlite3\n", encoding="utf-8"
+            )
 
             with patch.dict("os.environ", {}, clear=True):
                 load_env(base_dir)
@@ -189,9 +216,13 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
 
             values = parse_env_file(env_path)
 
-        self.assertNotEqual(values["DATABASE_ENCRYPTION_KEY"], "replace-with-a-strong-passphrase")
+        self.assertNotEqual(
+            values["DATABASE_ENCRYPTION_KEY"], "replace-with-a-strong-passphrase"
+        )
         self.assertGreaterEqual(len(values["DATABASE_ENCRYPTION_KEY"]), 48)
-        self.assertNotEqual(values["SECRET_KEY"], "django-insecure-development-only-change-me")
+        self.assertNotEqual(
+            values["SECRET_KEY"], "django-insecure-development-only-change-me"
+        )
         self.assertEqual(values["DATABASE_NAME"], DEFAULT_DATABASE_NAME)
         self.assertEqual(values["TIME_ZONE"], "America/New_York")
 
@@ -232,7 +263,9 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
         self.assertEqual(backup_count, 1)
         self.assertIn("existing-db-key", backup_content)
 
-    def test_bootstrap_secrets_aborts_before_rewriting_existing_env_without_confirmation(self):
+    def test_bootstrap_secrets_aborts_before_rewriting_existing_env_without_confirmation(
+        self,
+    ):
         with TemporaryDirectory() as temp_dir:
             base_dir = Path(temp_dir)
             env_path = base_dir / ".env"
@@ -287,11 +320,14 @@ class LoginRateLimitTests(TestCase):
 
         username_key = _lockout_key("owner")
 
-        with override_settings(
-            HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_USERNAME=1,
-            HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_CLIENT=20,
-            HOLYFHIR_LOGIN_LOCKOUT_SECONDS=60,
-        ), patch("django.contrib.auth.forms.authenticate", return_value=None):
+        with (
+            override_settings(
+                HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_USERNAME=1,
+                HOLYFHIR_LOGIN_MAX_ATTEMPTS_PER_CLIENT=20,
+                HOLYFHIR_LOGIN_LOCKOUT_SECONDS=60,
+            ),
+            patch("django.contrib.auth.forms.authenticate", return_value=None),
+        ):
             form = RateLimitedAdminAuthenticationForm(
                 request=request,
                 data={"username": "owner", "password": "wrong-password"},
@@ -319,7 +355,9 @@ class RecoveryKeyTests(TestCase):
         recovery_key = generate_recovery_key()
         recovery_hash = hash_recovery_key(recovery_key)
 
-        self.assertTrue(check_recovery_key(recovery_key.lower().replace("-", " "), recovery_hash))
+        self.assertTrue(
+            check_recovery_key(recovery_key.lower().replace("-", " "), recovery_hash)
+        )
 
     def test_recovery_key_reset_form_validates_user_and_key(self):
         User = get_user_model()
@@ -370,12 +408,18 @@ class PatientProfileAdminTests(TestCase):
         CareTeam.objects.create(patient=patient, name="Primary care team")
         self.client.force_login(user)
 
-        response = self.client.get(f"/admin/patients/patientprofile/{patient.pk}/change/")
+        response = self.client.get(
+            f"/admin/patients/patientprofile/{patient.pk}/change/"
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Care Team")
-        self.assertContains(response, f"/admin/clinical/careteam/?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"/admin/clinical/careteam/add/?patient={patient.pk}")
+        self.assertContains(
+            response, f"/admin/clinical/careteam/?patient__id__exact={patient.pk}"
+        )
+        self.assertContains(
+            response, f"/admin/clinical/careteam/add/?patient={patient.pk}"
+        )
 
     def test_patient_profile_shows_related_people_summary(self):
         User = get_user_model()
@@ -393,11 +437,17 @@ class PatientProfileAdminTests(TestCase):
         )
         self.client.force_login(user)
 
-        response = self.client.get(f"/admin/patients/patientprofile/{patient.pk}/change/")
+        response = self.client.get(
+            f"/admin/patients/patientprofile/{patient.pk}/change/"
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Related People")
         self.assertContains(response, "Alex Rivera")
         self.assertContains(response, "Guardian")
-        self.assertContains(response, f"/admin/clinical/relatedperson/?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"/admin/clinical/relatedperson/{related_person.pk}/change/")
+        self.assertContains(
+            response, f"/admin/clinical/relatedperson/?patient__id__exact={patient.pk}"
+        )
+        self.assertContains(
+            response, f"/admin/clinical/relatedperson/{related_person.pk}/change/"
+        )

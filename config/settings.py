@@ -30,59 +30,57 @@ load_env(
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-development-only-change-me')
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-development-only-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_flag('DEBUG', default=True)
+DEBUG = env_flag("DEBUG", default=True)
 
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv('ALLOWED_HOSTS', '').split(',')
-    if host.strip()
+    host.strip() for host in os.getenv("ALLOWED_HOSTS", "").split(",") if host.strip()
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
-    'config.apps.HolyFHIRAuthConfig',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'patients',
-    'clinical',
-    'documents',
-    'fhir',
-    'system_settings',
+    "jazzmin",
+    "django.contrib.admin",
+    "config.apps.HolyFHIRAuthConfig",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "patients",
+    "clinical",
+    "documents",
+    "fhir",
+    "system_settings",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'system_settings.middleware.AppLockMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "system_settings.middleware.AppLockMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
                 "patients.context_processors.admin_recent_patients",
                 "system_settings.context_processors.system_settings",
             ],
@@ -90,7 +88,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
@@ -104,16 +102,16 @@ DATABASES = build_default_database_config(BASE_DIR)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -121,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = os.getenv("TIME_ZONE", "America/New_York")
 
@@ -133,7 +131,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -141,7 +139,7 @@ STATICFILES_DIRS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Desktop/local-first behavior: keep the owner signed in for a long time.
 # The session can still be cleared by deleting app data, clearing cookies, or changing secrets.
@@ -166,7 +164,6 @@ JAZZMIN_SETTINGS = {
     "custom_js": "js/admin_custom.js",
     # "show_ui_builder": True,
     "changeform_format": "single",
-
     "search_model": "patients.PatientProfile",
     "order_with_respect_to": [
         "patients",
@@ -175,63 +172,59 @@ JAZZMIN_SETTINGS = {
         "fhir",
         "System",
     ],
-
-
     "icons": {
         "auth": "fas fa-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
         "system": "fas fa-cog",
         "system_settings.SystemSettings": "fas fa-sliders-h",
-
         "patients": "fas fa-hospital-user",
         "patients.PatientProfile": "fas fa-id-card",
-
-          "clinical": "fas fa-notes-medical",
-          "clinical.ActivityDefinition": "fas fa-play-circle",
-          "clinical.CapabilityStatement": "fas fa-server",
-          "clinical.CompartmentDefinition": "fas fa-boxes",
-          "clinical.EventDefinition": "fas fa-bolt",
-          "clinical.ExampleScenario": "fas fa-theater-masks",
-          "clinical.GraphDefinition": "fas fa-project-diagram",
-          "clinical.ImplementationGuide": "fas fa-book-open",
-          "clinical.MessageDefinition": "fas fa-envelope-open-text",
-          "clinical.NamingSystem": "fas fa-fingerprint",
-          "clinical.OperationDefinition": "fas fa-terminal",
-          "clinical.SearchParameter": "fas fa-search",
-          "clinical.SpecimenDefinition": "fas fa-vials",
-          "clinical.StructureDefinition": "fas fa-layer-group",
-          "clinical.StructureMap": "fas fa-random",
-          "clinical.TerminologyCapabilities": "fas fa-language",
-          "clinical.Account": "fas fa-wallet",
-          "clinical.Appointment": "fas fa-calendar-check",
-          "clinical.AppointmentResponse": "fas fa-calendar-alt",
-          "clinical.AuditEvent": "fas fa-user-shield",
-          "clinical.ChargeItem": "fas fa-tags",
-          "clinical.Claim": "fas fa-file-invoice",
-          "clinical.ClaimResponse": "fas fa-receipt",
-          "clinical.BinaryResource": "fas fa-file-code",
-          "clinical.BodyStructure": "fas fa-diagnoses",
-          "clinical.Composition": "fas fa-file-alt",
-          "clinical.Condition": "fas fa-heartbeat",
-          "clinical.AdverseEvent": "fas fa-exclamation-circle",
-          "clinical.Allergy": "fas fa-exclamation-triangle",
-          "clinical.ClinicalImpression": "fas fa-notes-medical",
-          "clinical.DetectedIssue": "fas fa-shield-alt",
-          "clinical.DeviceDefinition": "fas fa-microchip",
-          "clinical.DeviceMetric": "fas fa-tachometer-alt",
-          "clinical.DeviceRequest": "fas fa-toolbox",
-          "clinical.DeviceUseStatement": "fas fa-notes-medical",
-          "clinical.DiagnosticReport": "fas fa-file-medical-alt",
-          "clinical.DocumentManifest": "fas fa-folder-open",
-          "clinical.Invoice": "fas fa-file-invoice-dollar",
-          "clinical.Endpoint": "fas fa-plug",
-          "clinical.FamilyMemberHistory": "fas fa-people-arrows",
-          "clinical.FHIRList": "fas fa-list",
-          "clinical.Flag": "fas fa-flag",
-          "clinical.GuidanceResponse": "fas fa-route",
-          "clinical.HealthcareService": "fas fa-clinic-medical",
-          "clinical.ImagingStudy": "fas fa-x-ray",
+        "clinical": "fas fa-notes-medical",
+        "clinical.ActivityDefinition": "fas fa-play-circle",
+        "clinical.CapabilityStatement": "fas fa-server",
+        "clinical.CompartmentDefinition": "fas fa-boxes",
+        "clinical.EventDefinition": "fas fa-bolt",
+        "clinical.ExampleScenario": "fas fa-theater-masks",
+        "clinical.GraphDefinition": "fas fa-project-diagram",
+        "clinical.ImplementationGuide": "fas fa-book-open",
+        "clinical.MessageDefinition": "fas fa-envelope-open-text",
+        "clinical.NamingSystem": "fas fa-fingerprint",
+        "clinical.OperationDefinition": "fas fa-terminal",
+        "clinical.SearchParameter": "fas fa-search",
+        "clinical.SpecimenDefinition": "fas fa-vials",
+        "clinical.StructureDefinition": "fas fa-layer-group",
+        "clinical.StructureMap": "fas fa-random",
+        "clinical.TerminologyCapabilities": "fas fa-language",
+        "clinical.Account": "fas fa-wallet",
+        "clinical.Appointment": "fas fa-calendar-check",
+        "clinical.AppointmentResponse": "fas fa-calendar-alt",
+        "clinical.AuditEvent": "fas fa-user-shield",
+        "clinical.ChargeItem": "fas fa-tags",
+        "clinical.Claim": "fas fa-file-invoice",
+        "clinical.ClaimResponse": "fas fa-receipt",
+        "clinical.BinaryResource": "fas fa-file-code",
+        "clinical.BodyStructure": "fas fa-diagnoses",
+        "clinical.Composition": "fas fa-file-alt",
+        "clinical.Condition": "fas fa-heartbeat",
+        "clinical.AdverseEvent": "fas fa-exclamation-circle",
+        "clinical.Allergy": "fas fa-exclamation-triangle",
+        "clinical.ClinicalImpression": "fas fa-notes-medical",
+        "clinical.DetectedIssue": "fas fa-shield-alt",
+        "clinical.DeviceDefinition": "fas fa-microchip",
+        "clinical.DeviceMetric": "fas fa-tachometer-alt",
+        "clinical.DeviceRequest": "fas fa-toolbox",
+        "clinical.DeviceUseStatement": "fas fa-notes-medical",
+        "clinical.DiagnosticReport": "fas fa-file-medical-alt",
+        "clinical.DocumentManifest": "fas fa-folder-open",
+        "clinical.Invoice": "fas fa-file-invoice-dollar",
+        "clinical.Endpoint": "fas fa-plug",
+        "clinical.FamilyMemberHistory": "fas fa-people-arrows",
+        "clinical.FHIRList": "fas fa-list",
+        "clinical.Flag": "fas fa-flag",
+        "clinical.GuidanceResponse": "fas fa-route",
+        "clinical.HealthcareService": "fas fa-clinic-medical",
+        "clinical.ImagingStudy": "fas fa-x-ray",
         "clinical.Medication": "fas fa-pills",
         "clinical.MedicationAdministration": "fas fa-prescription-bottle",
         "clinical.MedicationCatalog": "fas fa-capsules",
@@ -244,11 +237,11 @@ JAZZMIN_SETTINGS = {
         "clinical.Media": "fas fa-photo-video",
         "clinical.MolecularSequence": "fas fa-dna",
         "clinical.NutritionOrder": "fas fa-utensils",
-          "clinical.Observation": "fas fa-chart-line",
-          "clinical.ObservationDefinition": "fas fa-ruler-combined",
-          "clinical.OrganizationAffiliation": "fas fa-handshake",
-          "clinical.Communication": "fas fa-comments",
-          "clinical.CommunicationRequest": "fas fa-paper-plane",
+        "clinical.Observation": "fas fa-chart-line",
+        "clinical.ObservationDefinition": "fas fa-ruler-combined",
+        "clinical.OrganizationAffiliation": "fas fa-handshake",
+        "clinical.Communication": "fas fa-comments",
+        "clinical.CommunicationRequest": "fas fa-paper-plane",
         "clinical.Consent": "fas fa-file-signature",
         "clinical.Coverage": "fas fa-id-card-alt",
         "clinical.Encounter": "fas fa-stethoscope",
@@ -262,84 +255,92 @@ JAZZMIN_SETTINGS = {
         "clinical.Device": "fas fa-laptop-medical",
         "clinical.FHIRGroup": "fas fa-layer-group",
         "clinical.Goal": "fas fa-bullseye",
-          "clinical.Person": "fas fa-user-circle",
-          "clinical.Provenance": "fas fa-history",
-          "clinical.Questionnaire": "fas fa-clipboard-question",
-          "clinical.QuestionnaireResponse": "fas fa-clipboard-list",
-          "clinical.RequestGroup": "fas fa-stream",
+        "clinical.Person": "fas fa-user-circle",
+        "clinical.Provenance": "fas fa-history",
+        "clinical.Questionnaire": "fas fa-clipboard-question",
+        "clinical.QuestionnaireResponse": "fas fa-clipboard-list",
+        "clinical.RequestGroup": "fas fa-stream",
         "clinical.PractitionerRole": "fas fa-id-badge",
         "clinical.Practitioner": "fas fa-user-md",
         "clinical.RelatedPerson": "fas fa-address-book",
-          "clinical.RiskAssessment": "fas fa-chart-pie",
-          "clinical.Schedule": "fas fa-calendar",
-          "clinical.Slot": "fas fa-clock",
-          "clinical.Substance": "fas fa-flask",
-          "clinical.SupplyDelivery": "fas fa-truck",
-          "clinical.SupplyRequest": "fas fa-box-open",
-          "clinical.Task": "fas fa-tasks",
-          "clinical.VisionPrescription": "fas fa-glasses",
+        "clinical.RiskAssessment": "fas fa-chart-pie",
+        "clinical.Schedule": "fas fa-calendar",
+        "clinical.Slot": "fas fa-clock",
+        "clinical.Substance": "fas fa-flask",
+        "clinical.SupplyDelivery": "fas fa-truck",
+        "clinical.SupplyRequest": "fas fa-box-open",
+        "clinical.Task": "fas fa-tasks",
+        "clinical.VisionPrescription": "fas fa-glasses",
         "clinical.Organization": "fas fa-hospital",
         "clinical.Location": "fas fa-map-marker-alt",
-
         "documents": "fas fa-file-medical",
         "documents.ClinicalDocument": "fas fa-file-pdf",
-
         "fhir": "fas fa-exchange-alt",
         "fhir.FHIRLink": "fas fa-link",
         "fhir.FHIRResourceSnapshot": "fas fa-database",
         "interop": "fas fa-exchange-alt",
     },
     "custom_links": {
-        "System": [{
-            "name": "Settings",
-            "url": "admin_settings",
-            "icon": "fas fa-cog",
-            "permissions": ["auth.view_user"],
-        }],
-        "patients": [{
-            "name": "Add Patient",
-            "url": "admin:patients_patientprofile_add",
-            "icon": "fas fa-user-plus",
-            "permissions": ["patients.add_patientprofile"],
-        }],
-        "clinical": [{
-            "name": "Clinical Resources",
-            "url": "new_clinical_resources_directory",
-            "icon": "fas fa-notes-medical",
-            "permissions": ["clinical.view_condition"],
-        }, {
-            "name": "Care Team Info",
-            "url": "clinical_care_team_directory",
-            "icon": "fas fa-user-friends",
-            "permissions": ["clinical.view_careteam"],
-        }, {
-            "name": "Health Trends",
-            "url": "observation_charts",
-            "icon": "fas fa-chart-area",
-            "permissions": ["clinical.view_observation"],
-        }],
-        "fhir": [{
-            "name": "FHIR / Interop",
-            "url": "fhir_interop_hub",
-            "icon": "fas fa-exchange-alt",
-            "permissions": ["fhir.view_fhirresourcesnapshot"],
-        }, {
-            "name": "Import FHIR Data",
-            "url": "fhir_import",
-            "icon": "fas fa-file-import",
-            "permissions": ["fhir.add_fhirresourcesnapshot"],
-        }, {
-            "name": "FHIR Explorer",
-            "url": "fhir_explorer",
-            "icon": "fas fa-search",
-            "permissions": ["fhir.view_fhirresourcesnapshot"],
-        }],
+        "System": [
+            {
+                "name": "Settings",
+                "url": "admin_settings",
+                "icon": "fas fa-cog",
+                "permissions": ["auth.view_user"],
+            }
+        ],
+        "patients": [
+            {
+                "name": "Add Patient",
+                "url": "admin:patients_patientprofile_add",
+                "icon": "fas fa-user-plus",
+                "permissions": ["patients.add_patientprofile"],
+            }
+        ],
+        "clinical": [
+            {
+                "name": "Clinical Resources",
+                "url": "new_clinical_resources_directory",
+                "icon": "fas fa-notes-medical",
+                "permissions": ["clinical.view_condition"],
+            },
+            {
+                "name": "Care Team Info",
+                "url": "clinical_care_team_directory",
+                "icon": "fas fa-user-friends",
+                "permissions": ["clinical.view_careteam"],
+            },
+            {
+                "name": "Health Trends",
+                "url": "observation_charts",
+                "icon": "fas fa-chart-area",
+                "permissions": ["clinical.view_observation"],
+            },
+        ],
+        "fhir": [
+            {
+                "name": "FHIR / Interop",
+                "url": "fhir_interop_hub",
+                "icon": "fas fa-exchange-alt",
+                "permissions": ["fhir.view_fhirresourcesnapshot"],
+            },
+            {
+                "name": "Import FHIR Data",
+                "url": "fhir_import",
+                "icon": "fas fa-file-import",
+                "permissions": ["fhir.add_fhirresourcesnapshot"],
+            },
+            {
+                "name": "FHIR Explorer",
+                "url": "fhir_explorer",
+                "icon": "fas fa-search",
+                "permissions": ["fhir.view_fhirresourcesnapshot"],
+            },
+        ],
     },
-    
     "hide_apps": [
         "auth",
     ],
-
     "hide_models": [
         "patients.RecoveryCredential",
         "clinical.Account",
@@ -495,18 +496,12 @@ JAZZMIN_SETTINGS = {
         "fhir.FHIRLink",
         "fhir.FHIRResourceSnapshot",
     ],
-
-# "hide_models": [
-#     "auth.Group",
-#     "fhir.FHIRLink",
-# ],
-
+    # "hide_models": [
+    #     "auth.Group",
+    #     "fhir.FHIRLink",
+    # ],
 }
 
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-
-
-

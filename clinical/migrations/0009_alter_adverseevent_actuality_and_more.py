@@ -5,372 +5,698 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0002_clinicaldocument_authors_clinicaldocument_custodian_and_more'),
-        ('patients', '0004_alter_patientprofile_options'),
-        ('clinical', '0008_clinicalimpression_familymemberhistory_and_more'),
+        (
+            "documents",
+            "0002_clinicaldocument_authors_clinicaldocument_custodian_and_more",
+        ),
+        ("patients", "0004_alter_patientprofile_options"),
+        ("clinical", "0008_clinicalimpression_familymemberhistory_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='adverseevent',
-            name='actuality',
-            field=models.CharField(blank=True, help_text='FHIR actuality: actual or potential adverse event.', max_length=30),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='category',
-            field=models.CharField(blank=True, help_text='FHIR category: product-problem, product-quality, etc.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='causality_summary',
-            field=models.TextField(blank=True, help_text='FHIR causality: assessment of causality for suspect entities.'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='contributor_devices',
-            field=models.ManyToManyField(blank=True, help_text='FHIR contributor: devices involved in the event.', related_name='adverse_event_contributions', to='clinical.device'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='contributor_practitioners',
-            field=models.ManyToManyField(blank=True, help_text='FHIR contributor: practitioners involved in the event.', related_name='adverse_event_contributions', to='clinical.practitioner'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='contributor_roles',
-            field=models.ManyToManyField(blank=True, help_text='FHIR contributor: practitioner roles involved in the event.', related_name='adverse_event_contributions', to='clinical.practitionerrole'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='detected_date',
-            field=models.DateTimeField(blank=True, help_text='FHIR detected: when the event was detected.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='encounter',
-            field=models.ForeignKey(blank=True, help_text='FHIR encounter: visit or encounter associated with the event.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='adverse_events', to='clinical.encounter'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='event',
-            field=models.CharField(blank=True, help_text='FHIR event: type of adverse event.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='event_date',
-            field=models.DateTimeField(blank=True, help_text='FHIR date: when the adverse event occurred.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='location',
-            field=models.ForeignKey(blank=True, help_text='FHIR location: where the event occurred.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='adverse_events', to='clinical.location'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='notes',
-            field=models.TextField(blank=True, help_text='FHIR note: additional event notes.'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='outcome',
-            field=models.CharField(blank=True, help_text='FHIR outcome: result or final state of the event.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='patient',
-            field=models.ForeignKey(help_text='FHIR subject: patient affected by the adverse event.', on_delete=django.db.models.deletion.CASCADE, related_name='adverse_events', to='patients.patientprofile'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='recorded_date',
-            field=models.DateTimeField(blank=True, help_text='FHIR recordedDate: when the event was recorded.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='recorder_practitioner',
-            field=models.ForeignKey(blank=True, help_text='FHIR recorder: person who recorded the event.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='recorded_adverse_events', to='clinical.practitioner'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='recorder_role',
-            field=models.ForeignKey(blank=True, help_text='FHIR recorder: practitioner role used when the recorder is represented by role.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='recorded_adverse_events', to='clinical.practitionerrole'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='reference_documents',
-            field=models.ManyToManyField(blank=True, help_text='FHIR referenceDocument: documents relevant to the event.', related_name='adverse_events', to='documents.clinicaldocument'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='resulting_conditions',
-            field=models.ManyToManyField(blank=True, help_text='FHIR resultingCondition: conditions that resulted from the event.', related_name='adverse_events', to='clinical.condition'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='seriousness',
-            field=models.CharField(blank=True, help_text='FHIR seriousness: serious, non-serious, etc.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='severity',
-            field=models.CharField(blank=True, help_text='FHIR severity: mild, moderate, severe, etc.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='subject_medical_history_conditions',
-            field=models.ManyToManyField(blank=True, help_text='FHIR subjectMedicalHistory: prior conditions relevant to the event.', related_name='adverse_event_medical_history_refs', to='clinical.condition'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='subject_medical_history_immunizations',
-            field=models.ManyToManyField(blank=True, help_text='FHIR subjectMedicalHistory: prior immunizations relevant to the event.', related_name='adverse_event_medical_history_refs', to='clinical.immunization'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='subject_medical_history_observations',
-            field=models.ManyToManyField(blank=True, help_text='FHIR subjectMedicalHistory: prior observations relevant to the event.', related_name='adverse_event_medical_history_refs', to='clinical.observation'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='subject_medical_history_procedures',
-            field=models.ManyToManyField(blank=True, help_text='FHIR subjectMedicalHistory: prior procedures relevant to the event.', related_name='adverse_event_medical_history_refs', to='clinical.procedure'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='suspect_devices',
-            field=models.ManyToManyField(blank=True, help_text='FHIR suspectEntity.instance: devices suspected to have contributed.', related_name='suspected_adverse_events', to='clinical.device'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='suspect_entity_summary',
-            field=models.TextField(blank=True, help_text='FHIR suspectEntity: imported summary for unsupported suspects.'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='suspect_immunizations',
-            field=models.ManyToManyField(blank=True, help_text='FHIR suspectEntity.instance: immunizations suspected to have contributed.', related_name='suspected_adverse_events', to='clinical.immunization'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='suspect_medications',
-            field=models.ManyToManyField(blank=True, help_text='FHIR suspectEntity.instance: medications suspected to have contributed.', related_name='suspected_adverse_events', to='clinical.medication'),
-        ),
-        migrations.AlterField(
-            model_name='adverseevent',
-            name='suspect_procedures',
-            field=models.ManyToManyField(blank=True, help_text='FHIR suspectEntity.instance: procedures suspected to have contributed.', related_name='suspected_adverse_events', to='clinical.procedure'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='assessor_practitioner',
-            field=models.ForeignKey(blank=True, help_text='FHIR assessor: clinician responsible for the assessment.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='clinical_impressions', to='clinical.practitioner'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='assessor_role',
-            field=models.ForeignKey(blank=True, help_text='FHIR assessor: practitioner role used when the assessor is represented by role.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='clinical_impressions', to='clinical.practitionerrole'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='conditions',
-            field=models.ManyToManyField(blank=True, help_text='FHIR finding/problem references resolved to local Condition records.', related_name='clinical_impressions', to='clinical.condition'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='date',
-            field=models.DateTimeField(blank=True, help_text='FHIR date: when the assessment was made.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='description',
-            field=models.TextField(blank=True, help_text='FHIR description: why the assessment was performed.'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='effective_datetime',
-            field=models.DateTimeField(blank=True, help_text='FHIR effective[x]: time or period covered by the assessment.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='encounter',
-            field=models.ForeignKey(blank=True, help_text='FHIR encounter: visit or encounter where the assessment occurred.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='clinical_impressions', to='clinical.encounter'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='investigations_observations',
-            field=models.ManyToManyField(blank=True, help_text='FHIR investigation.item: observations reviewed as part of the assessment.', related_name='clinical_impression_investigations', to='clinical.observation'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='notes',
-            field=models.TextField(blank=True, help_text='FHIR note: clinical notes about the impression.'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='observations',
-            field=models.ManyToManyField(blank=True, help_text='FHIR finding/investigation references resolved to local Observation records.', related_name='clinical_impressions', to='clinical.observation'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='patient',
-            field=models.ForeignKey(help_text='FHIR subject: patient who was assessed.', on_delete=django.db.models.deletion.CASCADE, related_name='clinical_impressions', to='patients.patientprofile'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='problems',
-            field=models.ManyToManyField(blank=True, help_text='FHIR problem: conditions or problems considered during the assessment.', related_name='clinical_impression_problem_refs', to='clinical.condition'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='prognosis',
-            field=models.TextField(blank=True, help_text='FHIR prognosisCodeableConcept/prognosisReference: expected outcome.'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='protocol',
-            field=models.TextField(blank=True, help_text='FHIR protocol: clinical protocol or guideline followed.'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='status',
-            field=models.CharField(blank=True, help_text='FHIR status: state of the assessment.', max_length=30),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpression',
-            name='summary',
-            field=models.TextField(blank=True, help_text='FHIR summary: narrative summary of the assessment.'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpressionfinding',
-            name='basis',
-            field=models.TextField(blank=True, help_text='FHIR basis: reason this finding is relevant.'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpressionfinding',
-            name='clinical_impression',
-            field=models.ForeignKey(help_text='The clinical impression this finding belongs to.', on_delete=django.db.models.deletion.CASCADE, related_name='finding_links', to='clinical.clinicalimpression'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpressionfinding',
-            name='condition',
-            field=models.ForeignKey(blank=True, help_text='FHIR finding.itemReference resolved to a local Condition.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='clinical_impression_findings', to='clinical.condition'),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpressionfinding',
-            name='finding_text',
-            field=models.CharField(blank=True, help_text='FHIR finding.itemCodeableConcept or display text.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='clinicalimpressionfinding',
-            name='observation',
-            field=models.ForeignKey(blank=True, help_text='FHIR finding.itemReference resolved to a local Observation.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='clinical_impression_findings', to='clinical.observation'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='age_text',
-            field=models.CharField(blank=True, help_text='FHIR age[x]: age or age range at the time recorded.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='born_date',
-            field=models.DateField(blank=True, help_text='FHIR bornDate: actual or approximate birth date.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='born_text',
-            field=models.CharField(blank=True, help_text='FHIR bornString/Period: textual birth details.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='conditions',
-            field=models.ManyToManyField(blank=True, help_text='FHIR condition: patient Condition records that help represent or match the family history.', related_name='family_member_histories', to='clinical.condition'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='deceased',
-            field=models.BooleanField(blank=True, help_text='FHIR deceasedBoolean: whether the relative is deceased.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='deceased_date',
-            field=models.DateField(blank=True, help_text='FHIR deceasedDate: date of death when known.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='deceased_text',
-            field=models.CharField(blank=True, help_text='FHIR deceased[x]: age, range, or text about death.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='estimated_age',
-            field=models.BooleanField(default=False, help_text='FHIR estimatedAge: whether the age is approximate.'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='notes',
-            field=models.TextField(blank=True, help_text='FHIR note: general notes about the related person.'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='patient',
-            field=models.ForeignKey(help_text='FHIR patient: the patient whose family history this record describes.', on_delete=django.db.models.deletion.CASCADE, related_name='family_member_histories', to='patients.patientprofile'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='reason',
-            field=models.CharField(blank=True, help_text='FHIR reasonCode/reasonReference: why this history was recorded.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='relationship',
-            field=models.CharField(help_text='FHIR relationship: how this relative is related to the patient.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='sex',
-            field=models.CharField(blank=True, help_text='FHIR sex: recorded sex of the family member.', max_length=30),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistory',
-            name='status',
-            field=models.CharField(blank=True, help_text='FHIR status: partial, completed, entered-in-error, or health-unknown.', max_length=30),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistorycondition',
-            name='condition',
-            field=models.ForeignKey(blank=True, help_text='Optional matching local Condition record.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='family_history_condition_links', to='clinical.condition'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistorycondition',
-            name='condition_text',
-            field=models.CharField(help_text='FHIR code: condition suffered by the family member.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistorycondition',
-            name='contributed_to_death',
-            field=models.BooleanField(blank=True, help_text='FHIR contributedToDeath: whether this condition contributed to death.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistorycondition',
-            name='family_member_history',
-            field=models.ForeignKey(help_text='The family member history record this condition belongs to.', on_delete=django.db.models.deletion.CASCADE, related_name='condition_links', to='clinical.familymemberhistory'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistorycondition',
-            name='notes',
-            field=models.TextField(blank=True, help_text='FHIR note: extra notes about this specific family condition.'),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistorycondition',
-            name='onset_text',
-            field=models.CharField(blank=True, help_text='FHIR onset[x]: when the condition first appeared.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='familymemberhistorycondition',
-            name='outcome',
-            field=models.CharField(blank=True, help_text='FHIR outcome: result such as death or disability.', max_length=255),
+            model_name="adverseevent",
+            name="actuality",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR actuality: actual or potential adverse event.",
+                max_length=30,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="category",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR category: product-problem, product-quality, etc.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="causality_summary",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR causality: assessment of causality for suspect entities.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="contributor_devices",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR contributor: devices involved in the event.",
+                related_name="adverse_event_contributions",
+                to="clinical.device",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="contributor_practitioners",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR contributor: practitioners involved in the event.",
+                related_name="adverse_event_contributions",
+                to="clinical.practitioner",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="contributor_roles",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR contributor: practitioner roles involved in the event.",
+                related_name="adverse_event_contributions",
+                to="clinical.practitionerrole",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="detected_date",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="FHIR detected: when the event was detected.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="encounter",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR encounter: visit or encounter associated with the event.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="adverse_events",
+                to="clinical.encounter",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="event",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR event: type of adverse event.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="event_date",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="FHIR date: when the adverse event occurred.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="location",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR location: where the event occurred.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="adverse_events",
+                to="clinical.location",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="notes",
+            field=models.TextField(
+                blank=True, help_text="FHIR note: additional event notes."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="outcome",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR outcome: result or final state of the event.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="patient",
+            field=models.ForeignKey(
+                help_text="FHIR subject: patient affected by the adverse event.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="adverse_events",
+                to="patients.patientprofile",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="recorded_date",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="FHIR recordedDate: when the event was recorded.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="recorder_practitioner",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR recorder: person who recorded the event.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="recorded_adverse_events",
+                to="clinical.practitioner",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="recorder_role",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR recorder: practitioner role used when the recorder is represented by role.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="recorded_adverse_events",
+                to="clinical.practitionerrole",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="reference_documents",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR referenceDocument: documents relevant to the event.",
+                related_name="adverse_events",
+                to="documents.clinicaldocument",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="resulting_conditions",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR resultingCondition: conditions that resulted from the event.",
+                related_name="adverse_events",
+                to="clinical.condition",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="seriousness",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR seriousness: serious, non-serious, etc.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="severity",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR severity: mild, moderate, severe, etc.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="subject_medical_history_conditions",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR subjectMedicalHistory: prior conditions relevant to the event.",
+                related_name="adverse_event_medical_history_refs",
+                to="clinical.condition",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="subject_medical_history_immunizations",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR subjectMedicalHistory: prior immunizations relevant to the event.",
+                related_name="adverse_event_medical_history_refs",
+                to="clinical.immunization",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="subject_medical_history_observations",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR subjectMedicalHistory: prior observations relevant to the event.",
+                related_name="adverse_event_medical_history_refs",
+                to="clinical.observation",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="subject_medical_history_procedures",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR subjectMedicalHistory: prior procedures relevant to the event.",
+                related_name="adverse_event_medical_history_refs",
+                to="clinical.procedure",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="suspect_devices",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR suspectEntity.instance: devices suspected to have contributed.",
+                related_name="suspected_adverse_events",
+                to="clinical.device",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="suspect_entity_summary",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR suspectEntity: imported summary for unsupported suspects.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="suspect_immunizations",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR suspectEntity.instance: immunizations suspected to have contributed.",
+                related_name="suspected_adverse_events",
+                to="clinical.immunization",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="suspect_medications",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR suspectEntity.instance: medications suspected to have contributed.",
+                related_name="suspected_adverse_events",
+                to="clinical.medication",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="adverseevent",
+            name="suspect_procedures",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR suspectEntity.instance: procedures suspected to have contributed.",
+                related_name="suspected_adverse_events",
+                to="clinical.procedure",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="assessor_practitioner",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR assessor: clinician responsible for the assessment.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="clinical_impressions",
+                to="clinical.practitioner",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="assessor_role",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR assessor: practitioner role used when the assessor is represented by role.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="clinical_impressions",
+                to="clinical.practitionerrole",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="conditions",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR finding/problem references resolved to local Condition records.",
+                related_name="clinical_impressions",
+                to="clinical.condition",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="date",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="FHIR date: when the assessment was made.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="description",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR description: why the assessment was performed.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="effective_datetime",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="FHIR effective[x]: time or period covered by the assessment.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="encounter",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR encounter: visit or encounter where the assessment occurred.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="clinical_impressions",
+                to="clinical.encounter",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="investigations_observations",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR investigation.item: observations reviewed as part of the assessment.",
+                related_name="clinical_impression_investigations",
+                to="clinical.observation",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="notes",
+            field=models.TextField(
+                blank=True, help_text="FHIR note: clinical notes about the impression."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="observations",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR finding/investigation references resolved to local Observation records.",
+                related_name="clinical_impressions",
+                to="clinical.observation",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="patient",
+            field=models.ForeignKey(
+                help_text="FHIR subject: patient who was assessed.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="clinical_impressions",
+                to="patients.patientprofile",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="problems",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR problem: conditions or problems considered during the assessment.",
+                related_name="clinical_impression_problem_refs",
+                to="clinical.condition",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="prognosis",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR prognosisCodeableConcept/prognosisReference: expected outcome.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="protocol",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR protocol: clinical protocol or guideline followed.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="status",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR status: state of the assessment.",
+                max_length=30,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpression",
+            name="summary",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR summary: narrative summary of the assessment.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpressionfinding",
+            name="basis",
+            field=models.TextField(
+                blank=True, help_text="FHIR basis: reason this finding is relevant."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpressionfinding",
+            name="clinical_impression",
+            field=models.ForeignKey(
+                help_text="The clinical impression this finding belongs to.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="finding_links",
+                to="clinical.clinicalimpression",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpressionfinding",
+            name="condition",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR finding.itemReference resolved to a local Condition.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="clinical_impression_findings",
+                to="clinical.condition",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpressionfinding",
+            name="finding_text",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR finding.itemCodeableConcept or display text.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="clinicalimpressionfinding",
+            name="observation",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="FHIR finding.itemReference resolved to a local Observation.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="clinical_impression_findings",
+                to="clinical.observation",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="age_text",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR age[x]: age or age range at the time recorded.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="born_date",
+            field=models.DateField(
+                blank=True,
+                help_text="FHIR bornDate: actual or approximate birth date.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="born_text",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR bornString/Period: textual birth details.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="conditions",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="FHIR condition: patient Condition records that help represent or match the family history.",
+                related_name="family_member_histories",
+                to="clinical.condition",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="deceased",
+            field=models.BooleanField(
+                blank=True,
+                help_text="FHIR deceasedBoolean: whether the relative is deceased.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="deceased_date",
+            field=models.DateField(
+                blank=True,
+                help_text="FHIR deceasedDate: date of death when known.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="deceased_text",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR deceased[x]: age, range, or text about death.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="estimated_age",
+            field=models.BooleanField(
+                default=False,
+                help_text="FHIR estimatedAge: whether the age is approximate.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="notes",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR note: general notes about the related person.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="patient",
+            field=models.ForeignKey(
+                help_text="FHIR patient: the patient whose family history this record describes.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="family_member_histories",
+                to="patients.patientprofile",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="reason",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR reasonCode/reasonReference: why this history was recorded.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="relationship",
+            field=models.CharField(
+                help_text="FHIR relationship: how this relative is related to the patient.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="sex",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR sex: recorded sex of the family member.",
+                max_length=30,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistory",
+            name="status",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR status: partial, completed, entered-in-error, or health-unknown.",
+                max_length=30,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistorycondition",
+            name="condition",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Optional matching local Condition record.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="family_history_condition_links",
+                to="clinical.condition",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistorycondition",
+            name="condition_text",
+            field=models.CharField(
+                help_text="FHIR code: condition suffered by the family member.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistorycondition",
+            name="contributed_to_death",
+            field=models.BooleanField(
+                blank=True,
+                help_text="FHIR contributedToDeath: whether this condition contributed to death.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistorycondition",
+            name="family_member_history",
+            field=models.ForeignKey(
+                help_text="The family member history record this condition belongs to.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="condition_links",
+                to="clinical.familymemberhistory",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistorycondition",
+            name="notes",
+            field=models.TextField(
+                blank=True,
+                help_text="FHIR note: extra notes about this specific family condition.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistorycondition",
+            name="onset_text",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR onset[x]: when the condition first appeared.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="familymemberhistorycondition",
+            name="outcome",
+            field=models.CharField(
+                blank=True,
+                help_text="FHIR outcome: result such as death or disability.",
+                max_length=255,
+            ),
         ),
     ]

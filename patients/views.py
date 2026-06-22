@@ -51,7 +51,9 @@ def recovery_key_reset_start(request):
 
         if form.is_valid():
             request.session["recovery_reset_user_id"] = form.cleaned_data["user"].pk
-            request.session["recovery_reset_credential_id"] = form.cleaned_data["credential"].pk
+            request.session["recovery_reset_credential_id"] = form.cleaned_data[
+                "credential"
+            ].pk
             return redirect("recovery_key_reset_confirm")
     else:
         form = RecoveryKeyPasswordResetForm()

@@ -5,265 +5,1353 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0004_alter_patientprofile_options'),
-        ('clinical', '0017_coverage_insuranceplan_explanationofbenefit_and_more'),
+        ("patients", "0004_alter_patientprofile_options"),
+        ("clinical", "0017_coverage_insuranceplan_explanationofbenefit_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='VisionPrescription',
+            name="VisionPrescription",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: active, cancelled, draft, or entered-in-error.', max_length=30)),
-                ('created_datetime', models.DateTimeField(blank=True, help_text='FHIR created: response creation date.', null=True)),
-                ('date_written', models.DateTimeField(blank=True, help_text='FHIR dateWritten: when the prescription was authorized.', null=True)),
-                ('lens_summary', models.TextField(blank=True, help_text='FHIR lensSpecification: product, eye, power, sphere, cylinder, axis, prism, brand, and notes.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this vision prescription.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('encounter', models.ForeignKey(blank=True, help_text='FHIR encounter: encounter where the prescription was created.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='vision_prescriptions', to='clinical.encounter')),
-                ('patient', models.ForeignKey(help_text='FHIR patient: patient the vision prescription is for.', on_delete=django.db.models.deletion.CASCADE, related_name='vision_prescriptions', to='patients.patientprofile')),
-                ('prescriber_practitioner', models.ForeignKey(blank=True, help_text='FHIR prescriber: practitioner who authorized the prescription.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='vision_prescriptions', to='clinical.practitioner')),
-                ('prescriber_role', models.ForeignKey(blank=True, help_text='FHIR prescriber: practitioner role that authorized the prescription.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='vision_prescriptions', to='clinical.practitionerrole')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: active, cancelled, draft, or entered-in-error.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "created_datetime",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR created: response creation date.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "date_written",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR dateWritten: when the prescription was authorized.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "lens_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR lensSpecification: product, eye, power, sphere, cylinder, axis, prism, brand, and notes.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this vision prescription.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR encounter: encounter where the prescription was created.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="vision_prescriptions",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        help_text="FHIR patient: patient the vision prescription is for.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="vision_prescriptions",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "prescriber_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR prescriber: practitioner who authorized the prescription.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="vision_prescriptions",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "prescriber_role",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR prescriber: practitioner role that authorized the prescription.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="vision_prescriptions",
+                        to="clinical.practitionerrole",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Vision Prescription',
-                'verbose_name_plural': 'Vision Prescriptions',
+                "verbose_name": "Vision Prescription",
+                "verbose_name_plural": "Vision Prescriptions",
             },
         ),
         migrations.CreateModel(
-            name='SupplyRequest',
+            name="SupplyRequest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: draft, active, suspended, cancelled, completed, entered-in-error, unknown.', max_length=30)),
-                ('category', models.CharField(blank=True, help_text='FHIR category: supply category.', max_length=255)),
-                ('priority', models.CharField(blank=True, help_text='FHIR priority: routine, urgent, asap, or stat.', max_length=30)),
-                ('item', models.CharField(help_text='FHIR item[x]: medication, substance, device, or supply item requested.', max_length=255)),
-                ('quantity', models.CharField(blank=True, help_text='FHIR quantity: amount requested.', max_length=255)),
-                ('authored_on', models.DateTimeField(blank=True, help_text='FHIR authoredOn: when the supply request was created.', null=True)),
-                ('occurrence_start', models.DateTimeField(blank=True, help_text='FHIR occurrence[x]: requested supply time or period start.', null=True)),
-                ('occurrence_end', models.DateTimeField(blank=True, help_text='FHIR occurrencePeriod.end: requested supply period end.', null=True)),
-                ('reason', models.CharField(blank=True, help_text='FHIR reasonCode: why the supply is requested.', max_length=255)),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this supply request.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('based_on_service_requests', models.ManyToManyField(blank=True, help_text='FHIR basedOn: service requests this supply request follows.', related_name='supply_requests', to='clinical.servicerequest')),
-                ('deliver_to_location', models.ForeignKey(blank=True, help_text='FHIR deliverTo: requested delivery location.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='supply_requests', to='clinical.location')),
-                ('patient', models.ForeignKey(blank=True, help_text='FHIR deliverTo/patient context: patient associated with the supply request when known.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='supply_requests', to='patients.patientprofile')),
-                ('requester_organization', models.ForeignKey(blank=True, help_text='FHIR requester: organization requesting the supply.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='supply_requests', to='clinical.organization')),
-                ('requester_practitioner', models.ForeignKey(blank=True, help_text='FHIR requester: practitioner requesting the supply.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='supply_requests', to='clinical.practitioner')),
-                ('supplier_organization', models.ForeignKey(blank=True, help_text='FHIR supplier: requested supply organization.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='supplied_requests', to='clinical.organization')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: draft, active, suspended, cancelled, completed, entered-in-error, unknown.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "category",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR category: supply category.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "priority",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR priority: routine, urgent, asap, or stat.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "item",
+                    models.CharField(
+                        help_text="FHIR item[x]: medication, substance, device, or supply item requested.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "quantity",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR quantity: amount requested.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "authored_on",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR authoredOn: when the supply request was created.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "occurrence_start",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR occurrence[x]: requested supply time or period start.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "occurrence_end",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR occurrencePeriod.end: requested supply period end.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "reason",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR reasonCode: why the supply is requested.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this supply request.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "based_on_service_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR basedOn: service requests this supply request follows.",
+                        related_name="supply_requests",
+                        to="clinical.servicerequest",
+                    ),
+                ),
+                (
+                    "deliver_to_location",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR deliverTo: requested delivery location.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="supply_requests",
+                        to="clinical.location",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR deliverTo/patient context: patient associated with the supply request when known.",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="supply_requests",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "requester_organization",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR requester: organization requesting the supply.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="supply_requests",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "requester_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR requester: practitioner requesting the supply.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="supply_requests",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "supplier_organization",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR supplier: requested supply organization.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="supplied_requests",
+                        to="clinical.organization",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Supply Request',
-                'verbose_name_plural': 'Supply Requests',
+                "verbose_name": "Supply Request",
+                "verbose_name_plural": "Supply Requests",
             },
         ),
         migrations.CreateModel(
-            name='SupplyDelivery',
+            name="SupplyDelivery",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: in-progress, completed, abandoned, or entered-in-error.', max_length=30)),
-                ('delivery_type', models.CharField(blank=True, help_text='FHIR type: category of dispense event.', max_length=255)),
-                ('item', models.CharField(blank=True, help_text='FHIR suppliedItem.item[x]: medication, substance, device, or supply delivered.', max_length=255)),
-                ('quantity', models.CharField(blank=True, help_text='FHIR suppliedItem.quantity: amount delivered.', max_length=255)),
-                ('occurrence_start', models.DateTimeField(blank=True, help_text='FHIR occurrence[x]: delivery time or period start.', null=True)),
-                ('occurrence_end', models.DateTimeField(blank=True, help_text='FHIR occurrencePeriod.end: delivery period end.', null=True)),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this supply delivery.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('based_on_supply_requests', models.ManyToManyField(blank=True, help_text='FHIR basedOn: supply requests fulfilled by this delivery.', related_name='supply_deliveries', to='clinical.supplyrequest')),
-                ('destination', models.ForeignKey(blank=True, help_text='FHIR destination: where the supply was sent.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='supply_deliveries', to='clinical.location')),
-                ('part_of_deliveries', models.ManyToManyField(blank=True, help_text='FHIR partOf: larger supply deliveries this delivery is part of.', related_name='child_supply_deliveries', to='clinical.supplydelivery')),
-                ('patient', models.ForeignKey(blank=True, help_text='FHIR patient: patient for whom the item is supplied.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='supply_deliveries', to='patients.patientprofile')),
-                ('receivers', models.ManyToManyField(blank=True, help_text='FHIR receiver: practitioners who collected the supply.', related_name='received_supply_deliveries', to='clinical.practitioner')),
-                ('supplier_organization', models.ForeignKey(blank=True, help_text='FHIR supplier: organization responsible for delivery.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='supply_deliveries', to='clinical.organization')),
-                ('supplier_practitioner', models.ForeignKey(blank=True, help_text='FHIR supplier: practitioner responsible for delivery.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='supply_deliveries', to='clinical.practitioner')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: in-progress, completed, abandoned, or entered-in-error.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "delivery_type",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR type: category of dispense event.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "item",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR suppliedItem.item[x]: medication, substance, device, or supply delivered.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "quantity",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR suppliedItem.quantity: amount delivered.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "occurrence_start",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR occurrence[x]: delivery time or period start.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "occurrence_end",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR occurrencePeriod.end: delivery period end.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this supply delivery.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "based_on_supply_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR basedOn: supply requests fulfilled by this delivery.",
+                        related_name="supply_deliveries",
+                        to="clinical.supplyrequest",
+                    ),
+                ),
+                (
+                    "destination",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR destination: where the supply was sent.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="supply_deliveries",
+                        to="clinical.location",
+                    ),
+                ),
+                (
+                    "part_of_deliveries",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR partOf: larger supply deliveries this delivery is part of.",
+                        related_name="child_supply_deliveries",
+                        to="clinical.supplydelivery",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR patient: patient for whom the item is supplied.",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="supply_deliveries",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "receivers",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR receiver: practitioners who collected the supply.",
+                        related_name="received_supply_deliveries",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "supplier_organization",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR supplier: organization responsible for delivery.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="supply_deliveries",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "supplier_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR supplier: practitioner responsible for delivery.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="supply_deliveries",
+                        to="clinical.practitioner",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Supply Delivery',
-                'verbose_name_plural': 'Supply Deliveries',
+                "verbose_name": "Supply Delivery",
+                "verbose_name_plural": "Supply Deliveries",
             },
         ),
         migrations.CreateModel(
-            name='RequestGroup',
+            name="RequestGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: draft, active, on-hold, revoked, completed, entered-in-error, or unknown.', max_length=30)),
-                ('intent', models.CharField(blank=True, help_text='FHIR intent: proposal, plan, directive, order, etc.', max_length=30)),
-                ('priority', models.CharField(blank=True, help_text='FHIR priority: routine, urgent, asap, or stat.', max_length=30)),
-                ('code', models.CharField(blank=True, help_text='FHIR code: request group code or title.', max_length=255)),
-                ('authored_on', models.DateTimeField(blank=True, help_text='FHIR authoredOn: when the group was authored.', null=True)),
-                ('reason', models.CharField(blank=True, help_text='FHIR reasonCode: reason for the request group.', max_length=255)),
-                ('action_summary', models.TextField(blank=True, help_text='FHIR action: grouped action details, conditions, timing, participants, and resources.')),
-                ('notes', models.TextField(blank=True, help_text='FHIR note: additional request group comments.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('author_practitioner', models.ForeignKey(blank=True, help_text='FHIR author: practitioner who authored the request group.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='authored_request_groups', to='clinical.practitioner')),
-                ('based_on_service_requests', models.ManyToManyField(blank=True, help_text='FHIR basedOn: requests this group fulfills or follows.', related_name='request_groups', to='clinical.servicerequest')),
-                ('encounter', models.ForeignKey(blank=True, help_text='FHIR encounter: encounter associated with the request group.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='request_groups', to='clinical.encounter')),
-                ('patient', models.ForeignKey(blank=True, help_text='FHIR subject: patient or group the request group applies to.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='request_groups', to='patients.patientprofile')),
-                ('replaces', models.ManyToManyField(blank=True, help_text='FHIR replaces: request groups replaced by this one.', related_name='replacement_request_groups', to='clinical.requestgroup')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: draft, active, on-hold, revoked, completed, entered-in-error, or unknown.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "intent",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR intent: proposal, plan, directive, order, etc.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "priority",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR priority: routine, urgent, asap, or stat.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "code",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR code: request group code or title.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "authored_on",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR authoredOn: when the group was authored.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "reason",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR reasonCode: reason for the request group.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "action_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR action: grouped action details, conditions, timing, participants, and resources.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR note: additional request group comments.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "author_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR author: practitioner who authored the request group.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="authored_request_groups",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "based_on_service_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR basedOn: requests this group fulfills or follows.",
+                        related_name="request_groups",
+                        to="clinical.servicerequest",
+                    ),
+                ),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR encounter: encounter associated with the request group.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="request_groups",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR subject: patient or group the request group applies to.",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="request_groups",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "replaces",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR replaces: request groups replaced by this one.",
+                        related_name="replacement_request_groups",
+                        to="clinical.requestgroup",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Request Group',
-                'verbose_name_plural': 'Request Groups',
+                "verbose_name": "Request Group",
+                "verbose_name_plural": "Request Groups",
             },
         ),
         migrations.CreateModel(
-            name='MolecularSequence',
+            name="MolecularSequence",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sequence_type', models.CharField(blank=True, help_text='FHIR type: aa, dna, or rna.', max_length=30)),
-                ('coordinate_system', models.PositiveIntegerField(blank=True, help_text='FHIR coordinateSystem: 0-based or 1-based coordinate system.', null=True)),
-                ('observed_sequence', models.TextField(blank=True, help_text='FHIR observedSeq: observed sequence string.')),
-                ('reference_sequence_summary', models.TextField(blank=True, help_text='FHIR referenceSeq: reference sequence details.')),
-                ('variant_summary', models.TextField(blank=True, help_text='FHIR variant: variant start/end, observed allele, reference allele, and cigar.')),
-                ('repository_summary', models.TextField(blank=True, help_text='FHIR repository: external sequence repositories.')),
-                ('quality_summary', models.TextField(blank=True, help_text='FHIR quality: sequence quality metrics.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this molecular sequence.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('device', models.ForeignKey(blank=True, help_text='FHIR device: device used to generate sequence data.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='molecular_sequences', to='clinical.device')),
-                ('patient', models.ForeignKey(blank=True, help_text='FHIR patient: patient whose sequence is described.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='molecular_sequences', to='patients.patientprofile')),
-                ('performer_organization', models.ForeignKey(blank=True, help_text='FHIR performer: organization that performed sequencing.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='molecular_sequences', to='clinical.organization')),
-                ('specimen', models.ForeignKey(blank=True, help_text='FHIR specimen: specimen used for sequencing.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='molecular_sequences', to='clinical.specimen')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "sequence_type",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR type: aa, dna, or rna.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "coordinate_system",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        help_text="FHIR coordinateSystem: 0-based or 1-based coordinate system.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "observed_sequence",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR observedSeq: observed sequence string.",
+                    ),
+                ),
+                (
+                    "reference_sequence_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR referenceSeq: reference sequence details.",
+                    ),
+                ),
+                (
+                    "variant_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR variant: variant start/end, observed allele, reference allele, and cigar.",
+                    ),
+                ),
+                (
+                    "repository_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR repository: external sequence repositories.",
+                    ),
+                ),
+                (
+                    "quality_summary",
+                    models.TextField(
+                        blank=True, help_text="FHIR quality: sequence quality metrics."
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this molecular sequence.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "device",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR device: device used to generate sequence data.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="molecular_sequences",
+                        to="clinical.device",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR patient: patient whose sequence is described.",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="molecular_sequences",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "performer_organization",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR performer: organization that performed sequencing.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="molecular_sequences",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "specimen",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR specimen: specimen used for sequencing.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="molecular_sequences",
+                        to="clinical.specimen",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Molecular Sequence',
-                'verbose_name_plural': 'Molecular Sequences',
+                "verbose_name": "Molecular Sequence",
+                "verbose_name_plural": "Molecular Sequences",
             },
         ),
         migrations.CreateModel(
-            name='MedicationKnowledge',
+            name="MedicationKnowledge",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: active, inactive, or entered-in-error.', max_length=30)),
-                ('code', models.CharField(blank=True, help_text='FHIR code: medication or product concept.', max_length=255)),
-                ('dose_form', models.CharField(blank=True, help_text='FHIR doseForm: powder, tablet, capsule, solution, etc.', max_length=255)),
-                ('amount', models.CharField(blank=True, help_text='FHIR amount: amount of drug in package.', max_length=255)),
-                ('synonym', models.TextField(blank=True, help_text='FHIR synonym: alternate medication names.')),
-                ('product_type', models.CharField(blank=True, help_text='FHIR productType: category of medication product.', max_length=255)),
-                ('ingredient_summary', models.TextField(blank=True, help_text='FHIR ingredient: ingredients and strengths.')),
-                ('contraindication_summary', models.TextField(blank=True, help_text='FHIR contraindication: contraindicated conditions or use contexts.')),
-                ('monitoring_summary', models.TextField(blank=True, help_text='FHIR monitoringProgram: recommended monitoring programs.')),
-                ('medicine_classification_summary', models.TextField(blank=True, help_text='FHIR medicineClassification: drug class/category details.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this medication knowledge.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('associated_medications', models.ManyToManyField(blank=True, help_text='FHIR associatedMedication: related medication definitions.', related_name='associated_knowledge_records', to='clinical.medicationcatalog')),
-                ('medication', models.ForeignKey(blank=True, help_text='FHIR code/reference: medication concept this knowledge describes when resolved locally.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='knowledge_records', to='clinical.medicationcatalog')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: active, inactive, or entered-in-error.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "code",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR code: medication or product concept.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "dose_form",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR doseForm: powder, tablet, capsule, solution, etc.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "amount",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR amount: amount of drug in package.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "synonym",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR synonym: alternate medication names.",
+                    ),
+                ),
+                (
+                    "product_type",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR productType: category of medication product.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "ingredient_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR ingredient: ingredients and strengths.",
+                    ),
+                ),
+                (
+                    "contraindication_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR contraindication: contraindicated conditions or use contexts.",
+                    ),
+                ),
+                (
+                    "monitoring_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR monitoringProgram: recommended monitoring programs.",
+                    ),
+                ),
+                (
+                    "medicine_classification_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR medicineClassification: drug class/category details.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this medication knowledge.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "associated_medications",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR associatedMedication: related medication definitions.",
+                        related_name="associated_knowledge_records",
+                        to="clinical.medicationcatalog",
+                    ),
+                ),
+                (
+                    "medication",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR code/reference: medication concept this knowledge describes when resolved locally.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="knowledge_records",
+                        to="clinical.medicationcatalog",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Medication Knowledge',
-                'verbose_name_plural': 'Medication Knowledge',
+                "verbose_name": "Medication Knowledge",
+                "verbose_name_plural": "Medication Knowledge",
             },
         ),
         migrations.CreateModel(
-            name='Media',
+            name="Media",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: preparation, in-progress, not-done, on-hold, stopped, completed, entered-in-error, or unknown.', max_length=30)),
-                ('media_type', models.CharField(blank=True, help_text='FHIR type: image, video, audio, or other media category.', max_length=255)),
-                ('modality', models.CharField(blank=True, help_text='FHIR modality: acquisition equipment/process or DICOM modality.', max_length=255)),
-                ('view', models.CharField(blank=True, help_text='FHIR view: imaging view/projection.', max_length=255)),
-                ('created_datetime', models.DateTimeField(blank=True, help_text='FHIR created[x]: when the media was collected.', null=True)),
-                ('issued', models.DateTimeField(blank=True, help_text='FHIR issued: when this media version was made available.', null=True)),
-                ('body_site', models.CharField(blank=True, help_text='FHIR bodySite: observed body part.', max_length=255)),
-                ('device_name', models.CharField(blank=True, help_text='FHIR deviceName: capture device/manufacturer name.', max_length=255)),
-                ('content_title', models.CharField(blank=True, help_text='FHIR content.title: attachment title.', max_length=255)),
-                ('content_type', models.CharField(blank=True, help_text='FHIR content.contentType: attachment MIME type.', max_length=255)),
-                ('content_url', models.TextField(blank=True, help_text='FHIR content.url: external media URL.')),
-                ('dimension_summary', models.CharField(blank=True, help_text='FHIR height/width/frames/duration: media dimensions or duration.', max_length=255)),
-                ('notes', models.TextField(blank=True, help_text='FHIR note: comments about the media.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('based_on_service_requests', models.ManyToManyField(blank=True, help_text='FHIR basedOn: service requests fulfilled by the media.', related_name='media_records', to='clinical.servicerequest')),
-                ('device', models.ForeignKey(blank=True, help_text='FHIR device: observing or capture device.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='media_records', to='clinical.device')),
-                ('encounter', models.ForeignKey(blank=True, help_text='FHIR encounter: encounter associated with the media.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='media_records', to='clinical.encounter')),
-                ('operator_practitioner', models.ForeignKey(blank=True, help_text='FHIR operator: practitioner who generated or collected the media.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='operated_media', to='clinical.practitioner')),
-                ('patient', models.ForeignKey(blank=True, help_text='FHIR subject: patient or other subject the media records.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='media_records', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: preparation, in-progress, not-done, on-hold, stopped, completed, entered-in-error, or unknown.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "media_type",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR type: image, video, audio, or other media category.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "modality",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR modality: acquisition equipment/process or DICOM modality.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "view",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR view: imaging view/projection.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "created_datetime",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR created[x]: when the media was collected.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "issued",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR issued: when this media version was made available.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "body_site",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR bodySite: observed body part.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "device_name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR deviceName: capture device/manufacturer name.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "content_title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR content.title: attachment title.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "content_type",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR content.contentType: attachment MIME type.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "content_url",
+                    models.TextField(
+                        blank=True, help_text="FHIR content.url: external media URL."
+                    ),
+                ),
+                (
+                    "dimension_summary",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR height/width/frames/duration: media dimensions or duration.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True, help_text="FHIR note: comments about the media."
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "based_on_service_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR basedOn: service requests fulfilled by the media.",
+                        related_name="media_records",
+                        to="clinical.servicerequest",
+                    ),
+                ),
+                (
+                    "device",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR device: observing or capture device.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="media_records",
+                        to="clinical.device",
+                    ),
+                ),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR encounter: encounter associated with the media.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="media_records",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "operator_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR operator: practitioner who generated or collected the media.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="operated_media",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR subject: patient or other subject the media records.",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="media_records",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Media',
-                'verbose_name_plural': 'Media',
+                "verbose_name": "Media",
+                "verbose_name_plural": "Media",
             },
         ),
         migrations.CreateModel(
-            name='ImmunizationEvaluation',
+            name="ImmunizationEvaluation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: completed or entered-in-error.', max_length=30)),
-                ('target_disease', models.CharField(blank=True, help_text='FHIR targetDisease: disease protected against.', max_length=255)),
-                ('dose_status', models.CharField(blank=True, help_text='FHIR doseStatus: valid or not valid dose status.', max_length=255)),
-                ('dose_status_reason', models.CharField(blank=True, help_text='FHIR doseStatusReason: reason for dose status.', max_length=255)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: evaluation description.')),
-                ('series', models.CharField(blank=True, help_text='FHIR series: vaccine series name.', max_length=255)),
-                ('dose_number', models.CharField(blank=True, help_text='FHIR doseNumber[x]: dose number within the series.', max_length=50)),
-                ('series_doses', models.CharField(blank=True, help_text='FHIR seriesDoses[x]: recommended number of doses.', max_length=50)),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this immunization evaluation.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('authority', models.ForeignKey(blank=True, help_text='FHIR authority: organization responsible for the evaluation.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='immunization_evaluations', to='clinical.organization')),
-                ('immunization', models.ForeignKey(blank=True, help_text='FHIR immunizationEvent: immunization being evaluated.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='evaluations', to='clinical.immunization')),
-                ('patient', models.ForeignKey(help_text='FHIR patient: patient whose immunization was evaluated.', on_delete=django.db.models.deletion.CASCADE, related_name='immunization_evaluations', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: completed or entered-in-error.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "target_disease",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR targetDisease: disease protected against.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "dose_status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR doseStatus: valid or not valid dose status.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "dose_status_reason",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR doseStatusReason: reason for dose status.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: evaluation description.",
+                    ),
+                ),
+                (
+                    "series",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR series: vaccine series name.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "dose_number",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR doseNumber[x]: dose number within the series.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "series_doses",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR seriesDoses[x]: recommended number of doses.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this immunization evaluation.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "authority",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR authority: organization responsible for the evaluation.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="immunization_evaluations",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "immunization",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR immunizationEvent: immunization being evaluated.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="evaluations",
+                        to="clinical.immunization",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        help_text="FHIR patient: patient whose immunization was evaluated.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="immunization_evaluations",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Immunization Evaluation',
-                'verbose_name_plural': 'Immunization Evaluations',
+                "verbose_name": "Immunization Evaluation",
+                "verbose_name_plural": "Immunization Evaluations",
             },
         ),
         migrations.CreateModel(
-            name='ImagingStudy',
+            name="ImagingStudy",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: registered, available, cancelled, entered-in-error, unknown, etc.', max_length=30)),
-                ('started', models.DateTimeField(blank=True, help_text='FHIR started: when the study started.', null=True)),
-                ('modality_summary', models.TextField(blank=True, help_text='FHIR modality/series.modality: modalities used in the study.')),
-                ('procedure_code', models.CharField(blank=True, help_text='FHIR procedureCode: procedure performed for the study.', max_length=255)),
-                ('location_display', models.CharField(blank=True, help_text='FHIR location: where the study occurred.', max_length=255)),
-                ('reason', models.CharField(blank=True, help_text='FHIR reasonCode: reason for the study.', max_length=255)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: study description.')),
-                ('series_summary', models.TextField(blank=True, help_text='FHIR series/instance: summarized DICOM series and image instances.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this imaging study.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('based_on_service_requests', models.ManyToManyField(blank=True, help_text='FHIR basedOn: orders or requests that caused the study.', related_name='imaging_studies', to='clinical.servicerequest')),
-                ('encounter', models.ForeignKey(blank=True, help_text='FHIR encounter: encounter associated with the imaging study.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='imaging_studies', to='clinical.encounter')),
-                ('endpoint_organizations', models.ManyToManyField(blank=True, help_text='FHIR endpoint: organizations/endpoints associated with image access when resolved locally.', related_name='imaging_studies', to='clinical.organization')),
-                ('interpreter_practitioners', models.ManyToManyField(blank=True, help_text='FHIR interpreter: practitioners who interpreted the study.', related_name='interpreted_imaging_studies', to='clinical.practitioner')),
-                ('patient', models.ForeignKey(help_text='FHIR subject: patient imaged in the study.', on_delete=django.db.models.deletion.CASCADE, related_name='imaging_studies', to='patients.patientprofile')),
-                ('referrer_practitioner', models.ForeignKey(blank=True, help_text='FHIR referrer: referring practitioner.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='referred_imaging_studies', to='clinical.practitioner')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: registered, available, cancelled, entered-in-error, unknown, etc.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "started",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR started: when the study started.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "modality_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR modality/series.modality: modalities used in the study.",
+                    ),
+                ),
+                (
+                    "procedure_code",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR procedureCode: procedure performed for the study.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "location_display",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR location: where the study occurred.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "reason",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR reasonCode: reason for the study.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True, help_text="FHIR description: study description."
+                    ),
+                ),
+                (
+                    "series_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR series/instance: summarized DICOM series and image instances.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this imaging study.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "based_on_service_requests",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR basedOn: orders or requests that caused the study.",
+                        related_name="imaging_studies",
+                        to="clinical.servicerequest",
+                    ),
+                ),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR encounter: encounter associated with the imaging study.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="imaging_studies",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "endpoint_organizations",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR endpoint: organizations/endpoints associated with image access when resolved locally.",
+                        related_name="imaging_studies",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "interpreter_practitioners",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="FHIR interpreter: practitioners who interpreted the study.",
+                        related_name="interpreted_imaging_studies",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        help_text="FHIR subject: patient imaged in the study.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="imaging_studies",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "referrer_practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR referrer: referring practitioner.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="referred_imaging_studies",
+                        to="clinical.practitioner",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Imaging Study',
-                'verbose_name_plural': 'Imaging Studies',
+                "verbose_name": "Imaging Study",
+                "verbose_name_plural": "Imaging Studies",
             },
         ),
         migrations.CreateModel(
-            name='GuidanceResponse',
+            name="GuidanceResponse",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('request_identifier', models.CharField(blank=True, help_text='FHIR requestIdentifier: identifier of the request that initiated guidance.', max_length=255)),
-                ('module_uri', models.TextField(blank=True, help_text='FHIR module[x]: decision support module URI/canonical/code.')),
-                ('status', models.CharField(blank=True, help_text='FHIR status: success, data-requested, data-required, in-progress, failure, or entered-in-error.', max_length=30)),
-                ('reason', models.CharField(blank=True, help_text='FHIR reasonCode: reason for guidance.', max_length=255)),
-                ('occurrence_datetime', models.DateTimeField(blank=True, help_text='FHIR occurrenceDateTime: when guidance was processed.', null=True)),
-                ('output_parameters', models.TextField(blank=True, help_text='FHIR outputParameters: output parameters or reference summary.')),
-                ('result_summary', models.TextField(blank=True, help_text='FHIR result: resulting plan, request group, or other guidance output.')),
-                ('data_requirement_summary', models.TextField(blank=True, help_text='FHIR dataRequirement: data needed by the guidance service.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this guidance response.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('encounter', models.ForeignKey(blank=True, help_text='FHIR encounter: encounter associated with the guidance.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='guidance_responses', to='clinical.encounter')),
-                ('patient', models.ForeignKey(blank=True, help_text='FHIR subject: patient or group the guidance is about.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='guidance_responses', to='patients.patientprofile')),
-                ('performer_organization', models.ForeignKey(blank=True, help_text='FHIR performer: organization or service that generated the guidance.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='guidance_responses', to='clinical.organization')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "request_identifier",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR requestIdentifier: identifier of the request that initiated guidance.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "module_uri",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR module[x]: decision support module URI/canonical/code.",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: success, data-requested, data-required, in-progress, failure, or entered-in-error.",
+                        max_length=30,
+                    ),
+                ),
+                (
+                    "reason",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR reasonCode: reason for guidance.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "occurrence_datetime",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR occurrenceDateTime: when guidance was processed.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "output_parameters",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR outputParameters: output parameters or reference summary.",
+                    ),
+                ),
+                (
+                    "result_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR result: resulting plan, request group, or other guidance output.",
+                    ),
+                ),
+                (
+                    "data_requirement_summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR dataRequirement: data needed by the guidance service.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this guidance response.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR encounter: encounter associated with the guidance.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="guidance_responses",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR subject: patient or group the guidance is about.",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="guidance_responses",
+                        to="patients.patientprofile",
+                    ),
+                ),
+                (
+                    "performer_organization",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="FHIR performer: organization or service that generated the guidance.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="guidance_responses",
+                        to="clinical.organization",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Guidance Response',
-                'verbose_name_plural': 'Guidance Responses',
+                "verbose_name": "Guidance Response",
+                "verbose_name_plural": "Guidance Responses",
             },
         ),
     ]

@@ -6,7 +6,15 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.html import format_html, format_html_join
 
-from clinical.models import Allergy, CareTeam, Condition, Encounter, Immunization, Medication, Observation
+from clinical.models import (
+    Allergy,
+    CareTeam,
+    Condition,
+    Encounter,
+    Immunization,
+    Medication,
+    Observation,
+)
 from documents.models import ClinicalDocument
 
 from .models import PatientProfile, RecoveryCredential
@@ -150,6 +158,7 @@ class ObservationInline(ReadOnlyPatientRecordInline):
     def effective(self, obj):
         return human_datetime(obj.effective_datetime)
 
+
 class EncounterInline(ReadOnlyPatientRecordInline):
     model = Encounter
     fields = (
@@ -215,7 +224,6 @@ class PatientProfileAdmin(admin.ModelAdmin):
         ClinicalDocumentInline,
     )
 
-
     list_display = (
         "id",
         "full_name",
@@ -224,9 +232,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
         "email",
         "updated_at",
     )
-    list_display_links = (
-        "full_name",
-    )
+    list_display_links = ("full_name",)
 
     search_fields = (
         "first_name",
@@ -236,7 +242,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
-        'sex_at_birth',
+        "sex_at_birth",
         "organ_donor",
         "created_at",
     )
@@ -251,59 +257,64 @@ class PatientProfileAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        ("Patient Overview", {
-            "fields": ("patient_overview",)
-        }),
-        ("Basic Info", {
-            "fields": (
-                "first_name",
-                "last_name",
-                "date_of_birth",
-                'sex_at_birth',
-                "gender_identity",
-            )
-        }),
-        ("Contact", {
-            "fields": (
-                "phone",
-                "email",
-            )
-        }),
-        ("Address", {
-            "fields": (
-                "address_line_1",
-                "address_line_2",
-                "city",
-                "state",
-                "postal_code",
-                "country",
-            )
-        }),
-        ("Medical Info", {
-            "fields": (
-                "blood_type",
-                "organ_donor",
-            )
-        }),
-        ("Emergency Contact", {
-            "fields": (
-                "emergency_contact_name",
-                "emergency_contact_phone",
-                "emergency_contact_relationship",
-            )
-        }),
-        ("Related People", {
-            "fields": ("related_people_summary",)
-        }),
-        ("Recent Vitals & Labs", {
-            "fields": ("latest_observations",)
-        }),
-        ("Recent Visits & Actions", {
-            "fields": ("latest_visits",)
-        }),
-        ("Meta", {
-            "fields": ("created", "updated")
-        }),
+        ("Patient Overview", {"fields": ("patient_overview",)}),
+        (
+            "Basic Info",
+            {
+                "fields": (
+                    "first_name",
+                    "last_name",
+                    "date_of_birth",
+                    "sex_at_birth",
+                    "gender_identity",
+                )
+            },
+        ),
+        (
+            "Contact",
+            {
+                "fields": (
+                    "phone",
+                    "email",
+                )
+            },
+        ),
+        (
+            "Address",
+            {
+                "fields": (
+                    "address_line_1",
+                    "address_line_2",
+                    "city",
+                    "state",
+                    "postal_code",
+                    "country",
+                )
+            },
+        ),
+        (
+            "Medical Info",
+            {
+                "fields": (
+                    "blood_type",
+                    "organ_donor",
+                )
+            },
+        ),
+        (
+            "Emergency Contact",
+            {
+                "fields": (
+                    "emergency_contact_name",
+                    "emergency_contact_phone",
+                    "emergency_contact_relationship",
+                )
+            },
+        ),
+        ("Related People", {"fields": ("related_people_summary",)}),
+        ("Recent Vitals & Labs", {"fields": ("latest_observations",)}),
+        ("Recent Visits & Actions", {"fields": ("latest_visits",)}),
+        ("Meta", {"fields": ("created", "updated")}),
     )
 
     @admin.display(description="")
@@ -321,32 +332,53 @@ class PatientProfileAdmin(admin.ModelAdmin):
             ("Emergency contact", obj.emergency_contact_name or "-"),
         ]
         stats = [
-            self._overview_stat_card(obj, "Conditions", "clinical_condition", obj.conditions.count()),
-            self._overview_stat_card(obj, "Allergies", "clinical_allergy", obj.allergies.count()),
-            self._overview_stat_card(obj, "Medications", "clinical_medication", obj.medications.count()),
-            self._overview_stat_card(obj, "Immunizations", "clinical_immunization", obj.immunizations.count()),
-            self._overview_stat_card(obj, "Vitals & Labs", "clinical_observation", obj.observations.count()),
-            self._overview_stat_card(obj, "Visits & Actions", "clinical_encounter", obj.encounters.count()),
-            self._overview_stat_card(obj, "Care Team", "clinical_careteam", obj.care_teams.count()),
-            self._overview_stat_card(obj, "Related People", "clinical_relatedperson", obj.related_people.count()),
-            self._overview_stat_card(obj, "Documents", "documents_clinicaldocument", obj.documents.count()),
+            self._overview_stat_card(
+                obj, "Conditions", "clinical_condition", obj.conditions.count()
+            ),
+            self._overview_stat_card(
+                obj, "Allergies", "clinical_allergy", obj.allergies.count()
+            ),
+            self._overview_stat_card(
+                obj, "Medications", "clinical_medication", obj.medications.count()
+            ),
+            self._overview_stat_card(
+                obj, "Immunizations", "clinical_immunization", obj.immunizations.count()
+            ),
+            self._overview_stat_card(
+                obj, "Vitals & Labs", "clinical_observation", obj.observations.count()
+            ),
+            self._overview_stat_card(
+                obj, "Visits & Actions", "clinical_encounter", obj.encounters.count()
+            ),
+            self._overview_stat_card(
+                obj, "Care Team", "clinical_careteam", obj.care_teams.count()
+            ),
+            self._overview_stat_card(
+                obj,
+                "Related People",
+                "clinical_relatedperson",
+                obj.related_people.count(),
+            ),
+            self._overview_stat_card(
+                obj, "Documents", "documents_clinicaldocument", obj.documents.count()
+            ),
         ]
 
         return format_html(
             '<div class="patient-overview">'
             '<div class="patient-overview-main">'
-            '<h3>{}</h3>'
-            '<dl>{}</dl>'
+            "<h3>{}</h3>"
+            "<dl>{}</dl>"
             '<div class="patient-overview-actions">'
             '<a class="btn btn-primary btn-sm" href="{}">View all patient resources</a>'
-            '</div>'
-            '</div>'
+            "</div>"
+            "</div>"
             '<div class="patient-overview-stats">{}</div>'
-            '</div>',
+            "</div>",
             self._patient_name(obj),
             format_html_join(
                 "",
-                '<div><dt>{}</dt><dd>{}</dd></div>',
+                "<div><dt>{}</dt><dd>{}</dd></div>",
                 demographics,
             ),
             reverse("patient_resources_directory", args=[obj.pk]),
@@ -369,24 +401,28 @@ class PatientProfileAdmin(admin.ModelAdmin):
 
         rows = []
         for person in related_people:
-            contact = " / ".join(part for part in [person.phone, person.email] if part) or "-"
-            rows.append((
-                person.name or "-",
-                person.relationship or "-",
-                contact,
-                "Active" if person.active else "Inactive",
-                reverse("admin:clinical_relatedperson_change", args=[person.pk]),
-            ))
+            contact = (
+                " / ".join(part for part in [person.phone, person.email] if part) or "-"
+            )
+            rows.append(
+                (
+                    person.name or "-",
+                    person.relationship or "-",
+                    contact,
+                    "Active" if person.active else "Inactive",
+                    reverse("admin:clinical_relatedperson_change", args=[person.pk]),
+                )
+            )
 
         list_url = reverse("admin:clinical_relatedperson_changelist")
         return format_html(
             '<div class="patient-compact-table">'
-            '<table><thead><tr><th>Name</th><th>Relationship</th><th>Contact</th><th>Status</th><th></th></tr></thead>'
-            '<tbody>{}</tbody></table>'
+            "<table><thead><tr><th>Name</th><th>Relationship</th><th>Contact</th><th>Status</th><th></th></tr></thead>"
+            "<tbody>{}</tbody></table>"
             '<div class="patient-table-actions">'
             '<a class="btn btn-primary btn-sm" href="{}?patient__id__exact={}">Open all</a>'
             '<a class="btn btn-outline-primary btn-sm" href="{}?patient={}">Add related person</a>'
-            '</div></div>',
+            "</div></div>",
             format_html_join(
                 "",
                 '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td><a class="btn btn-primary btn-sm" href="{}">Open</a></td></tr>',
@@ -415,24 +451,26 @@ class PatientProfileAdmin(admin.ModelAdmin):
         rows = []
         for observation in observations:
             value = self._observation_value(observation)
-            rows.append((
-                observation.name,
-                observation.get_category_display(),
-                value,
-                self._display_datetime(observation.effective_datetime),
-                reverse("admin:clinical_observation_change", args=[observation.pk]),
-            ))
+            rows.append(
+                (
+                    observation.name,
+                    observation.get_category_display(),
+                    value,
+                    self._display_datetime(observation.effective_datetime),
+                    reverse("admin:clinical_observation_change", args=[observation.pk]),
+                )
+            )
 
         list_url = reverse("admin:clinical_observation_changelist")
         add_url = reverse("admin:clinical_observation_add")
         return format_html(
             '<div class="patient-compact-table">'
-            '<table><thead><tr><th>Name</th><th>Category</th><th>Value</th><th>Date</th><th></th></tr></thead>'
-            '<tbody>{}</tbody></table>'
+            "<table><thead><tr><th>Name</th><th>Category</th><th>Value</th><th>Date</th><th></th></tr></thead>"
+            "<tbody>{}</tbody></table>"
             '<div class="patient-table-actions">'
             '<a class="btn btn-primary btn-sm" href="{}?patient__id__exact={}">Open all</a>'
             '<a class="btn btn-outline-primary btn-sm" href="{}?patient={}">Add result</a>'
-            '</div></div>',
+            "</div></div>",
             format_html_join(
                 "",
                 '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td><a class="btn btn-primary btn-sm" href="{}">Open</a></td></tr>',
@@ -460,25 +498,27 @@ class PatientProfileAdmin(admin.ModelAdmin):
 
         rows = []
         for visit in visits:
-            rows.append((
-                visit.encounter_type or "-",
-                visit.status or "-",
-                visit.provider_name or "-",
-                visit.facility_name or "-",
-                self._display_visit_datetime(visit.start_time),
-                reverse("admin:clinical_encounter_change", args=[visit.pk]),
-            ))
+            rows.append(
+                (
+                    visit.encounter_type or "-",
+                    visit.status or "-",
+                    visit.provider_name or "-",
+                    visit.facility_name or "-",
+                    self._display_visit_datetime(visit.start_time),
+                    reverse("admin:clinical_encounter_change", args=[visit.pk]),
+                )
+            )
 
         list_url = reverse("admin:clinical_encounter_changelist")
         add_url = reverse("admin:clinical_encounter_add")
         return format_html(
             '<div class="patient-compact-table">'
-            '<table><thead><tr><th>Visit / Action</th><th>Status</th><th>Provider</th><th>Facility</th><th>Date</th><th></th></tr></thead>'
-            '<tbody>{}</tbody></table>'
+            "<table><thead><tr><th>Visit / Action</th><th>Status</th><th>Provider</th><th>Facility</th><th>Date</th><th></th></tr></thead>"
+            "<tbody>{}</tbody></table>"
             '<div class="patient-table-actions">'
             '<a class="btn btn-primary btn-sm" href="{}?patient__id__exact={}">Open all</a>'
             '<a class="btn btn-outline-primary btn-sm" href="{}?patient={}">Add visit/action</a>'
-            '</div></div>',
+            "</div></div>",
             format_html_join(
                 "",
                 '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td><a class="btn btn-primary btn-sm" href="{}">Open</a></td></tr>',
@@ -502,8 +542,13 @@ class PatientProfileAdmin(admin.ModelAdmin):
         if not obj.date_of_birth:
             return None
         today = timezone.localdate()
-        return today.year - obj.date_of_birth.year - (
-            (today.month, today.day) < (obj.date_of_birth.month, obj.date_of_birth.day)
+        return (
+            today.year
+            - obj.date_of_birth.year
+            - (
+                (today.month, today.day)
+                < (obj.date_of_birth.month, obj.date_of_birth.day)
+            )
         )
 
     def _observation_value(self, observation):
@@ -540,7 +585,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
             '<div class="patient-stat">'
             '<a class="patient-stat-main" href="{}?{}"><strong>{}</strong><span>{}</span></a>'
             '<a class="patient-stat-add" href="{}?patient={}">Add</a>'
-            '</div>',
+            "</div>",
             changelist_url,
             query,
             count,
@@ -548,6 +593,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
             add_url,
             obj.pk,
         )
+
 
 admin.site.unregister(User)
 

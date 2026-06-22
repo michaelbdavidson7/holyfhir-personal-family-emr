@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("clinical", "0002_alter_allergy_options_alter_encounter_options_and_more"),
     ]
@@ -14,7 +13,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="CareTeam",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.CharField(max_length=255)),
                 ("status", models.CharField(blank=True, max_length=30)),
                 ("category", models.CharField(blank=True, max_length=255)),

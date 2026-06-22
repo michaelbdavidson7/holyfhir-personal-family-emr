@@ -17,14 +17,26 @@ def _sql_quote(value):
 
 
 class Command(BaseCommand):
-    help = "Convert a plaintext SQLite database file into an encrypted SQLCipher database."
+    help = (
+        "Convert a plaintext SQLite database file into an encrypted SQLCipher database."
+    )
 
     def add_arguments(self, parser):
         default_source = Path(settings.DATABASES["default"]["NAME"])
-        default_target = default_source.with_name(f"{default_source.stem}.encrypted{default_source.suffix}")
+        default_target = default_source.with_name(
+            f"{default_source.stem}.encrypted{default_source.suffix}"
+        )
 
-        parser.add_argument("--source", default=str(default_source), help="Path to the plaintext SQLite database.")
-        parser.add_argument("--target", default=str(default_target), help="Path for the encrypted SQLCipher database.")
+        parser.add_argument(
+            "--source",
+            default=str(default_source),
+            help="Path to the plaintext SQLite database.",
+        )
+        parser.add_argument(
+            "--target",
+            default=str(default_target),
+            help="Path for the encrypted SQLCipher database.",
+        )
         parser.add_argument("--key", help="Encryption key for the target database.")
         parser.add_argument(
             "--key-env",
@@ -49,7 +61,11 @@ class Command(BaseCommand):
             type=int,
             help=f"SQLCipher compatibility mode. Default: {DEFAULT_DATABASE_CIPHER_COMPATIBILITY}.",
         )
-        parser.add_argument("--force", action="store_true", help="Overwrite the target file if it already exists.")
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Overwrite the target file if it already exists.",
+        )
 
     def handle(self, *args, **options):
         try:
@@ -62,7 +78,9 @@ class Command(BaseCommand):
         key = options["key"] or os.getenv(options["key_env"], "")
 
         if not key:
-            raise CommandError("No encryption key was provided. Use --key or set the configured key environment variable.")
+            raise CommandError(
+                "No encryption key was provided. Use --key or set the configured key environment variable."
+            )
 
         if not source.exists():
             raise CommandError(f"Source database does not exist: {source}")
@@ -72,7 +90,9 @@ class Command(BaseCommand):
 
         if target.exists():
             if not options["force"]:
-                raise CommandError(f"Target database already exists: {target}. Use --force to overwrite it.")
+                raise CommandError(
+                    f"Target database already exists: {target}. Use --force to overwrite it."
+                )
             target.unlink()
 
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -83,7 +103,9 @@ class Command(BaseCommand):
 
             cipher_compatibility = options.get("cipher_compatibility")
             if cipher_compatibility:
-                cursor.execute(f"PRAGMA cipher_compatibility = {int(cipher_compatibility)}")
+                cursor.execute(
+                    f"PRAGMA cipher_compatibility = {int(cipher_compatibility)}"
+                )
 
             cursor.execute(
                 f"ATTACH DATABASE '{_sql_quote(target)}' AS encrypted KEY '{_sql_quote(key)}'"
@@ -91,7 +113,9 @@ class Command(BaseCommand):
 
             cipher_page_size = options.get("cipher_page_size")
             if cipher_page_size:
-                cursor.execute(f"PRAGMA encrypted.cipher_page_size = {int(cipher_page_size)}")
+                cursor.execute(
+                    f"PRAGMA encrypted.cipher_page_size = {int(cipher_page_size)}"
+                )
 
             kdf_iter = options.get("kdf_iter")
             if kdf_iter:

@@ -60,12 +60,21 @@ class SettingsBackupPageTests(TestCase):
             ("Detected Issues", "admin:clinical_detectedissue_changelist"),
             ("Medications", "admin:clinical_medication_changelist"),
             ("Medication Catalog", "admin:clinical_medicationcatalog_changelist"),
-            ("Medication Administrations", "admin:clinical_medicationadministration_changelist"),
+            (
+                "Medication Administrations",
+                "admin:clinical_medicationadministration_changelist",
+            ),
             ("Medication Dispenses", "admin:clinical_medicationdispense_changelist"),
             ("Medication Knowledge", "admin:clinical_medicationknowledge_changelist"),
             ("Immunizations", "admin:clinical_immunization_changelist"),
-            ("Immunization Evaluations", "admin:clinical_immunizationevaluation_changelist"),
-            ("Immunization Recommendations", "admin:clinical_immunizationrecommendation_changelist"),
+            (
+                "Immunization Evaluations",
+                "admin:clinical_immunizationevaluation_changelist",
+            ),
+            (
+                "Immunization Recommendations",
+                "admin:clinical_immunizationrecommendation_changelist",
+            ),
             ("Vitals &amp; Labs", "admin:clinical_observation_changelist"),
             ("Diagnostic Reports", "admin:clinical_diagnosticreport_changelist"),
             ("Media", "admin:clinical_media_changelist"),
@@ -74,7 +83,10 @@ class SettingsBackupPageTests(TestCase):
             ("Flags", "admin:clinical_flag_changelist"),
             ("Consents", "admin:clinical_consent_changelist"),
             ("Communications", "admin:clinical_communication_changelist"),
-            ("Questionnaire Responses", "admin:clinical_questionnaireresponse_changelist"),
+            (
+                "Questionnaire Responses",
+                "admin:clinical_questionnaireresponse_changelist",
+            ),
             ("FHIR Lists", "admin:clinical_fhirlist_changelist"),
             ("Risk Assessments", "admin:clinical_riskassessment_changelist"),
             ("Body Structures", "admin:clinical_bodystructure_changelist"),
@@ -85,7 +97,10 @@ class SettingsBackupPageTests(TestCase):
             ("Care Teams", "admin:clinical_careteam_changelist"),
             ("Care Plans", "admin:clinical_careplan_changelist"),
             ("Service Requests", "admin:clinical_servicerequest_changelist"),
-            ("Communication Requests", "admin:clinical_communicationrequest_changelist"),
+            (
+                "Communication Requests",
+                "admin:clinical_communicationrequest_changelist",
+            ),
             ("Nutrition Orders", "admin:clinical_nutritionorder_changelist"),
             ("Vision Prescriptions", "admin:clinical_visionprescription_changelist"),
             ("Request Groups", "admin:clinical_requestgroup_changelist"),
@@ -98,14 +113,26 @@ class SettingsBackupPageTests(TestCase):
             ("Procedures", "admin:clinical_procedure_changelist"),
             ("Specimens", "admin:clinical_specimen_changelist"),
             ("Coverages", "admin:clinical_coverage_changelist"),
-            ("Explanations of Benefits", "admin:clinical_explanationofbenefit_changelist"),
+            (
+                "Explanations of Benefits",
+                "admin:clinical_explanationofbenefit_changelist",
+            ),
             ("Insurance Plans", "admin:clinical_insuranceplan_changelist"),
-            ("Coverage Eligibility Requests", "admin:clinical_coverageeligibilityrequest_changelist"),
-            ("Coverage Eligibility Responses", "admin:clinical_coverageeligibilityresponse_changelist"),
+            (
+                "Coverage Eligibility Requests",
+                "admin:clinical_coverageeligibilityrequest_changelist",
+            ),
+            (
+                "Coverage Eligibility Responses",
+                "admin:clinical_coverageeligibilityresponse_changelist",
+            ),
             ("Enrollment Requests", "admin:clinical_enrollmentrequest_changelist"),
             ("Enrollment Responses", "admin:clinical_enrollmentresponse_changelist"),
             ("Payment Notices", "admin:clinical_paymentnotice_changelist"),
-            ("Payment Reconciliations", "admin:clinical_paymentreconciliation_changelist"),
+            (
+                "Payment Reconciliations",
+                "admin:clinical_paymentreconciliation_changelist",
+            ),
             ("Libraries", "admin:clinical_library_changelist"),
             ("Plan Definitions", "admin:clinical_plandefinition_changelist"),
             ("Measures", "admin:clinical_measure_changelist"),
@@ -126,20 +153,30 @@ class SettingsBackupPageTests(TestCase):
             ("Search Parameters", "admin:clinical_searchparameter_changelist"),
             ("Message Definitions", "admin:clinical_messagedefinition_changelist"),
             ("Operation Definitions", "admin:clinical_operationdefinition_changelist"),
-            ("Compartment Definitions", "admin:clinical_compartmentdefinition_changelist"),
+            (
+                "Compartment Definitions",
+                "admin:clinical_compartmentdefinition_changelist",
+            ),
             ("Structure Maps", "admin:clinical_structuremap_changelist"),
             ("Graph Definitions", "admin:clinical_graphdefinition_changelist"),
             ("Example Scenarios", "admin:clinical_examplescenario_changelist"),
             ("Naming Systems", "admin:clinical_namingsystem_changelist"),
-            ("Terminology Capabilities", "admin:clinical_terminologycapabilities_changelist"),
+            (
+                "Terminology Capabilities",
+                "admin:clinical_terminologycapabilities_changelist",
+            ),
             ("Activity Definitions", "admin:clinical_activitydefinition_changelist"),
             ("Event Definitions", "admin:clinical_eventdefinition_changelist"),
-            ("Specimen Definitions", "admin:clinical_specimendefinition_changelist"),            ("Code Systems", "admin:clinical_codesystem_changelist"),
+            ("Specimen Definitions", "admin:clinical_specimendefinition_changelist"),
+            ("Code Systems", "admin:clinical_codesystem_changelist"),
             ("Value Sets", "admin:clinical_valueset_changelist"),
             ("Concept Maps", "admin:clinical_conceptmap_changelist"),
             ("Questionnaires", "admin:clinical_questionnaire_changelist"),
             ("Device Definitions", "admin:clinical_devicedefinition_changelist"),
-            ("Observation Definitions", "admin:clinical_observationdefinition_changelist"),
+            (
+                "Observation Definitions",
+                "admin:clinical_observationdefinition_changelist",
+            ),
             ("Compositions", "admin:clinical_composition_changelist"),
             ("Document Manifests", "admin:clinical_documentmanifest_changelist"),
             ("Binary Resources", "admin:clinical_binaryresource_changelist"),
@@ -152,7 +189,10 @@ class SettingsBackupPageTests(TestCase):
             ("Practitioners", "admin:clinical_practitioner_changelist"),
             ("Practitioner Roles", "admin:clinical_practitionerrole_changelist"),
             ("Healthcare Services", "admin:clinical_healthcareservice_changelist"),
-            ("Organization Affiliations", "admin:clinical_organizationaffiliation_changelist"),
+            (
+                "Organization Affiliations",
+                "admin:clinical_organizationaffiliation_changelist",
+            ),
             ("Endpoints", "admin:clinical_endpoint_changelist"),
             ("Substances", "admin:clinical_substance_changelist"),
             ("Device Metrics", "admin:clinical_devicemetric_changelist"),
@@ -166,21 +206,29 @@ class SettingsBackupPageTests(TestCase):
     def test_patient_profile_links_to_patient_resources_directory(self):
         patient = PatientProfile.objects.create(first_name="Maya", last_name="Rivera")
 
-        response = self.client.get(reverse("admin:patients_patientprofile_change", args=[patient.pk]))
+        response = self.client.get(
+            reverse("admin:patients_patientprofile_change", args=[patient.pk])
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "View all patient resources")
-        self.assertContains(response, reverse("patient_resources_directory", args=[patient.pk]))
+        self.assertContains(
+            response, reverse("patient_resources_directory", args=[patient.pk])
+        )
 
     def test_patient_resources_directory_lists_filtered_resource_links(self):
         patient = PatientProfile.objects.create(first_name="Maya", last_name="Rivera")
-        other_patient = PatientProfile.objects.create(first_name="Other", last_name="Patient")
+        other_patient = PatientProfile.objects.create(
+            first_name="Other", last_name="Patient"
+        )
         Condition.objects.create(patient=patient, name="Asthma")
         Condition.objects.create(patient=other_patient, name="Migraine")
         Observation.objects.create(patient=patient, name="Blood pressure")
         ClinicalDocument.objects.create(patient=patient, title="Discharge summary")
 
-        response = self.client.get(reverse("patient_resources_directory", args=[patient.pk]))
+        response = self.client.get(
+            reverse("patient_resources_directory", args=[patient.pk])
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Maya Rivera")
@@ -198,13 +246,32 @@ class SettingsBackupPageTests(TestCase):
         self.assertContains(response, "Tasks")
         self.assertContains(response, "Appointments")
         self.assertContains(response, "Provenance")
-        self.assertContains(response, f"{reverse('admin:clinical_condition_changelist')}?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"{reverse('admin:clinical_observation_changelist')}?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"{reverse('admin:documents_clinicaldocument_changelist')}?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"{reverse('admin:clinical_coverage_changelist')}?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"{reverse('admin:clinical_claim_changelist')}?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"{reverse('admin:clinical_account_changelist')}?patient__id__exact={patient.pk}")
-        self.assertContains(response, f"{reverse('admin:clinical_task_changelist')}?patient__id__exact={patient.pk}")
+        self.assertContains(
+            response,
+            f"{reverse('admin:clinical_condition_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertContains(
+            response,
+            f"{reverse('admin:clinical_observation_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertContains(
+            response,
+            f"{reverse('admin:documents_clinicaldocument_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertContains(
+            response,
+            f"{reverse('admin:clinical_coverage_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertContains(
+            response,
+            f"{reverse('admin:clinical_claim_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertContains(
+            response,
+            f"{reverse('admin:clinical_account_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertContains(
+            response,
+            f"{reverse('admin:clinical_task_changelist')}?patient__id__exact={patient.pk}",
+        )
         self.assertContains(response, "1 record")
-
-

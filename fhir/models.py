@@ -20,11 +20,11 @@ class FHIRResourceSnapshot(models.Model):
         blank=True,
     )
 
-    resource_type = models.CharField(max_length=100)   # Patient, Observation, Condition
+    resource_type = models.CharField(max_length=100)  # Patient, Observation, Condition
     resource_id = models.CharField(max_length=100, blank=True)
     version_id = models.CharField(max_length=100, blank=True)
 
-    source = models.CharField(max_length=50, default="internal")  
+    source = models.CharField(max_length=50, default="internal")
     # internal, imported, exported, synced
 
     raw_json = models.JSONField()
@@ -49,9 +49,11 @@ class FHIRLink(models.Model):
     resource_type = models.CharField(max_length=100)
     resource_id = models.CharField(max_length=100, blank=True)
 
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True, blank=True)
+    patient = models.ForeignKey(
+        PatientProfile, on_delete=models.CASCADE, null=True, blank=True
+    )
 
-    django_model = models.CharField(max_length=100)    # Medication, Observation, etc.
+    django_model = models.CharField(max_length=100)  # Medication, Observation, etc.
     django_object_id = models.PositiveIntegerField()
 
     last_synced_at = models.DateTimeField(null=True, blank=True)

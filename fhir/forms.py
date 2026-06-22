@@ -41,16 +41,22 @@ class FHIRImportForm(forms.Form):
         pasted_json = cleaned_data.get("fhir_json", "").strip()
 
         if not uploaded_file and not pasted_json:
-            raise forms.ValidationError("Upload a FHIR ZIP/JSON/NDJSON file or paste FHIR JSON.")
+            raise forms.ValidationError(
+                "Upload a FHIR ZIP/JSON/NDJSON file or paste FHIR JSON."
+            )
 
         if uploaded_file and pasted_json:
-            raise forms.ValidationError("Use either a file upload or pasted JSON, not both.")
+            raise forms.ValidationError(
+                "Use either a file upload or pasted JSON, not both."
+            )
 
         if uploaded_file:
             cleaned_data["payloads"] = self._payloads_from_upload(uploaded_file)
         else:
             try:
-                cleaned_data["payloads"] = loads_fhir_documents(pasted_json, "pasted FHIR JSON")
+                cleaned_data["payloads"] = loads_fhir_documents(
+                    pasted_json, "pasted FHIR JSON"
+                )
             except ValueError as exc:
                 raise forms.ValidationError(str(exc)) from exc
 
@@ -65,7 +71,9 @@ class FHIRImportForm(forms.Form):
         try:
             raw = content.decode("utf-8-sig")
         except UnicodeDecodeError as exc:
-            raise forms.ValidationError("FHIR file must be UTF-8 encoded JSON/NDJSON or a ZIP export.") from exc
+            raise forms.ValidationError(
+                "FHIR file must be UTF-8 encoded JSON/NDJSON or a ZIP export."
+            ) from exc
 
         try:
             return loads_fhir_documents(raw, filename)
@@ -87,16 +95,22 @@ class FHIRImportForm(forms.Form):
                     try:
                         raw = archive.read(name).decode("utf-8-sig")
                     except UnicodeDecodeError as exc:
-                        raise forms.ValidationError(f"{name} must be UTF-8 encoded.") from exc
+                        raise forms.ValidationError(
+                            f"{name} must be UTF-8 encoded."
+                        ) from exc
                     try:
                         payloads.extend(loads_fhir_documents(raw, path.name))
                     except ValueError as exc:
                         raise forms.ValidationError(f"{name}: {exc}") from exc
         except BadZipFile as exc:
-            raise forms.ValidationError("Uploaded ZIP file could not be opened.") from exc
+            raise forms.ValidationError(
+                "Uploaded ZIP file could not be opened."
+            ) from exc
 
         if not payloads:
-            raise forms.ValidationError("ZIP file did not contain any FHIR JSON or NDJSON files.")
+            raise forms.ValidationError(
+                "ZIP file did not contain any FHIR JSON or NDJSON files."
+            )
         return payloads
 
 
@@ -112,5 +126,7 @@ class QuickPatientCreateForm(forms.ModelForm):
         widgets = {
             "first_name": forms.TextInput(attrs={"class": "form-control"}),
             "last_name": forms.TextInput(attrs={"class": "form-control"}),
-            "date_of_birth": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "date_of_birth": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
         }

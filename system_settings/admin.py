@@ -27,20 +27,29 @@ class SystemSettingsAdminForm(forms.ModelForm):
 class SystemSettingsAdmin(admin.ModelAdmin):
     form = SystemSettingsAdminForm
     fieldsets = (
-        ("Local time", {
-            "fields": ("time_zone",),
-            "description": (
-                "HolyFHIR stores medical calendar dates as dates. This setting controls how exact timestamps "
-                "are displayed, such as observations, encounters, imports, and security events."
-            ),
-        }),
-        ("Lock screen", {
-            "fields": ("lock_shortcut_enabled",),
-            "description": "Manual Lock app is always available from the account menu. The keyboard shortcut is opt in.",
-        }),
-        ("Meta", {
-            "fields": ("updated_at",),
-        }),
+        (
+            "Local time",
+            {
+                "fields": ("time_zone",),
+                "description": (
+                    "HolyFHIR stores medical calendar dates as dates. This setting controls how exact timestamps "
+                    "are displayed, such as observations, encounters, imports, and security events."
+                ),
+            },
+        ),
+        (
+            "Lock screen",
+            {
+                "fields": ("lock_shortcut_enabled",),
+                "description": "Manual Lock app is always available from the account menu. The keyboard shortcut is opt in.",
+            },
+        ),
+        (
+            "Meta",
+            {
+                "fields": ("updated_at",),
+            },
+        ),
     )
     readonly_fields = ("updated_at",)
 

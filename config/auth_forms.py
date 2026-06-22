@@ -110,8 +110,12 @@ class RateLimitedAdminAuthenticationForm(AdminAuthenticationForm):
         try:
             cleaned_data = super().clean()
         except ValidationError:
-            _increment_failure(LoginLockout.SCOPE_USERNAME, username_key, username_limit, timeout)
-            _increment_failure(LoginLockout.SCOPE_CLIENT, client_key, client_limit, timeout)
+            _increment_failure(
+                LoginLockout.SCOPE_USERNAME, username_key, username_limit, timeout
+            )
+            _increment_failure(
+                LoginLockout.SCOPE_CLIENT, client_key, client_limit, timeout
+            )
             raise
 
         _clear_failure(LoginLockout.SCOPE_USERNAME, username_key)

@@ -4,703 +4,3144 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('clinical', '0024_activitydefinition_capabilitystatement_and_more'),
+        ("clinical", "0024_activitydefinition_capabilitystatement_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Basic',
+            name="Basic",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='BiologicallyDerivedProduct',
+            name="BiologicallyDerivedProduct",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='CatalogEntry',
+            name="CatalogEntry",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name_plural': 'Catalog entries',
+                "verbose_name_plural": "Catalog entries",
             },
         ),
         migrations.CreateModel(
-            name='ChargeItemDefinition',
+            name="ChargeItemDefinition",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Contract',
+            name="Contract",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='EffectEvidenceSynthesis',
+            name="EffectEvidenceSynthesis",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name_plural': 'Effect evidence syntheses',
+                "verbose_name_plural": "Effect evidence syntheses",
             },
         ),
         migrations.CreateModel(
-            name='Evidence',
+            name="Evidence",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name_plural': 'Evidence',
+                "verbose_name_plural": "Evidence",
             },
         ),
         migrations.CreateModel(
-            name='EvidenceVariable',
+            name="EvidenceVariable",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Linkage',
+            name="Linkage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProduct',
+            name="MedicinalProduct",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductAuthorization',
+            name="MedicinalProductAuthorization",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductContraindication',
+            name="MedicinalProductContraindication",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductIndication',
+            name="MedicinalProductIndication",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductIngredient',
+            name="MedicinalProductIngredient",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductInteraction',
+            name="MedicinalProductInteraction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductManufactured',
+            name="MedicinalProductManufactured",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductPackaged',
+            name="MedicinalProductPackaged",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductPharmaceutical',
+            name="MedicinalProductPharmaceutical",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MedicinalProductUndesirableEffect',
+            name="MedicinalProductUndesirableEffect",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MessageHeader',
+            name="MessageHeader",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='OperationOutcome',
+            name="OperationOutcome",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Parameters',
+            name="Parameters",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name_plural': 'Parameters',
+                "verbose_name_plural": "Parameters",
             },
         ),
         migrations.CreateModel(
-            name='ResearchDefinition',
+            name="ResearchDefinition",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='ResearchElementDefinition',
+            name="ResearchElementDefinition",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='RiskEvidenceSynthesis',
+            name="RiskEvidenceSynthesis",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name_plural': 'Risk evidence syntheses',
+                "verbose_name_plural": "Risk evidence syntheses",
             },
         ),
         migrations.CreateModel(
-            name='Subscription',
+            name="Subscription",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SubstanceNucleicAcid',
+            name="SubstanceNucleicAcid",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SubstancePolymer',
+            name="SubstancePolymer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SubstanceProtein',
+            name="SubstanceProtein",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SubstanceReferenceInformation',
+            name="SubstanceReferenceInformation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SubstanceSourceMaterial',
+            name="SubstanceSourceMaterial",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SubstanceSpecification',
+            name="SubstanceSpecification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='VerificationResult',
+            name="VerificationResult",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, help_text='FHIR url: canonical URL when this resource defines one.')),
-                ('version', models.CharField(blank=True, help_text='FHIR version: business version when present.', max_length=100)),
-                ('name', models.CharField(blank=True, help_text='FHIR name: computer-friendly name when present.', max_length=255)),
-                ('title', models.CharField(blank=True, help_text='FHIR title/name/code: human-friendly label for this resource.', max_length=255)),
-                ('status', models.CharField(blank=True, help_text='FHIR status: workflow/publication status when present.', max_length=50)),
-                ('publisher', models.CharField(blank=True, help_text='FHIR publisher: organization or individual responsible when present.', max_length=255)),
-                ('date', models.DateTimeField(blank=True, help_text='FHIR date: publication/change/event date when present.', null=True)),
-                ('description', models.TextField(blank=True, help_text='FHIR description: natural language description when present.')),
-                ('summary', models.TextField(blank=True, help_text='Compact summary of important FHIR elements for browsing/search.')),
-                ('notes', models.TextField(blank=True, help_text='Imported notes or source text for this resource.')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        blank=True,
+                        help_text="FHIR url: canonical URL when this resource defines one.",
+                    ),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR version: business version when present.",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR name: computer-friendly name when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR title/name/code: human-friendly label for this resource.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR status: workflow/publication status when present.",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "publisher",
+                    models.CharField(
+                        blank=True,
+                        help_text="FHIR publisher: organization or individual responsible when present.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="FHIR date: publication/change/event date when present.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="FHIR description: natural language description when present.",
+                    ),
+                ),
+                (
+                    "summary",
+                    models.TextField(
+                        blank=True,
+                        help_text="Compact summary of important FHIR elements for browsing/search.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Imported notes or source text for this resource.",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

@@ -5,9 +5,11 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("clinical", "0007_device_practitionerrole_servicerequest_episodeofcare_and_more"),
+        (
+            "clinical",
+            "0007_device_practitionerrole_servicerequest_episodeofcare_and_more",
+        ),
         ("documents", "0001_initial"),
     ]
 
@@ -15,7 +17,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="clinicaldocument",
             name="authors",
-            field=models.ManyToManyField(blank=True, related_name="authored_documents", to="clinical.practitioner"),
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="authored_documents",
+                to="clinical.practitioner",
+            ),
         ),
         migrations.AddField(
             model_name="clinicaldocument",
@@ -42,6 +48,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="clinicaldocument",
             name="related_documents",
-            field=models.ManyToManyField(blank=True, related_name="related_to_documents", to="documents.clinicaldocument"),
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="related_to_documents",
+                to="documents.clinicaldocument",
+            ),
         ),
     ]

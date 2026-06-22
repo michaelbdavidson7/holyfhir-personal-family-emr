@@ -84,7 +84,9 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         if passphrase:
             conn.execute(f"PRAGMA key = '{_sql_quote(passphrase)}'")
             if cipher_compatibility:
-                conn.execute(f"PRAGMA cipher_compatibility = {int(cipher_compatibility)}")
+                conn.execute(
+                    f"PRAGMA cipher_compatibility = {int(cipher_compatibility)}"
+                )
             if cipher_page_size:
                 conn.execute(f"PRAGMA cipher_page_size = {int(cipher_page_size)}")
             if kdf_iter:

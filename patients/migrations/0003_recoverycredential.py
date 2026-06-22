@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("patients", "0002_loginlockout"),
@@ -16,7 +15,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="RecoveryCredential",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("recovery_key_hash", models.CharField(max_length=255)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("last_used_at", models.DateTimeField(blank=True, null=True)),

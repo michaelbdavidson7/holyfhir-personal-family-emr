@@ -42,7 +42,10 @@ def import_fhir_data(request):
             try:
                 backup_path = create_pre_import_database_backup()
             except OSError as error:
-                messages.error(request, f"FHIR import was not started because the database backup failed: {error}")
+                messages.error(
+                    request,
+                    f"FHIR import was not started because the database backup failed: {error}",
+                )
                 patient_form = QuickPatientCreateForm()
                 return render(
                     request,
@@ -74,7 +77,9 @@ def import_fhir_data(request):
                 ),
             )
             if backup_path:
-                messages.info(request, f"Pre-import database backup created: {backup_path}")
+                messages.info(
+                    request, f"Pre-import database backup created: {backup_path}"
+                )
             return redirect(reverse("admin:fhir_fhirresourcesnapshot_changelist"))
         patient_form = QuickPatientCreateForm()
     else:

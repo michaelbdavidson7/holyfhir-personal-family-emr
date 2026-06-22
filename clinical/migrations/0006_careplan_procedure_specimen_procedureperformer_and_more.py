@@ -5,99 +5,221 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0004_alter_patientprofile_options'),
-        ('clinical', '0005_careteam_managing_organizations_careteamparticipant'),
+        ("patients", "0004_alter_patientprofile_options"),
+        ("clinical", "0005_careteam_managing_organizations_careteamparticipant"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CarePlan',
+            name="CarePlan",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('status', models.CharField(blank=True, max_length=30)),
-                ('intent', models.CharField(blank=True, max_length=30)),
-                ('category', models.CharField(blank=True, max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('start_date', models.DateField(blank=True, null=True)),
-                ('end_date', models.DateField(blank=True, null=True)),
-                ('author_display', models.CharField(blank=True, max_length=255)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('care_teams', models.ManyToManyField(blank=True, related_name='care_plans', to='clinical.careteam')),
-                ('conditions', models.ManyToManyField(blank=True, related_name='care_plans', to='clinical.condition')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='care_plans', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("status", models.CharField(blank=True, max_length=30)),
+                ("intent", models.CharField(blank=True, max_length=30)),
+                ("category", models.CharField(blank=True, max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("start_date", models.DateField(blank=True, null=True)),
+                ("end_date", models.DateField(blank=True, null=True)),
+                ("author_display", models.CharField(blank=True, max_length=255)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "care_teams",
+                    models.ManyToManyField(
+                        blank=True, related_name="care_plans", to="clinical.careteam"
+                    ),
+                ),
+                (
+                    "conditions",
+                    models.ManyToManyField(
+                        blank=True, related_name="care_plans", to="clinical.condition"
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="care_plans",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Care Plan',
-                'verbose_name_plural': 'Care Plans',
+                "verbose_name": "Care Plan",
+                "verbose_name_plural": "Care Plans",
             },
         ),
         migrations.CreateModel(
-            name='Procedure',
+            name="Procedure",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('status', models.CharField(blank=True, max_length=30)),
-                ('category', models.CharField(blank=True, max_length=255)),
-                ('performed_start', models.DateTimeField(blank=True, null=True)),
-                ('performed_end', models.DateTimeField(blank=True, null=True)),
-                ('body_site', models.CharField(blank=True, max_length=255)),
-                ('outcome', models.CharField(blank=True, max_length=255)),
-                ('reason', models.CharField(blank=True, max_length=255)),
-                ('location_display', models.CharField(blank=True, max_length=255)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('care_plans', models.ManyToManyField(blank=True, related_name='procedures', to='clinical.careplan')),
-                ('conditions', models.ManyToManyField(blank=True, related_name='procedures', to='clinical.condition')),
-                ('encounter', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='procedures', to='clinical.encounter')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='procedures', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("status", models.CharField(blank=True, max_length=30)),
+                ("category", models.CharField(blank=True, max_length=255)),
+                ("performed_start", models.DateTimeField(blank=True, null=True)),
+                ("performed_end", models.DateTimeField(blank=True, null=True)),
+                ("body_site", models.CharField(blank=True, max_length=255)),
+                ("outcome", models.CharField(blank=True, max_length=255)),
+                ("reason", models.CharField(blank=True, max_length=255)),
+                ("location_display", models.CharField(blank=True, max_length=255)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "care_plans",
+                    models.ManyToManyField(
+                        blank=True, related_name="procedures", to="clinical.careplan"
+                    ),
+                ),
+                (
+                    "conditions",
+                    models.ManyToManyField(
+                        blank=True, related_name="procedures", to="clinical.condition"
+                    ),
+                ),
+                (
+                    "encounter",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="procedures",
+                        to="clinical.encounter",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="procedures",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Specimen',
+            name="Specimen",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('accession_identifier', models.CharField(blank=True, max_length=100)),
-                ('status', models.CharField(blank=True, max_length=30)),
-                ('specimen_type', models.CharField(blank=True, max_length=255)),
-                ('received_time', models.DateTimeField(blank=True, null=True)),
-                ('collected_datetime', models.DateTimeField(blank=True, null=True)),
-                ('collection_method', models.CharField(blank=True, max_length=255)),
-                ('body_site', models.CharField(blank=True, max_length=255)),
-                ('collector_display', models.CharField(blank=True, max_length=255)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('parent_specimens', models.ManyToManyField(blank=True, related_name='child_specimens', to='clinical.specimen')),
-                ('patient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='specimens', to='patients.patientprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("accession_identifier", models.CharField(blank=True, max_length=100)),
+                ("status", models.CharField(blank=True, max_length=30)),
+                ("specimen_type", models.CharField(blank=True, max_length=255)),
+                ("received_time", models.DateTimeField(blank=True, null=True)),
+                ("collected_datetime", models.DateTimeField(blank=True, null=True)),
+                ("collection_method", models.CharField(blank=True, max_length=255)),
+                ("body_site", models.CharField(blank=True, max_length=255)),
+                ("collector_display", models.CharField(blank=True, max_length=255)),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "parent_specimens",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="child_specimens",
+                        to="clinical.specimen",
+                    ),
+                ),
+                (
+                    "patient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="specimens",
+                        to="patients.patientprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ProcedurePerformer',
+            name="ProcedurePerformer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(blank=True, max_length=255)),
-                ('actor_display', models.CharField(blank=True, max_length=255)),
-                ('actor_reference', models.CharField(blank=True, max_length=255)),
-                ('on_behalf_of_display', models.CharField(blank=True, max_length=255)),
-                ('on_behalf_of_reference', models.CharField(blank=True, max_length=255)),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='procedure_performances', to='clinical.organization')),
-                ('practitioner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='procedure_performances', to='clinical.practitioner')),
-                ('procedure', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='performer_links', to='clinical.procedure')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("role", models.CharField(blank=True, max_length=255)),
+                ("actor_display", models.CharField(blank=True, max_length=255)),
+                ("actor_reference", models.CharField(blank=True, max_length=255)),
+                ("on_behalf_of_display", models.CharField(blank=True, max_length=255)),
+                (
+                    "on_behalf_of_reference",
+                    models.CharField(blank=True, max_length=255),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="procedure_performances",
+                        to="clinical.organization",
+                    ),
+                ),
+                (
+                    "practitioner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="procedure_performances",
+                        to="clinical.practitioner",
+                    ),
+                ),
+                (
+                    "procedure",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="performer_links",
+                        to="clinical.procedure",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Procedure Performer',
-                'verbose_name_plural': 'Procedure Performers',
+                "verbose_name": "Procedure Performer",
+                "verbose_name_plural": "Procedure Performers",
             },
         ),
         migrations.AddField(
-            model_name='observation',
-            name='specimen',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='observations', to='clinical.specimen'),
+            model_name="observation",
+            name="specimen",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="observations",
+                to="clinical.specimen",
+            ),
         ),
     ]

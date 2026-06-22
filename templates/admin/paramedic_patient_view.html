@@ -1,0 +1,109 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+  .paramedic-view { max-width: 1100px; }
+  .emergency-banner {
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    border-radius: 12px;
+    color: #7f1d1d;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .paramedic-section {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    padding: 16px;
+  }
+  .paramedic-section h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .paramedic-list {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .empty {
+    color: #6b7280;
+  }
+</style>
+
+<div class="content">
+  <div class="container-fluid paramedic-view">
+    <div class="emergency-banner">
+      <h1>Paramedic View</h1>
+      <strong>{{ patient }}</strong>
+      <div>Emergency-focused summary. Not a full chart.</div>
+    </div>
+
+    <section class="paramedic-section">
+      <h2>Critical Alerts</h2>
+      {% if flags %}
+        <ul class="paramedic-list">
+          {% for flag in flags %}
+            <li><strong>{{ flag.code }}</strong>{% if flag.notes %}: {{ flag.notes }}{% endif %}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">No flags recorded.</p>
+      {% endif %}
+    </section>
+
+    <section class="paramedic-section">
+      <h2>Allergies</h2>
+      {% if allergies %}
+        <ul class="paramedic-list">
+          {% for allergy in allergies %}
+            <li><strong>{{ allergy.substance }}</strong> {{ allergy.severity }} {{ allergy.reaction }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">No allergies recorded.</p>
+      {% endif %}
+    </section>
+
+    <section class="paramedic-section">
+      <h2>Medications</h2>
+      {% if medications %}
+        <ul class="paramedic-list">
+          {% for med in medications %}
+            <li><strong>{{ med.name }}</strong>{% if med.dosage_text %}: {{ med.dosage_text }}{% endif %}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">No medications recorded.</p>
+      {% endif %}
+    </section>
+
+    <section class="paramedic-section">
+      <h2>Conditions</h2>
+      {% if conditions %}
+        <ul class="paramedic-list">
+          {% for condition in conditions %}
+            <li><strong>{{ condition.name }}</strong> {{ condition.clinical_status }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">No conditions recorded.</p>
+      {% endif %}
+    </section>
+
+    <section class="paramedic-section">
+      <h2>Emergency Contacts</h2>
+      {% if related_people %}
+        <ul class="paramedic-list">
+          {% for person in related_people %}
+            <li><strong>{{ person.name }}</strong> {{ person.relationship }} {{ person.phone }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">No emergency contacts recorded.</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

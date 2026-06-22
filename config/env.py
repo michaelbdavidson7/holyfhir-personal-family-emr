@@ -33,7 +33,9 @@ def _unquote(value):
 def parse_env_file(path: Path):
     values = {}
 
-    for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+    for line_number, raw_line in enumerate(
+        path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
         line = raw_line.strip()
 
         if not line or line.startswith("#"):
@@ -43,13 +45,17 @@ def parse_env_file(path: Path):
             line = line[7:].lstrip()
 
         if "=" not in line:
-            raise ImproperlyConfigured(f"Invalid environment line in {path} at line {line_number}: expected KEY=VALUE.")
+            raise ImproperlyConfigured(
+                f"Invalid environment line in {path} at line {line_number}: expected KEY=VALUE."
+            )
 
         key, value = line.split("=", 1)
         key = key.strip()
 
         if not key:
-            raise ImproperlyConfigured(f"Invalid environment line in {path} at line {line_number}: key is empty.")
+            raise ImproperlyConfigured(
+                f"Invalid environment line in {path} at line {line_number}: key is empty."
+            )
 
         values[key] = _unquote(_strip_inline_comment(value.strip()))
 
@@ -77,11 +83,15 @@ def load_env(base_dir: Path, env_file_name=".env", example_file_name=".env.examp
         return
 
     env_values = parse_env_file(env_path)
-    missing_keys = sorted(key for key in required_keys - set(env_values) if not os.getenv(key))
+    missing_keys = sorted(
+        key for key in required_keys - set(env_values) if not os.getenv(key)
+    )
 
     if missing_keys:
         missing = ", ".join(missing_keys)
-        raise ImproperlyConfigured(f"{env_path} is missing required key(s) from {example_path}: {missing}")
+        raise ImproperlyConfigured(
+            f"{env_path} is missing required key(s) from {example_path}: {missing}"
+        )
 
     for key, value in env_values.items():
         os.environ.setdefault(key, value)

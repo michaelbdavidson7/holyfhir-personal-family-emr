@@ -33,7 +33,7 @@ class PatientProfile(models.Model):
     class Meta:
         verbose_name = "Patient Profile"
         verbose_name_plural = "Patient Profiles"
-        
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -55,7 +55,9 @@ class LoginLockout(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["scope", "key"], name="unique_login_lockout_scope_key"),
+            models.UniqueConstraint(
+                fields=["scope", "key"], name="unique_login_lockout_scope_key"
+            ),
         ]
         verbose_name = "Login Lockout"
         verbose_name_plural = "Login Lockouts"

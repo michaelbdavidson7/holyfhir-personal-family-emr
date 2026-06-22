@@ -23,9 +23,13 @@ def observation_charts(request):
 
     numeric_observations = Observation.objects.filter(value_quantity__isnull=False)
 
-    patients = PatientProfile.objects.filter(
-        observations__value_quantity__isnull=False,
-    ).distinct().order_by("last_name", "first_name")
+    patients = (
+        PatientProfile.objects.filter(
+            observations__value_quantity__isnull=False,
+        )
+        .distinct()
+        .order_by("last_name", "first_name")
+    )
 
     if patient_id:
         numeric_observations = numeric_observations.filter(patient_id=patient_id)
@@ -45,12 +49,18 @@ def observation_charts(request):
     chart_observations = numeric_observations.filter(name__in=selected_names)
 
     if start_date:
-        chart_observations = chart_observations.filter(effective_datetime__date__gte=start_date)
+        chart_observations = chart_observations.filter(
+            effective_datetime__date__gte=start_date
+        )
 
     if end_date:
-        chart_observations = chart_observations.filter(effective_datetime__date__lte=end_date)
+        chart_observations = chart_observations.filter(
+            effective_datetime__date__lte=end_date
+        )
 
-    chart_observations = chart_observations.select_related("patient").order_by("effective_datetime", "created_at", "id")
+    chart_observations = chart_observations.select_related("patient").order_by(
+        "effective_datetime", "created_at", "id"
+    )
     chart_series = _chart_series(chart_observations, selected_names)
 
     context = {
@@ -73,7 +83,10 @@ def _default_observation_names(available_names):
     blood_pressure_names = [
         name
         for name in available_names
-        if any(fragment in name.lower() for fragment in ("blood pressure", "systolic", "diastolic", "bp "))
+        if any(
+            fragment in name.lower()
+            for fragment in ("blood pressure", "systolic", "diastolic", "bp ")
+        )
     ]
 
     if blood_pressure_names:

@@ -16,7 +16,10 @@ RECOVERY_KEY_ALPHABET = "".join(
 
 def generate_recovery_key():
     groups = [
-        "".join(secrets.choice(RECOVERY_KEY_ALPHABET) for _ in range(RECOVERY_KEY_GROUP_LENGTH))
+        "".join(
+            secrets.choice(RECOVERY_KEY_ALPHABET)
+            for _ in range(RECOVERY_KEY_GROUP_LENGTH)
+        )
         for _ in range(RECOVERY_KEY_GROUPS)
     ]
     return "-".join([RECOVERY_KEY_PREFIX, *groups])

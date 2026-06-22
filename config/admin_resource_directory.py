@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from django.urls import reverse
 
+
 @dataclass(frozen=True)
 class ResourceCard:
     title: str
