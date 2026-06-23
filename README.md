@@ -6,6 +6,10 @@ It is meant to help you organize things like patients, medications, allergies, c
 
 HolyFHIR has a permanent free software license that no one can take away from you - even us. Your medical data is YOURS, it is private, and you have permission to access it forever.
 
+HolyFHIR supports 145 "FHIR Resources" - meaning it can support any FHIR-compliant file transfer you can throw at it.
+
+This project is the beginning of a journey to improved patient privacy, and new safe usages for your medical data. Join us for free!
+
 ![HolyFHIR Personal Family EMR screenshot](https://github.com/user-attachments/assets/a0bf0afa-3c5c-4451-89d8-ea9971fd6b9e)
 
 ## Plain-English Summary
