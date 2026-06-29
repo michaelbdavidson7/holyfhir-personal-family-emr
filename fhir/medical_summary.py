@@ -18,6 +18,10 @@ CORE_RESOURCE_LABELS = {
     "Conditions",
     "Medications",
 }
+EXCLUDED_RESOURCE_MODEL_LABELS = {
+    "fhir.fhirlink",
+    "fhir.fhirresourcesnapshot",
+}
 EXCLUDED_DETAIL_FIELDS = {
     "id",
     "patient",
@@ -32,6 +36,8 @@ EXCLUDED_DETAIL_FIELDS = {
 def patient_resource_sections(patient):
     sections = []
     for model in apps.get_models():
+        if model._meta.label_lower in EXCLUDED_RESOURCE_MODEL_LABELS:
+            continue
         try:
             field = model._meta.get_field("patient")
         except Exception:

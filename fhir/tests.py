@@ -3236,3 +3236,27 @@ class FHIRExportTests(TestCase):
         self.assertIn(b"Everything Else", response.content)
         self.assertIn(b"Visits", response.content)
         self.assertIn(b"Status: finished", response.content)
+
+    def test_medical_summary_pdf_excludes_fhir_snapshots(self):
+        patient = PatientProfile.objects.create(first_name="Maya", last_name="Rivera")
+        FHIRResourceSnapshot.objects.create(
+            patient=patient,
+            resource_type="Observation",
+            resource_id="obs-technical-1",
+            raw_json={"resourceType": "Observation", "id": "obs-technical-1"},
+            source="imported",
+        )
+
+        response = self.client.post(
+            reverse("fhir_export"),
+            {
+                "action": "download_medical_summary_pdf",
+                "patient": patient.pk,
+                "include_everything_else": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b"Fhir Resource Snapshots", response.content)
+        self.assertNotIn(b"Observation/obs-technical-1", response.content)
+        self.assertNotIn(b"Import Status", response.content)
