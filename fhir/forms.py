@@ -130,6 +130,13 @@ class FHIRExportForm(forms.Form):
         help_text="Recommended. This avoids duplicate copies from repeated imports.",
     )
 
+    include_model_serialized = forms.BooleanField(
+        label="Include current app records as FHIR",
+        required=False,
+        initial=True,
+        help_text="Exports supported Django records as fresh FHIR JSON before falling back to saved snapshots.",
+    )
+
 
 class MedicalSummaryPDFForm(forms.Form):
     patient = forms.ModelChoiceField(

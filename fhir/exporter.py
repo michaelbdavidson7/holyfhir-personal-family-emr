@@ -6,6 +6,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from django.utils import timezone
 
 from .models import FHIRResourceSnapshot
+from .serializers import SERIALIZER_MODELS, serialize_model_resource
 
 
 def exportable_snapshot_queryset():
@@ -31,11 +32,17 @@ def latest_snapshots(queryset):
     return snapshots
 
 
-def build_fhir_export_zip(queryset, latest_only=True):
-    snapshots = latest_snapshots(queryset) if latest_only else list(queryset)
+def build_fhir_export_zip(
+    queryset, latest_only=True, patient=None, include_model_serialized=False
+):
     grouped_resources = defaultdict(list)
     skipped = 0
 
+    if include_model_serialized:
+        for resource in serialized_model_resources(patient=patient):
+            grouped_resources[resource["resourceType"]].append(resource)
+
+    snapshots = latest_snapshots(queryset) if latest_only else list(queryset)
     for snapshot in snapshots:
         resource = snapshot.raw_json
         if not isinstance(resource, dict) or not resource.get("resourceType"):
@@ -53,6 +60,7 @@ def build_fhir_export_zip(queryset, latest_only=True):
             "export": {
                 "format": "ndjson-by-resource-type",
                 "latestOnly": latest_only,
+                "modelSerialized": include_model_serialized,
                 "skipped": skipped,
             },
             "entry": [
@@ -85,3 +93,19 @@ def build_fhir_export_zip(queryset, latest_only=True):
 
     archive_bytes.seek(0)
     return archive_bytes.getvalue()
+
+
+def serialized_model_resources(patient=None):
+    for model in SERIALIZER_MODELS:
+        queryset = model.objects.all()
+        if patient:
+            if model._meta.label_lower == "patients.patientprofile":
+                queryset = queryset.filter(pk=patient.pk)
+            elif any(field.name == "patient" for field in model._meta.fields):
+                queryset = queryset.filter(patient=patient)
+            else:
+                queryset = queryset.none()
+        for obj in queryset.order_by("pk"):
+            resource = serialize_model_resource(obj)
+            if resource:
+                yield resource

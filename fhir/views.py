@@ -140,6 +140,10 @@ def export_fhir_data(request):
             archive = build_fhir_export_zip(
                 queryset,
                 latest_only=export_form.cleaned_data.get("latest_only", False),
+                patient=patient,
+                include_model_serialized=export_form.cleaned_data.get(
+                    "include_model_serialized", False
+                ),
             )
             filename = "fhir-export.zip"
             if patient:

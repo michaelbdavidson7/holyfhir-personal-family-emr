@@ -3211,6 +3211,109 @@ class FHIRExportTests(TestCase):
         exported_ids = {json.loads(line)["id"] for line in lines}
         self.assertEqual(exported_ids, {"obs-included"})
 
+    def test_export_includes_current_model_serialized_resources(self):
+        patient = PatientProfile.objects.create(first_name="Maya", last_name="Rivera")
+        Condition.objects.create(
+            patient=patient, name="Asthma", clinical_status="active"
+        )
+
+        response = self.client.post(
+            reverse("fhir_export"),
+            {
+                "patient": patient.pk,
+                "latest_only": "on",
+                "include_model_serialized": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        with ZipFile(BytesIO(response.content)) as archive:
+            condition_lines = (
+                archive.read("FHIR/Condition.ndjson").decode().strip().splitlines()
+            )
+            patient_lines = (
+                archive.read("FHIR/Patient.ndjson").decode().strip().splitlines()
+            )
+            manifest = json.loads(archive.read("manifest.json"))
+        exported_condition = json.loads(condition_lines[0])
+        exported_patient = json.loads(patient_lines[0])
+        self.assertEqual(exported_condition["resourceType"], "Condition")
+        self.assertEqual(exported_condition["code"]["text"], "Asthma")
+        self.assertEqual(
+            exported_condition["subject"]["reference"], f"Patient/{patient.pk}"
+        )
+        self.assertEqual(exported_patient["name"][0]["family"], "Rivera")
+        self.assertTrue(manifest["export"]["modelSerialized"])
+
+    def test_model_serialized_export_uses_r4_required_fields_and_codes(self):
+        patient = PatientProfile.objects.create(
+            first_name="Maya",
+            last_name="Rivera",
+            sex_at_birth="not-a-fhir-gender",
+        )
+        Condition.objects.create(patient=patient, name="Asthma")
+        Allergy.objects.create(
+            patient=patient,
+            substance="Peanuts",
+            category="not-a-category",
+            criticality="not-criticality",
+            reaction="Hives",
+            severity="not-severity",
+        )
+        Medication.objects.create(patient=patient, name="Albuterol", status="custom")
+        Immunization.objects.create(patient=patient, vaccine_name="Influenza vaccine")
+        Observation.objects.create(patient=patient, name="Heart rate", category="vital")
+        Encounter.objects.create(
+            patient=patient,
+            status="finished",
+            encounter_type="Office visit",
+        )
+
+        response = self.client.post(
+            reverse("fhir_export"),
+            {
+                "patient": patient.pk,
+                "latest_only": "on",
+                "include_model_serialized": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        with ZipFile(BytesIO(response.content)) as archive:
+            resources = []
+            for name in archive.namelist():
+                if not name.startswith("FHIR/") or not name.endswith(".ndjson"):
+                    continue
+                resources.extend(
+                    json.loads(line)
+                    for line in archive.read(name).decode().strip().splitlines()
+                )
+
+        by_type = {resource["resourceType"]: resource for resource in resources}
+        required_fields = {
+            "Patient": ["resourceType"],
+            "Condition": ["resourceType", "subject"],
+            "AllergyIntolerance": ["resourceType", "patient"],
+            "MedicationStatement": ["resourceType", "status", "subject"],
+            "Immunization": ["resourceType", "status", "patient", "vaccineCode"],
+            "Observation": ["resourceType", "code"],
+            "Encounter": ["resourceType", "status", "class"],
+        }
+        for resource_type, fields in required_fields.items():
+            self.assertIn(resource_type, by_type)
+            for field in fields:
+                self.assertIn(field, by_type[resource_type])
+
+        self.assertNotIn("gender", by_type["Patient"])
+        self.assertNotIn("category", by_type["AllergyIntolerance"])
+        self.assertNotIn("criticality", by_type["AllergyIntolerance"])
+        self.assertNotIn(
+            "severity", by_type["AllergyIntolerance"].get("reaction", [{}])[0]
+        )
+        self.assertEqual(by_type["MedicationStatement"]["status"], "unknown")
+        self.assertEqual(by_type["Encounter"]["class"]["code"], "AMB")
+        self.assertNotIn("text", by_type["Encounter"])
+
     def test_export_page_includes_medical_summary_panel(self):
         response = self.client.get(reverse("fhir_export"))
 
