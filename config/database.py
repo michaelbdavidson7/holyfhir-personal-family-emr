@@ -4,6 +4,8 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+from config.credential_storage import CredentialStorageError, get_configured_secret
+
 
 DEFAULT_DATABASE_TIMEOUT = 20.0
 DEFAULT_DATABASE_NAME = "holyfhir.encrypted.sqlite3"
@@ -39,12 +41,15 @@ def _env_int(name, default):
 
 def build_default_database_config(base_dir: Path):
     database_name = os.getenv("DATABASE_NAME", str(base_dir / DEFAULT_DATABASE_NAME))
-    encryption_key = os.getenv("DATABASE_ENCRYPTION_KEY", "").strip()
+    try:
+        encryption_key = get_configured_secret("DATABASE_ENCRYPTION_KEY")
+    except CredentialStorageError as error:
+        raise ImproperlyConfigured(str(error)) from error
     is_bootstrap_command = len(sys.argv) > 1 and sys.argv[1] == "bootstrap_secrets"
 
     if not encryption_key and not is_bootstrap_command:
         raise ImproperlyConfigured(
-            "DATABASE_ENCRYPTION_KEY is required. HolyFHIR stores EMR data and database encryption is always enforced."
+            "A database encryption key is required. Open HolyFHIR from the desktop app or run bootstrap_secrets to set up local secure storage."
         )
 
     options = {

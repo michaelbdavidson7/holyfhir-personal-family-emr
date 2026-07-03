@@ -69,7 +69,7 @@ C:\Users\<you>\AppData\Local\HolyFHIR Personal EMR
 
 Useful files in that folder:
 
-- `.env`: local app settings and generated secrets
+- `.env`: local app settings. New desktop installs store credentials in this computer's secure storage by default.
 - `holyfhir.encrypted.sqlite3`: encrypted database
 - `holyfhir-desktop.log`: log file for troubleshooting
 - `.env.backup.*`: automatic backups made before `.env` changes
@@ -194,7 +194,7 @@ pip install -r requirements-build.txt
 python manage.py bootstrap_secrets
 ```
 
-This creates `.env`, generates the database encryption key, and generates Django's secret key.
+This creates `.env`, generates the database encryption key, and generates Django's secret key. By default, developer setup stores credentials in `.env`. The desktop app uses this computer's secure storage on first launch.
 
 If `.env` already exists, HolyFHIR prompts before rewriting it and creates a timestamped backup first:
 
@@ -202,7 +202,7 @@ If `.env` already exists, HolyFHIR prompts before rewriting it and creates a tim
 .env.backup.YYYYMMDD-HHMMSS
 ```
 
-Do not casually rotate `DATABASE_ENCRYPTION_KEY`. Changing it can make an existing encrypted database unreadable without a migration or restore plan.
+Do not casually rotate the database encryption key. Changing it can make an existing encrypted database unreadable without a migration or restore plan.
 
 ### 5. Run migrations
 
@@ -310,7 +310,8 @@ Release-tag builds upload the NSIS installer artifact and attach it to a draft G
 - `ALLOWED_HOSTS`: comma-separated allowed hosts
 - `DATABASE_NAME`: encrypted database path
 - `DATABASE_TIMEOUT`: SQLite/SQLCipher connection timeout
-- `DATABASE_ENCRYPTION_KEY`: required SQLCipher encryption key
+- `DATABASE_CREDENTIAL_STORAGE`: `system` uses this computer's secure storage; `file` stores credentials in `.env`
+- `DATABASE_ENCRYPTION_KEY`: SQLCipher encryption key when using file storage
 - `DATABASE_CIPHER_PAGE_SIZE`: SQLCipher page size
 - `DATABASE_KDF_ITER`: SQLCipher PBKDF iteration count
 - `DATABASE_CIPHER_COMPATIBILITY`: SQLCipher compatibility mode

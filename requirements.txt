@@ -2,3 +2,4 @@ Django==4.2.4
 django-jazzmin==3.0.4
 sqlcipher3==0.6.2
 psycopg2==2.9.11
+keyring==25.6.0

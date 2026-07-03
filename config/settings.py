@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+from config.credential_storage import CredentialStorageError, get_configured_secret
 from config.database import build_default_database_config, env_flag
 from config.env import load_env
 
@@ -30,7 +31,15 @@ load_env(
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-development-only-change-me")
+try:
+    SECRET_KEY = (
+        get_configured_secret("SECRET_KEY")
+        or "django-insecure-development-only-change-me"
+    )
+except CredentialStorageError as error:
+    from django.core.exceptions import ImproperlyConfigured
+
+    raise ImproperlyConfigured(str(error)) from error
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_flag("DEBUG", default=True)

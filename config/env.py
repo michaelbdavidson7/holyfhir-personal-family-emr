@@ -4,6 +4,11 @@ from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 
 
+ENV_DEFAULTS = {
+    "DATABASE_CREDENTIAL_STORAGE": "file",
+}
+
+
 def _strip_inline_comment(value):
     in_single_quote = False
     in_double_quote = False
@@ -83,6 +88,10 @@ def load_env(base_dir: Path, env_file_name=".env", example_file_name=".env.examp
         return
 
     env_values = parse_env_file(env_path)
+    for key, value in ENV_DEFAULTS.items():
+        if key in required_keys and key not in env_values and not os.getenv(key):
+            os.environ.setdefault(key, value)
+
     missing_keys = sorted(
         key for key in required_keys - set(env_values) if not os.getenv(key)
     )

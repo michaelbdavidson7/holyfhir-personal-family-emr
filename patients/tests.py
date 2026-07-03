@@ -115,6 +115,7 @@ class EnvFileTests(SimpleTestCase):
             "DATABASE_TIMEOUT",
             "DATABASE_ENCRYPTION_KEY",
             "DATABASE_CIPHER_PAGE_SIZE",
+            "DATABASE_CREDENTIAL_STORAGE",
             "DATABASE_KDF_ITER",
             "DATABASE_CIPHER_COMPATIBILITY",
         }
@@ -225,6 +226,46 @@ class BootstrapSecretsCommandTests(SimpleTestCase):
         )
         self.assertEqual(values["DATABASE_NAME"], DEFAULT_DATABASE_NAME)
         self.assertEqual(values["TIME_ZONE"], "America/New_York")
+        self.assertEqual(values["DATABASE_CREDENTIAL_STORAGE"], "file")
+
+    def test_bootstrap_secrets_can_store_credentials_in_system_storage(self):
+        stored_credentials = {}
+
+        def fake_set_system_credential(key, value):
+            stored_credentials[key] = value
+
+        with TemporaryDirectory() as temp_dir:
+            base_dir = Path(temp_dir)
+            env_path = base_dir / ".env"
+
+            with (
+                patch.dict("os.environ", {}, clear=True),
+                patch(
+                    "patients.management.commands.bootstrap_secrets.get_system_credential",
+                    return_value="",
+                ),
+                patch(
+                    "patients.management.commands.bootstrap_secrets.set_system_credential",
+                    side_effect=fake_set_system_credential,
+                ),
+            ):
+                call_command(
+                    "bootstrap_secrets",
+                    env_file=str(env_path),
+                    credential_storage="system",
+                    yes=True,
+                )
+
+            values = parse_env_file(env_path)
+
+        self.assertEqual(values["DATABASE_CREDENTIAL_STORAGE"], "system")
+        self.assertEqual(values["DATABASE_ENCRYPTION_KEY"], "")
+        self.assertEqual(values["SECRET_KEY"], "")
+        self.assertGreaterEqual(len(stored_credentials["DATABASE_ENCRYPTION_KEY"]), 48)
+        self.assertNotEqual(
+            stored_credentials["SECRET_KEY"],
+            "django-insecure-development-only-change-me",
+        )
 
     def test_bootstrap_secrets_preserves_existing_secrets(self):
         with TemporaryDirectory() as temp_dir:

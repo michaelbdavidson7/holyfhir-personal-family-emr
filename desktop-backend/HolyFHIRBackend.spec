@@ -8,7 +8,7 @@ datas = []
 binaries = []
 hiddenimports = []
 
-for package in ("django", "jazzmin", "sqlcipher3"):
+for package in ("django", "jazzmin", "sqlcipher3", "keyring"):
     package_datas, package_binaries, package_hiddenimports = collect_all(package)
     datas += package_datas
     binaries += package_binaries

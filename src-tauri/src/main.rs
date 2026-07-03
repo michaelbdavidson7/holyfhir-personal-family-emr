@@ -83,8 +83,9 @@ fn runtime_paths(app: &tauri::AppHandle) -> Result<RuntimePaths, String> {
         installed_app_dir()?
     };
 
-    fs::create_dir_all(&app_data_dir)
-        .map_err(|error| format!("failed to create app data directory {app_data_dir:?}: {error}"))?;
+    fs::create_dir_all(&app_data_dir).map_err(|error| {
+        format!("failed to create app data directory {app_data_dir:?}: {error}")
+    })?;
 
     Ok(RuntimePaths {
         env_file: app_data_dir.join(".env"),
@@ -207,8 +208,8 @@ fn bundled_backend_candidates(paths: &RuntimePaths) -> String {
             .join("HolyFHIRBackend")
             .join("HolyFHIRBackend.exe"),
         paths
-        .project_root
-        .join("HolyFHIRBackend")
+            .project_root
+            .join("HolyFHIRBackend")
             .join("HolyFHIRBackend.exe"),
     ]
     .iter()
@@ -286,6 +287,8 @@ fn bootstrap_django(paths: &RuntimePaths) -> Result<(), String> {
             .arg(&paths.env_file)
             .arg("--example-file")
             .arg(&paths.env_example_file)
+            .arg("--credential-storage")
+            .arg("system")
             .arg("--yes");
         command_output(&mut command, paths, "bootstrap_secrets")?;
     }
@@ -311,7 +314,9 @@ fn start_django(paths: &RuntimePaths) -> Result<Child, String> {
                 .create(true)
                 .append(true)
                 .open(&paths.log_file)
-                .map_err(|error| format!("failed to open log file {:?}: {error}", paths.log_file))?,
+                .map_err(|error| {
+                    format!("failed to open log file {:?}: {error}", paths.log_file)
+                })?,
         )
         .spawn()
         .map_err(|error| format!("failed to start Django: {error}"))
@@ -345,11 +350,17 @@ fn show_app_window(app: &mut tauri::App, url: WebviewUrl, title: &str) -> tauri:
     Ok(())
 }
 
-fn show_startup_error(app: &mut tauri::App, paths: Option<&RuntimePaths>, message: &str) -> tauri::Result<()> {
+fn show_startup_error(
+    app: &mut tauri::App,
+    paths: Option<&RuntimePaths>,
+    message: &str,
+) -> tauri::Result<()> {
     if let Some(paths) = paths {
         append_log(paths, format!("startup error: {message}"));
     } else {
-        early_log(format!("startup error before runtime paths were ready: {message}"));
+        early_log(format!(
+            "startup error before runtime paths were ready: {message}"
+        ));
     }
 
     show_app_window(
