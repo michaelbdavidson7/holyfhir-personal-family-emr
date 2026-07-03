@@ -19,31 +19,35 @@ class SettingsBackupPageTests(TestCase):
         )
         self.client.force_login(self.user)
 
-    def test_settings_links_to_backups_page(self):
+    def test_settings_links_to_backup_and_recovery_page(self):
         response = self.client.get(reverse("admin_settings"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Backups")
+        self.assertContains(response, "Backup &amp; Recovery")
         self.assertContains(response, reverse("admin_backups"))
-        self.assertContains(response, "Recovery Kit")
-        self.assertContains(response, reverse("admin_recovery_kit"))
 
-    def test_recovery_kit_page_renders_download_action(self):
+    def test_backup_and_recovery_page_renders_recovery_kit_action(self):
         with patch("config.admin_views.get_configured_secret", return_value="db-key"):
-            response = self.client.get(reverse("admin_recovery_kit"))
+            response = self.client.get(reverse("admin_backups"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "HolyFHIR Recovery Kit")
+        self.assertContains(response, "Backup &amp; Recovery")
+        self.assertContains(response, "Recovery Kit")
         self.assertContains(response, "Download Recovery Kit")
 
     def test_recovery_kit_download_returns_text_attachment(self):
         with patch("config.admin_views.get_configured_secret", return_value="db-key"):
-            response = self.client.post(reverse("admin_recovery_kit"))
+            response = self.client.post(reverse("admin_backups"))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/plain; charset=utf-8")
         self.assertIn("HolyFHIR-Recovery-Kit.txt", response["Content-Disposition"])
         self.assertContains(response, "Database Recovery Key: db-key")
+
+    def test_old_recovery_kit_url_redirects_to_backup_and_recovery(self):
+        response = self.client.get(reverse("admin_recovery_kit"))
+
+        self.assertRedirects(response, reverse("admin_backups"))
 
     def test_backups_page_renders_manual_restore_explainer(self):
         response = self.client.get(reverse("admin_backups"))
@@ -52,6 +56,7 @@ class SettingsBackupPageTests(TestCase):
         self.assertContains(response, "Manual Restore")
         self.assertContains(response, "Close HolyFHIR completely")
         self.assertContains(response, "FHIR Import Backups")
+        self.assertContains(response, "Restore Key Command")
 
     def test_clinical_care_team_directory_lists_directory_sections(self):
         response = self.client.get(reverse("clinical_care_team_directory"))

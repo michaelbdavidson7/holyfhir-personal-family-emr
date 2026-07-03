@@ -195,14 +195,8 @@ def settings_hub(request):
             "icon": "fas fa-user-lock",
         },
         {
-            "title": "Recovery Kit",
-            "description": "Save the database Recovery Kit needed when moving HolyFHIR or restoring backups.",
-            "url": reverse("admin_recovery_kit"),
-            "icon": "fas fa-file-medical-alt",
-        },
-        {
-            "title": "Backups",
-            "description": "Find FHIR pre-import database backups and review the manual restore steps.",
+            "title": "Backup & Recovery",
+            "description": "Download your Recovery Kit, review database backups, and follow restore steps.",
             "url": reverse("admin_backups"),
             "icon": "fas fa-archive",
         },
@@ -219,27 +213,11 @@ def settings_hub(request):
 
 
 def backups_hub(request):
-    context = {
-        **admin.site.each_context(request),
-        "title": "Backups",
-        "database_path": database_path(),
-        "backup_dir": fhir_import_backup_dir(),
-        "backups": list_fhir_import_database_backups(),
-    }
-    return render(request, "admin/backups_hub.html", context)
-
-
-def recovery_kit(request):
-    if not request.user.is_authenticated:
-        return redirect("admin:login")
-
     try:
         database_key = get_configured_secret("DATABASE_ENCRYPTION_KEY")
     except CredentialStorageError as error:
         database_key = ""
         messages.error(request, str(error))
-
-    storage_mode = credential_storage_mode()
 
     if request.method == "POST":
         if not database_key:
@@ -247,7 +225,7 @@ def recovery_kit(request):
                 request,
                 "HolyFHIR could not find the database key needed to create a Recovery Kit.",
             )
-            return redirect("admin_recovery_kit")
+            return redirect("admin_backups")
 
         response = HttpResponse(
             render_recovery_kit(database_key),
@@ -260,11 +238,18 @@ def recovery_kit(request):
 
     context = {
         **admin.site.each_context(request),
-        "title": "HolyFHIR Recovery Kit",
+        "title": "Backup & Recovery",
+        "database_path": database_path(),
+        "backup_dir": fhir_import_backup_dir(),
+        "backups": list_fhir_import_database_backups(),
+        "credential_storage": credential_storage_mode(),
         "has_database_key": bool(database_key),
-        "credential_storage": storage_mode,
     }
-    return render(request, "admin/recovery_kit.html", context)
+    return render(request, "admin/backups_hub.html", context)
+
+
+def recovery_kit(request):
+    return redirect("admin_backups")
 
 
 def recovery_key_generate(request):
