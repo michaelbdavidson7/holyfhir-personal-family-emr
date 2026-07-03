@@ -30,7 +30,7 @@ class SettingsBackupPageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Manual Restore")
         self.assertContains(response, "Close HolyFHIR completely")
-        self.assertContains(response, "FHIR Import Backups")
+        self.assertContains(response, "FHIR Import Database Copies")
 
     def test_clinical_care_team_directory_lists_directory_sections(self):
         response = self.client.get(reverse("clinical_care_team_directory"))

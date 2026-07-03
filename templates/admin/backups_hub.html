@@ -20,7 +20,7 @@
       <div class="col-lg-7 col-12">
         <div class="card card-outline card-primary">
           <div class="card-header">
-            <h2 class="card-title">FHIR Import Backups</h2>
+            <h2 class="card-title">FHIR Import Database Copies</h2>
           </div>
           <div class="card-body p-0">
             {% if backups %}
@@ -28,7 +28,7 @@
                 <table class="table table-striped mb-0">
                   <thead>
                     <tr>
-                      <th>Backup file</th>
+                      <th>Copy file</th>
                       <th>Created</th>
                       <th>Size</th>
                     </tr>
@@ -49,7 +49,7 @@
               </div>
             {% else %}
               <div class="p-3">
-                <p class="text-muted mb-0">No FHIR import backups were found yet.</p>
+                <p class="text-muted mb-0">No FHIR import database copies were found yet.</p>
               </div>
             {% endif %}
           </div>
@@ -70,7 +70,7 @@
               <li>Close HolyFHIR completely.</li>
               <li>Open the app data folder shown below.</li>
               <li>Rename the current live database to keep a last-chance copy.</li>
-              <li>Copy the backup file you want from the backups folder.</li>
+              <li>Copy the database copy you want from the folder shown below.</li>
               <li>Rename the copied backup to the live database filename.</li>
               <li>Reopen HolyFHIR.</li>
             </ol>
@@ -79,7 +79,7 @@
               <dt>Live database</dt>
               <dd><code>{{ database_path|default:"Not available" }}</code></dd>
 
-              <dt>Backups folder</dt>
+              <dt>Database copies folder</dt>
               <dd><code>{{ backup_dir|default:"Not available" }}</code></dd>
             </dl>
           </div>
@@ -91,7 +91,7 @@
             <p class="mb-2">Rename the live database:</p>
             <pre class="mb-3"><code>holyfhir.encrypted.sqlite3
 holyfhir.encrypted.sqlite3.before-restore</code></pre>
-            <p class="mb-2">Then copy a backup into the app data folder and rename it:</p>
+            <p class="mb-2">Then copy a pre-import database copy into the app data folder and rename it:</p>
             <pre class="mb-0"><code>holyfhir.encrypted.pre-fhir-import.20260426-120000.sqlite3
 holyfhir.encrypted.sqlite3</code></pre>
           </div>

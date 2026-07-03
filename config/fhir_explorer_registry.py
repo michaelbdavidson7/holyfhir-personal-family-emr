@@ -513,7 +513,7 @@ FHIR_EXPLORER_GROUPS = [
             {
                 "resource": "RiskAssessment",
                 "model": "clinical.RiskAssessment",
-                "description": "Risk predictions/probabilities with basis records and mitigation.",
+                "description": "Risk-assessment records with basis records and mitigation notes.",
             },
             {
                 "resource": "RequestGroup",

@@ -3085,7 +3085,7 @@ class FHIRImportTests(TestCase):
         messages = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertTrue(
             any(
-                "Pre-import database backup created: backup.sqlite3" in message
+                "Pre-import database copy created: backup.sqlite3" in message
                 for message in messages
             )
         )
@@ -3122,7 +3122,7 @@ class FHIRImportTests(TestCase):
         )
         messages = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertTrue(
-            any("database backup failed" in message for message in messages)
+            any("pre-import database copy failed" in message for message in messages)
         )
 
 

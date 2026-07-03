@@ -358,7 +358,7 @@ def clinical_resources_directory(request):
                 },
                 {
                     "title": "Detected Issues",
-                    "description": "Clinical safety or quality issues such as interactions and duplicate therapy.",
+                    "description": "Imported or entered detected-issue records, such as noted interactions or duplicate therapy.",
                     "url": reverse("admin:clinical_detectedissue_changelist"),
                     "icon": "fas fa-shield-alt",
                     "count": DetectedIssue.objects.count(),
@@ -474,7 +474,7 @@ def clinical_resources_directory(request):
                 },
                 {
                     "title": "Risk Assessments",
-                    "description": "Clinical risk estimates, predictions, basis records, and mitigation notes.",
+                    "description": "Imported or entered risk-assessment records, basis records, and mitigation notes.",
                     "url": reverse("admin:clinical_riskassessment_changelist"),
                     "icon": "fas fa-chart-pie",
                     "count": RiskAssessment.objects.count(),
@@ -1404,14 +1404,14 @@ def patient_resources_directory(request, patient_id):
                     "Detected Issues",
                     DetectedIssue,
                     "clinical_detectedissue",
-                    "Clinical safety or quality issues.",
+                    "Imported or entered detected-issue records.",
                     "fas fa-shield-alt",
                 ),
                 card(
                     "Risk Assessments",
                     RiskAssessment,
                     "clinical_riskassessment",
-                    "Risk estimates, predictions, basis records, and mitigation.",
+                    "Imported or entered risk-assessment records, basis records, and mitigation notes.",
                     "fas fa-chart-pie",
                 ),
                 card(

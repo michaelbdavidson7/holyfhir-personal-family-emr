@@ -2,7 +2,7 @@
 
 HolyFHIR Personal EMR is free, open-source software for organizing personal health records.
 
-It is not medical advice, a medical device, a certified EHR or EMR system, or a substitute for care from a licensed clinician. Do not use HolyFHIR to diagnose, treat, prevent, or manage any disease or medical condition without consulting qualified medical professionals.
+It is not medical advice, a medical device, a certified EHR or EMR system, or a substitute for care from a licensed clinician. Using HolyFHIR does not create a doctor-patient, clinician-patient, professional, fiduciary, or support relationship. Do not use HolyFHIR to diagnose, treat, prevent, or manage any disease or medical condition without consulting qualified medical professionals.
 
 Do not rely on HolyFHIR for emergencies, urgent medical decisions, clinical decision support, medication safety checks, or as the only source of important health information. Always verify information against original records from your doctor, hospital, pharmacy, lab, patient portal, or other official sources.
 

@@ -345,14 +345,14 @@ PERSONAL_EMR_GROUPS = [
                 "title": "Detected Issues",
                 "resource": "DetectedIssue",
                 "model": "clinical.DetectedIssue",
-                "description": "Clinical safety or quality issues such as interactions or duplicate therapy.",
+                "description": "Imported or entered detected-issue records, such as noted interactions or duplicate therapy.",
                 "icon": "fas fa-shield-alt",
             },
             {
                 "title": "Risk Assessments",
                 "resource": "RiskAssessment",
                 "model": "clinical.RiskAssessment",
-                "description": "Risk estimates, predictions, basis records, and mitigation notes.",
+                "description": "Imported or entered risk-assessment records, basis records, and mitigation notes.",
                 "icon": "fas fa-chart-pie",
             },
             {
