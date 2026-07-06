@@ -21,9 +21,15 @@ This project is an early personal recordkeeping tool for people who want more lo
 - You can chart numeric observations, such as blood pressure, weight, glucose, or lab values.
 - You should still keep the original records from your doctor, hospital, pharmacy, or lab.
 
+## Trust Through Openness
+
+HolyFHIR is open source, which means the code can be inspected instead of treated like a black box. That matters for a personal health-record tool: users, caregivers, developers, and security reviewers can see how the app stores data, handles imports, and makes tradeoffs.
+
+Open source does not make software automatically safe or correct, but it does make the project more accountable. Bugs, privacy concerns, and design choices can be found, discussed, and improved in the open.
+
 ## Latest Release
 
-Download the latest Windows installer from the [GitHub Releases page](https://github.com/Code-Blue-Solutions-LLC/personal-emr/releases/latest).
+Download the latest Windows installer from the [GitHub Releases page](https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr/releases/latest).
 
 ## A Friendly Warning
 
@@ -53,7 +59,7 @@ This software is provided as-is, without warranty of any kind.
 
 If someone sent you a HolyFHIR installer:
 
-1. Download the Windows setup `.exe` from the [latest release](https://github.com/Code-Blue-Solutions-LLC/personal-emr/releases/latest).
+1. Download the Windows setup `.exe` from the [latest release](https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr/releases/latest).
 2. Run the installer.
 3. Open **HolyFHIR Personal EMR**.
 4. Create your first system user.

@@ -127,7 +127,7 @@
       background:
         linear-gradient(90deg, rgba(18, 31, 38, 0.88) 0%, rgba(18, 31, 38, 0.62) 45%, rgba(18, 31, 38, 0.14) 100%),
         linear-gradient(0deg, rgba(251, 250, 247, 1) 0%, rgba(251, 250, 247, 0) 24%),
-        url("image.png") center / cover no-repeat;
+        url("image.png?v=20260706") center / cover no-repeat;
     }
 
     .hero-inner {
@@ -333,6 +333,43 @@
       width: 100%;
       height: auto;
     }
+    .trust {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .trust-panel {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 42px;
+      align-items: start;
+      padding: 42px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .trust-panel h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      line-height: 1.08;
+    }
+
+    .trust-panel p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.68;
+    }
+
+    .trust-panel p:last-child {
+      margin-bottom: 0;
+    }
+
+    .trust-panel a {
+      color: var(--green-dark);
+      font-weight: 750;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
 
     .notice {
       display: grid;
@@ -388,12 +425,13 @@
         background:
           linear-gradient(90deg, rgba(18, 31, 38, 0.9), rgba(18, 31, 38, 0.46)),
           linear-gradient(0deg, rgba(251, 250, 247, 1) 0%, rgba(251, 250, 247, 0) 22%),
-          url("image.png") 58% center / cover no-repeat;
+          url("image.png?v=20260706") 58% center / cover no-repeat;
       }
 
       .hero-points,
       .feature-grid,
       .steps,
+      .trust-panel,
       .notice {
         grid-template-columns: 1fr;
       }
@@ -449,8 +487,9 @@
       <div class="nav-links">
         <a href="#records">Family records</a>
         <a href="#workflow">Appointment prep</a>
+        <a href="#trust">Open source</a>
         <a href="#notice">Safety notes</a>
-        <a class="button primary" href="https://github.com/Code-Blue-Solutions-LLC/personal-emr/releases/latest">Download</a>
+        <a class="button primary" href="https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr/releases/latest">Download</a>
       </div>
     </nav>
   </header>
@@ -465,8 +504,8 @@
             A calmer place for the health details families are always trying to find: medications, allergies, visits, school forms, care notes, lab results, documents, and portal exports, kept locally on your own computer.
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="https://github.com/Code-Blue-Solutions-LLC/personal-emr/releases/latest">Download for Windows</a>
-            <a class="button secondary" href="https://github.com/Code-Blue-Solutions-LLC/personal-emr">View source</a>
+            <a class="button primary" href="https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr/releases/latest">Download for Windows</a>
+            <a class="button secondary" href="https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr">View source</a>
           </div>
         </div>
         <div class="hero-points" aria-label="Key product qualities">
@@ -522,7 +561,7 @@
     <section class="screenshot-band" aria-label="HolyFHIR application screenshot">
       <div class="wrap">
         <div class="screenshot-frame">
-          <img src="image.png" alt="HolyFHIR Personal EMR desktop application showing a patient record screen">
+          <img src="image.png?v=20260706" alt="HolyFHIR Personal EMR desktop application showing a patient record screen">
         </div>
       </div>
     </section>
@@ -552,6 +591,24 @@
       </div>
     </section>
 
+    <section id="trust" class="trust" aria-labelledby="trust-title">
+      <div class="wrap">
+        <div class="trust-panel">
+          <h2 id="trust-title">Open source, so trust can be earned in the open.</h2>
+          <div>
+            <p>
+              HolyFHIR is open source, which means the code can be inspected instead of treated like a black box. For a family health-record tool, that matters: people can see how the app stores data, handles imports, and makes tradeoffs.
+            </p>
+            <p>
+              Open source does not make software automatically safe or correct, but it does make the project more accountable. Bugs, privacy concerns, and design choices can be found, discussed, and improved in public.
+            </p>
+            <p>
+              <a href="https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr">View the source code</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
     <section id="notice" aria-labelledby="notice-title">
       <div class="wrap">
         <div class="notice">
@@ -577,7 +634,7 @@
 
   <footer>
     <div class="footer-inner">
-      <span><a href="https://github.com/Code-Blue-Solutions-LLC/personal-emr/blob/main/LICENSE">MIT License</a> | <a href="https://github.com/Code-Blue-Solutions-LLC/personal-emr/blob/main/DISCLAIMER.md">Disclaimer</a></span>
+      <span><a href="https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr/blob/main/LICENSE">MIT License</a> | <a href="https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr/blob/main/DISCLAIMER.md">Disclaimer</a></span>
       <span>Local, offline-first family health records for Windows.</span>
     </div>
   </footer>
