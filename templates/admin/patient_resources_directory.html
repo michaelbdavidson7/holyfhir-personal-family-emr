@@ -8,7 +8,31 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .patient-resource-actions {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .patient-resource-filterbar {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+    color: #4b5563;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
     margin-bottom: 20px;
+    padding: 12px 14px;
+  }
+
+  .patient-resource-filterbar p {
+    margin: 0;
   }
 
   .patient-resource-header h1 {
@@ -21,71 +45,94 @@
   }
 
   .patient-resource-section {
-    margin-bottom: 28px;
+    margin-bottom: 22px;
   }
 
   .patient-resource-heading {
-    font-size: 1.1rem;
+    font-size: 1.04rem;
     font-weight: 700;
-    margin: 0 0 12px;
+    margin: 0 0 10px;
   }
 
   .patient-resource-card .card-body {
     display: flex;
     flex-direction: column;
-    min-height: 178px;
+    min-height: 148px;
+    padding: 14px;
   }
 
   .patient-resource-card-main {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: flex-start;
   }
 
   .patient-resource-icon {
     align-items: center;
     background: #eef4ff;
-    border-radius: 8px;
+    border-radius: 7px;
     color: #2563eb;
     display: inline-flex;
-    flex: 0 0 40px;
-    height: 40px;
+    flex: 0 0 34px;
+    font-size: 0.95rem;
+    height: 34px;
     justify-content: center;
-    width: 40px;
+    width: 34px;
   }
 
   .patient-resource-title {
-    font-size: 1rem;
+    font-size: 0.98rem;
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.22;
     margin: 0;
     overflow-wrap: anywhere;
   }
 
   .patient-resource-description {
-    margin: 8px 0 0;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    margin: 6px 0 0;
   }
 
   .patient-resource-footer {
     align-items: center;
     border-top: 1px solid #e5e7eb;
     display: flex;
+    gap: 10px;
     justify-content: space-between;
     margin-top: auto;
-    padding-top: 12px;
+    padding-top: 10px;
   }
 
   .patient-resource-count {
     color: #374151;
+    font-size: 0.9rem;
     font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .patient-resource-empty {
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    color: #4b5563;
+    padding: 24px;
+    text-align: center;
   }
 
   @media (max-width: 575.98px) {
-    .patient-resource-header {
+    .patient-resource-header,
+    .patient-resource-filterbar {
       display: block;
     }
 
-    .patient-resource-header .btn {
+    .patient-resource-actions {
+      align-items: stretch;
+      margin-top: 12px;
+    }
+
+    .patient-resource-header .btn,
+    .patient-resource-filterbar .btn {
       margin-top: 12px;
       width: 100%;
     }
@@ -99,7 +146,27 @@
       <h1>{{ patient }}</h1>
       <p class="patient-resource-subtitle">Patient-specific resources and filtered record lists.</p>
     </div>
-    <a class="btn btn-outline-primary" href="{% url 'admin:patients_patientprofile_change' patient.pk %}">Back to patient profile</a>
+    <div class="patient-resource-actions">
+      <a class="btn btn-outline-primary" href="{% url 'admin:patients_patientprofile_change' patient.pk %}">Back to patient profile</a>
+    </div>
+  </div>
+
+  <div class="patient-resource-filterbar">
+    <p>
+      Showing {{ displayed_resource_cards }} resource type{{ displayed_resource_cards|pluralize }} for this patient.
+      {% if show_all and used_resource_cards != total_resource_cards %}{{ used_resource_cards }} currently have records.{% endif %}
+    </p>
+    {% if not show_all %}
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'patient_resources_directory' patient.pk %}?show_all=1">
+        <i class="fas fa-eye mr-1"></i>
+        Show all resource types
+      </a>
+    {% else %}
+      <a class="btn btn-primary btn-sm" href="{% url 'patient_resources_directory' patient.pk %}">
+        <i class="fas fa-filter mr-1"></i>
+        Hide unused resource types
+      </a>
+    {% endif %}
   </div>
 
   {% for section in directory_sections %}
@@ -121,7 +188,7 @@
                 </div>
                 <div class="patient-resource-footer">
                   <span class="patient-resource-count">{{ card.count }} {{ card.count_label }}{{ card.count|pluralize }}</span>
-                  <a class="btn btn-primary btn-sm" href="{{ card.url }}">Open filtered list</a>
+                  <a class="btn btn-primary btn-sm" href="{{ card.url }}">Open</a>
                 </div>
               </div>
             </div>
@@ -129,5 +196,10 @@
         {% endfor %}
       </div>
     </section>
+  {% empty %}
+    <div class="patient-resource-empty">
+      <strong>No used resource types yet.</strong><br>
+      Show all resource types to add or inspect the available record areas for this patient.
+    </div>
   {% endfor %}
 {% endblock %}

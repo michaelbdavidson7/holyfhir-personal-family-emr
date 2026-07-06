@@ -216,7 +216,7 @@ class SettingsBackupPageTests(TestCase):
             response, reverse("patient_resources_directory", args=[patient.pk])
         )
 
-    def test_patient_resources_directory_lists_filtered_resource_links(self):
+    def test_patient_resources_directory_show_all_lists_filtered_resource_links(self):
         patient = PatientProfile.objects.create(first_name="Maya", last_name="Rivera")
         other_patient = PatientProfile.objects.create(
             first_name="Other", last_name="Patient"
@@ -227,7 +227,7 @@ class SettingsBackupPageTests(TestCase):
         ClinicalDocument.objects.create(patient=patient, title="Discharge summary")
 
         response = self.client.get(
-            reverse("patient_resources_directory", args=[patient.pk])
+            f"{reverse('patient_resources_directory', args=[patient.pk])}?show_all=1"
         )
 
         self.assertEqual(response.status_code, 200)
@@ -275,3 +275,28 @@ class SettingsBackupPageTests(TestCase):
             f"{reverse('admin:clinical_task_changelist')}?patient__id__exact={patient.pk}",
         )
         self.assertContains(response, "1 record")
+
+    def test_patient_resources_directory_hides_unused_resources_by_default(self):
+        patient = PatientProfile.objects.create(first_name="Maya", last_name="Rivera")
+        Condition.objects.create(patient=patient, name="Asthma")
+
+        response = self.client.get(
+            reverse("patient_resources_directory", args=[patient.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Showing 1 resource type for this patient.")
+        self.assertContains(response, "Show all resource types")
+        self.assertContains(response, "Conditions")
+        self.assertNotContains(
+            response,
+            f"{reverse('admin:clinical_observation_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertNotContains(
+            response,
+            f"{reverse('admin:documents_clinicaldocument_changelist')}?patient__id__exact={patient.pk}",
+        )
+        self.assertNotContains(
+            response,
+            f"{reverse('admin:clinical_coverage_changelist')}?patient__id__exact={patient.pk}",
+        )

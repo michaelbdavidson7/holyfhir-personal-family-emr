@@ -1234,6 +1234,7 @@ def clinical_resources_directory(request):
 
 def patient_resources_directory(request, patient_id):
     patient = get_object_or_404(PatientProfile, pk=patient_id)
+    show_all = request.GET.get("show_all") == "1"
 
     def card(title, model, admin_model_name, description, icon):
         count = model.objects.filter(patient=patient).count()
@@ -1753,11 +1754,39 @@ def patient_resources_directory(request, patient_id):
         },
     ]
 
+    total_cards = sum(len(section["cards"]) for section in sections)
+    used_cards = sum(
+        1
+        for section in sections
+        for resource_card in section["cards"]
+        if resource_card["count"]
+    )
+
+    if not show_all:
+        sections = [
+            {
+                **section,
+                "cards": [
+                    resource_card
+                    for resource_card in section["cards"]
+                    if resource_card["count"]
+                ],
+            }
+            for section in sections
+        ]
+        sections = [section for section in sections if section["cards"]]
+
+    displayed_cards = sum(len(section["cards"]) for section in sections)
+
     context = {
         **admin.site.each_context(request),
         "title": f"{patient} Resources",
         "patient": patient,
         "directory_sections": sections,
+        "show_all": show_all,
+        "total_resource_cards": total_cards,
+        "used_resource_cards": used_cards,
+        "displayed_resource_cards": displayed_cards,
     }
     return render(request, "admin/patient_resources_directory.html", context)
 
