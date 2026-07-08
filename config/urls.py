@@ -44,6 +44,7 @@ from system_settings.themes import DEFAULT_THEME, theme_assets
 from system_settings.views import lock_app, unlock_app
 
 admin.site.login_form = RateLimitedAdminAuthenticationForm
+admin.site.logout_template = "admin/logged_out.html"
 
 
 def admin_root_redirect(request):

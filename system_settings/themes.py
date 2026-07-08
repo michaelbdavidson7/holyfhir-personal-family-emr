@@ -5,14 +5,14 @@ DEFAULT_THEME = "regular"
 THEMES = {
     "regular": {
         "label": "Regular",
-        "logo": "system_settings/themes/regular/HolyFHIR_Icon_256.png",
+        "logo": "system_settings/themes/regular/65a5c847-9061-4145-87f6-a580a95c9fec2.png",
         "favicon": "system_settings/themes/regular/HolyFHIR_Favicon_128.png",
         "app_icon": "system_settings/themes/regular/HolyFHIR_AppIcon_1024.png",
         "master_logo": "system_settings/themes/regular/HolyFHIR_Logo_Master.png",
     },
     "cute": {
         "label": "Cute",
-        "logo": "system_settings/themes/cute/HolyFHIR_Cute_Icon_256.png",
+        "logo": "system_settings/themes/cute/8a1ea4f4-b272-4f56-885e-6a5c1473606e2.png",
         "favicon": "system_settings/themes/cute/HolyFHIR_Cute_Favicon_128.png",
         "app_icon": "system_settings/themes/cute/HolyFHIR_Cute_AppIcon_1024.png",
         "master_logo": "system_settings/themes/cute/HolyFHIR_Cute_Master.png",

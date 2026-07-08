@@ -1,0 +1,118 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  body.logged-out {
+    background: #f4f7f8;
+  }
+
+  body.logged-out #jazzy-navbar,
+  body.logged-out .main-sidebar,
+  body.logged-out .main-header,
+  body.logged-out .content-header,
+  body.logged-out .navbar,
+  body.logged-out .sidebar,
+  body.logged-out .brand-link,
+  body.logged-out .main-footer {
+    display: none !important;
+  }
+
+  body.logged-out .wrapper,
+  body.logged-out .content-wrapper {
+    margin-left: 0 !important;
+    min-height: 100vh !important;
+    background: #f4f7f8 !important;
+  }
+
+  body.logged-out #content {
+    width: 100%;
+    padding: 0;
+  }
+
+  body.logged-out .content {
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .logout-container {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+  }
+
+  .logout-card {
+    width: min(100%, 430px);
+    background: #ffffff;
+    border: 1px solid #d4dde3;
+    border-radius: 8px;
+    box-shadow: 0 18px 45px rgba(18, 31, 42, 0.11);
+    padding: 32px;
+    text-align: center;
+  }
+
+  .logout-logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    margin: 0 auto 18px;
+    filter: drop-shadow(0 8px 16px rgba(18, 31, 42, 0.14));
+  }
+
+  .logout-title {
+    margin: 0 0 8px;
+    color: #18212a;
+    font-size: 26px;
+    font-weight: 750;
+    line-height: 1.2;
+  }
+
+  .logout-copy {
+    margin: 0 0 22px;
+    color: #52616c;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .logout-action {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 6px;
+    background: #246f8f;
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .logout-action:hover {
+    background: #1d5d79;
+    color: #ffffff;
+  }
+
+  .app-sidebar {
+    display: none;
+  }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} logged-out{% endblock %}
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="logout-container">
+  <div id="content-main" class="logout-card">
+    <img class="logout-logo" src="{{ holyfhir_theme.logo_url }}" alt="" aria-hidden="true">
+    <h1 class="logout-title">{% translate "You are signed out" %}</h1>
+    <p class="logout-copy">HolyFHIR is closed to this session. Sign in again to return to your local records.</p>
+    <a class="logout-action" href="{% url 'admin:login' %}">{% translate "Sign in again" %}</a>
+  </div>
+</div>
+{% endblock %}

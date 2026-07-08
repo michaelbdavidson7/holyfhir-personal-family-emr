@@ -90,6 +90,15 @@ class AppLockTests(TestCase):
         self.assertRedirects(response, "/admin/", fetch_redirect_response=False)
         self.assertNotIn("app_locked", self.client.session)
 
+    def test_admin_logout_uses_themed_logo(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(reverse("admin:logout"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "logout-logo")
+        self.assertContains(response, '<img class="logout-logo" src="/static/')
+
 
 class SystemSettingsTests(TestCase):
     def test_get_solo_uses_configured_time_zone_default(self):
