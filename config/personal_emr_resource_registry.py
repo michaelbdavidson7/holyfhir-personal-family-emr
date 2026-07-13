@@ -1,4 +1,4 @@
-"""Personal health record resource registry for HolyFHIR admin.
+"""Personal health record resource registry for FamilyChartVault admin.
 
 Drop this into something like clinical/personal_emr_resource_registry.py.
 Use it to power the human-friendly "All Clinical Resources" page.

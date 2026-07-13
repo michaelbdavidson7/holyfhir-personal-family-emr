@@ -77,6 +77,6 @@ def unlock_app(request):
                 request, "Too many unlock attempts. Wait a few minutes and try again."
             )
         else:
-            messages.error(request, "That password did not unlock HolyFHIR.")
+            messages.error(request, "That password did not unlock FamilyChartVault.")
 
     return render(request, "unlock.html", {"locked_out": False})

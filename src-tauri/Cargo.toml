@@ -1,8 +1,8 @@
 [package]
 name = "holyfhir"
 version = "0.2.1"
-description = "HolyFHIR Family Health Records desktop shell"
-authors = ["HolyFHIR contributors"]
+description = "FamilyChartVault desktop shell"
+authors = ["FamilyChartVault contributors"]
 edition = "2021"
 
 [build-dependencies]

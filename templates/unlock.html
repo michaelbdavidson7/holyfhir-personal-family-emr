@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Unlock HolyFHIR</title>
+    <title>Unlock FamilyChartVault</title>
     <style>
       :root {
         color-scheme: light;
@@ -93,7 +93,7 @@
   </head>
   <body>
     <main>
-      <h1>HolyFHIR is locked</h1>
+      <h1>FamilyChartVault is locked</h1>
       <p>Enter your password to return to your local records.</p>
 
       {% for message in messages %}
@@ -107,7 +107,7 @@
           {% csrf_token %}
           <label for="password">Password</label>
           <input id="password" name="password" type="password" autocomplete="current-password" autofocus>
-          <button type="submit">Unlock HolyFHIR</button>
+          <button type="submit">Unlock FamilyChartVault</button>
         </form>
       {% endif %}
 

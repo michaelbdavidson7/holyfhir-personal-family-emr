@@ -1,5 +1,5 @@
 from django.contrib.auth.apps import AuthConfig
 
 
-class HolyFHIRAuthConfig(AuthConfig):
+class FamilyChartVaultAuthConfig(AuthConfig):
     verbose_name = "Settings"

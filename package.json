@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "desktop:dev": "tauri dev",
-    "backend:bundle": "cd desktop-backend && ..\\venv\\Scripts\\pyinstaller.exe --noconfirm HolyFHIRBackend.spec --distpath dist --workpath build",
+    "backend:bundle": "cd desktop-backend && ..\\venv\\Scripts\\pyinstaller.exe --noconfirm FamilyChartVaultBackend.spec --distpath dist --workpath build",
     "desktop:build": "npm run backend:bundle && tauri build",
     "django:dev": "python manage.py runserver 127.0.0.1:8000"
   },

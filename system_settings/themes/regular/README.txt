@@ -1,4 +1,4 @@
-HolyFHIR Brand Assets
+FamilyChartVault Brand Assets
 
 Included:
 - Master logo PNG

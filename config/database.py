@@ -44,7 +44,7 @@ def build_default_database_config(base_dir: Path):
 
     if not encryption_key and not is_bootstrap_command:
         raise ImproperlyConfigured(
-            "DATABASE_ENCRYPTION_KEY is required. HolyFHIR stores health record data and database encryption is always enforced."
+            "DATABASE_ENCRYPTION_KEY is required. FamilyChartVault stores health record data and database encryption is always enforced."
         )
 
     options = {

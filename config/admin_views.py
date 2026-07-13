@@ -231,7 +231,7 @@ def recovery_key_generate(request):
 
         messages.warning(
             request,
-            "Save this recovery key now. HolyFHIR cannot show it again.",
+            "Save this recovery key now. FamilyChartVault cannot show it again.",
         )
         return render(
             request,
@@ -1857,7 +1857,7 @@ def fhir_interop_hub(request):
         },
         {
             "title": "Get Records from MyChart",
-            "description": "Follow the MyChart download guide, then upload the ZIP or FHIR JSON into HolyFHIR.",
+            "description": "Follow the MyChart download guide, then upload the ZIP or FHIR JSON into FamilyChartVault.",
             "url": reverse("fhir_import"),
             "icon": "fas fa-question-circle",
         },

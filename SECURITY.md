@@ -1,6 +1,6 @@
 # Security Policy
 
-HolyFHIR Family Health Records handles sensitive health information. Please report security issues privately and do not include personal health information, real records, database files, recovery keys, passwords, access tokens, logs with secrets, screenshots with identifiable information, or portal exports in public issues, pull requests, discussions, or commits.
+FamilyChartVault handles sensitive health information. Please report security issues privately and do not include personal health information, real records, database files, recovery keys, passwords, access tokens, logs with secrets, screenshots with identifiable information, or portal exports in public issues, pull requests, discussions, or commits.
 
 ## Reporting A Vulnerability
 
@@ -34,8 +34,8 @@ Use synthetic examples that cannot be linked to a real person.
 
 ## Supported Versions
 
-HolyFHIR is early open-source software. Security fixes are generally made on the main development branch unless release branches are explicitly published.
+FamilyChartVault is early open-source software. Security fixes are generally made on the main development branch unless release branches are explicitly published.
 
 ## User Responsibilities
 
-HolyFHIR is intended for local, personal recordkeeping and is not represented as HIPAA-compliant, certified, audited, or appropriate for regulated use. Users are responsible for protecting their devices, passwords, recovery keys, backups, exports, database files, and any sensitive health information they store or share.
+FamilyChartVault is intended for local, personal recordkeeping and is not represented as HIPAA-compliant, certified, audited, or appropriate for regulated use. Users are responsible for protecting their devices, passwords, recovery keys, backups, exports, database files, and any sensitive health information they store or share.

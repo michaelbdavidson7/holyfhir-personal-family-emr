@@ -24,7 +24,7 @@ class SystemSettings(models.Model):
         max_length=32,
         choices=THEME_CHOICES,
         default=DEFAULT_THEME,
-        help_text="Controls HolyFHIR branding assets such as the logo and favicon.",
+        help_text="Controls FamilyChartVault branding assets such as the logo and favicon.",
     )
     app_lock_enabled = models.BooleanField(
         "Require sign-in and enable lock screen",

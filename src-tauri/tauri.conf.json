@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "HolyFHIR Family Health Records",
+  "productName": "FamilyChartVault",
   "version": "0.2.1",
   "identifier": "com.holyfhir.personal-emr",
   "build": {
@@ -32,7 +32,7 @@
       "../system_settings",
       "../templates",
       "../static",
-      "../desktop-backend/dist/HolyFHIRBackend"
+      "../desktop-backend/dist/FamilyChartVaultBackend"
     ]
   }
 }

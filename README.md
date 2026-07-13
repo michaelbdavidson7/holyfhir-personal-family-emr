@@ -1,20 +1,20 @@
-# HolyFHIR Family Health Records
+# FamilyChartVault
 
-HolyFHIR Family Health Records is a private, local-first health record organizer for your family.
+FamilyChartVault is a private, local-first health record organizer for your family.
 
 It is meant to help you organize things like patients, medications, allergies, conditions, documents, visits, and imported FHIR records from Epic's MyChart. The app runs on your computer and does not require a cloud account.
 
-HolyFHIR is licensed as free and open-source software under the MIT License. Your ability to use, copy, modify, and share this software is governed by that license.
+FamilyChartVault is licensed as free and open-source software under the MIT License. Your ability to use, copy, modify, and share this software is governed by that license.
 
-HolyFHIR includes models and browsing tools for many FHIR resource types, and its current importer maps a smaller supported subset. FHIR files vary by source, profile, version, and export quality, so imports may be incomplete, unsupported, or require review.
+FamilyChartVault includes models and browsing tools for many FHIR resource types, and its current importer maps a smaller supported subset. FHIR files vary by source, profile, version, and export quality, so imports may be incomplete, unsupported, or require review.
 
 This project is an early personal health record tool for people who want more local control over copies of their health information.
 
-![HolyFHIR Family Health Records screenshot](docs/images/screenshot.png)
+![FamilyChartVault screenshot](docs/images/screenshot.png)
 
 ## Plain-English Summary
 
-- HolyFHIR is designed to store app data locally on your computer by default.
+- FamilyChartVault is designed to store app data locally on your computer by default.
 - The Windows desktop app includes the backend it needs.
 - You can keep records for yourself or family members.
 - You can import some FHIR records, including MyChart requested-record exports.
@@ -23,7 +23,7 @@ This project is an early personal health record tool for people who want more lo
 
 ## Trust Through Openness
 
-HolyFHIR is open source, which means the code can be inspected instead of treated like a black box. That matters for a personal health-record tool: users, caregivers, developers, and security reviewers can see how the app stores data, handles imports, and makes tradeoffs.
+FamilyChartVault is open source, which means the code can be inspected instead of treated like a black box. That matters for a personal health-record tool: users, caregivers, developers, and security reviewers can see how the app stores data, handles imports, and makes tradeoffs.
 
 Open source does not make software automatically safe or correct, but it does make the project more accountable. Bugs, privacy concerns, and design choices can be found, discussed, and improved in the open.
 
@@ -33,13 +33,13 @@ Download the latest Windows installer from the [GitHub Releases page](https://gi
 
 ## A Friendly Warning
 
-HolyFHIR is early software. It is not a certified EMR/EHR system and should not be your only copy of important health information.
+FamilyChartVault is early software. It is not a certified EMR/EHR system and should not be your only copy of important health information.
 
 Please treat it like a personal health record organizer, not as a replacement for your doctor, patient portal, pharmacy records, or official chart.
 
-HolyFHIR is not medical advice, not a medical device, and not intended for diagnosis, treatment, emergencies, clinical decision support, or medication safety checking. Imported data may be incomplete or incorrect, so always verify important information against official sources.
+FamilyChartVault is not medical advice, not a medical device, and not intended for diagnosis, treatment, emergencies, clinical decision support, or medication safety checking. Imported data may be incomplete or incorrect, so always verify important information against official sources.
 
-You are responsible for protecting your local device, password, recovery key, backups, database files, and exported records. HolyFHIR is not represented as HIPAA-compliant, certified, validated, or appropriate for professional, clinical, organizational, research, or regulated use. If you use HolyFHIR with anyone else's health information, you are responsible for understanding and meeting any applicable privacy, security, consent, retention, licensing, and compliance obligations.
+You are responsible for protecting your local device, password, recovery key, backups, database files, and exported records. FamilyChartVault is not represented as HIPAA-compliant, certified, validated, or appropriate for professional, clinical, organizational, research, or regulated use. If you use FamilyChartVault with anyone else's health information, you are responsible for understanding and meeting any applicable privacy, security, consent, retention, licensing, and compliance obligations.
 
 See [DISCLAIMER.md](DISCLAIMER.md) for the full disclaimer.
 
@@ -51,26 +51,26 @@ Contributions are welcome, but sample data, test fixtures, screenshots, and bug 
 
 ## License
 
-HolyFHIR Family Health Records is licensed under the MIT License. See [LICENSE](LICENSE).
+FamilyChartVault is licensed under the MIT License. See [LICENSE](LICENSE).
 
 This software is provided as-is, without warranty of any kind.
 
 ## For Friends Testing The Windows App
 
-If someone sent you a HolyFHIR installer:
+If someone sent you a FamilyChartVault installer:
 
 1. Download the Windows setup `.exe` from the [latest release](https://github.com/Code-Blue-Solutions-LLC/holyfhir-personal-family-emr/releases/latest).
 2. Run the installer.
-3. Open **HolyFHIR Family Health Records**.
+3. Open **FamilyChartVault**.
 4. Create your first system user.
 5. Save your password and recovery key somewhere safe.
 
 Windows may warn you because the installer is not code-signed yet. That warning is expected for early friend builds.
 
-Do not delete this folder unless you mean to remove local HolyFHIR data:
+Do not delete this folder unless you mean to remove local FamilyChartVault data:
 
 ```text
-C:\Users\<you>\AppData\Local\HolyFHIR Family Health Records
+C:\Users\<you>\AppData\Local\FamilyChartVault
 ```
 
 Useful files in that folder:
@@ -92,7 +92,7 @@ Useful files in that folder:
 - Health documents, such as PDFs and reports
 - Imported FHIR resources
 
-On each patient profile, HolyFHIR shows related conditions, allergies, and medications so the most important context is easy to find.
+On each patient profile, FamilyChartVault shows related conditions, allergies, and medications so the most important context is easy to find.
 
 ## FHIR Import
 
@@ -122,7 +122,7 @@ Currently mapped resources:
 - Observation
 - Encounter
 
-HolyFHIR also keeps a raw copy of each imported FHIR resource for traceability.
+FamilyChartVault also keeps a raw copy of each imported FHIR resource for traceability.
 
 ## Health Trends
 
@@ -143,7 +143,7 @@ Only numeric measurements can be charted. Text-only notes are intentionally skip
 
 ## Passwords And Recovery Keys
 
-HolyFHIR is designed for local use. That means there is no cloud account where someone can reset your password for you.
+FamilyChartVault is designed for local use. That means there is no cloud account where someone can reset your password for you.
 
 Please save:
 
@@ -155,7 +155,7 @@ If the password, encryption key, and recovery material are all lost, the data ma
 
 ## Current Status
 
-HolyFHIR is still early. The biggest things to finish before a wider release are:
+FamilyChartVault is still early. The biggest things to finish before a wider release are:
 
 - fuller backup and restore tooling
 - friendlier first-run recovery-key setup
@@ -202,7 +202,7 @@ python manage.py bootstrap_secrets
 
 This creates `.env`, generates the database encryption key, and generates Django's secret key.
 
-If `.env` already exists, HolyFHIR prompts before rewriting it and tries to create a timestamped local copy first:
+If `.env` already exists, FamilyChartVault prompts before rewriting it and tries to create a timestamped local copy first:
 
 ```text
 .env.backup.YYYYMMDD-HHMMSS
@@ -270,10 +270,10 @@ src-tauri\target\release\bundle\nsis\
 
 Share the NSIS setup `.exe`, not the raw `src-tauri\target\release\holyfhir.exe`.
 
-If the build fails with a Windows permission error for `HolyFHIRBackend.exe`, an old backend process is probably still running:
+If the build fails with a Windows permission error for `FamilyChartVaultBackend.exe`, an old backend process is probably still running:
 
 ```powershell
-Get-Process HolyFHIRBackend -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-Process FamilyChartVaultBackend -ErrorAction SilentlyContinue | Stop-Process -Force
 npm run desktop:build
 ```
 
@@ -323,6 +323,6 @@ Release-tag builds upload the NSIS installer artifact and attach it to a draft G
 
 ## Medical Date Handling
 
-HolyFHIR stores calendar-only health record facts, such as date of birth or medication start date, as dates. Exact moments, such as imports, lockouts, encounters, and timed observations, use timezone-aware datetimes.
+FamilyChartVault stores calendar-only health record facts, such as date of birth or medication start date, as dates. Exact moments, such as imports, lockouts, encounters, and timed observations, use timezone-aware datetimes.
 
 That distinction matters because medical dates should not move to the previous or next day because of timezone conversion.

@@ -11,7 +11,7 @@ from patients.recovery import generate_recovery_key, hash_recovery_key
 
 class FirstRunOwnerForm(UserCreationForm):
     confirm_no_password_recovery = forms.BooleanField(
-        label="I understand HolyFHIR cannot recover this password for me.",
+        label="I understand FamilyChartVault cannot recover this password for me.",
         required=True,
         error_messages={
             "required": "Please confirm that you understand there is no password recovery yet.",

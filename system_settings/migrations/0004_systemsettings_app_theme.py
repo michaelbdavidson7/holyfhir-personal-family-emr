@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=system_settings.themes.THEME_CHOICES,
                 default=system_settings.themes.DEFAULT_THEME,
-                help_text="Controls HolyFHIR branding assets such as the logo and favicon.",
+                help_text="Controls FamilyChartVault branding assets such as the logo and favicon.",
                 max_length=32,
             ),
         ),

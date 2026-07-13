@@ -73,7 +73,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
 
         if _is_plaintext_sqlite_database(database_name):
             raise ImproperlyConfigured(
-                f"{database_name} is a plaintext SQLite database, but HolyFHIR now requires SQLCipher encryption. "
+                f"{database_name} is a plaintext SQLite database, but FamilyChartVault now requires SQLCipher encryption. "
                 "Encrypt it with `python manage.py encrypt_sqlite_db --source db.sqlite3 --target holyfhir.encrypted.sqlite3`, "
                 "then set DATABASE_NAME to the encrypted database path. For a fresh install, move/delete the plaintext "
                 "database and run migrations again."

@@ -13,7 +13,7 @@ from .time_zones import time_zone_choices
 class SystemSettingsAdminForm(forms.ModelForm):
     app_theme = forms.ChoiceField(
         choices=THEME_CHOICES,
-        help_text="Choose the HolyFHIR branding assets used by the local app.",
+        help_text="Choose the FamilyChartVault branding assets used by the local app.",
     )
 
     time_zone = forms.ChoiceField(
@@ -37,7 +37,7 @@ class SystemSettingsAdmin(admin.ModelAdmin):
             "Theme",
             {
                 "fields": ("app_theme",),
-                "description": "Choose the default HolyFHIR look for this local app.",
+                "description": "Choose the default FamilyChartVault look for this local app.",
             },
         ),
         (
@@ -45,7 +45,7 @@ class SystemSettingsAdmin(admin.ModelAdmin):
             {
                 "fields": ("time_zone",),
                 "description": (
-                    "HolyFHIR stores medical calendar dates as dates. This setting controls how exact timestamps "
+                    "FamilyChartVault stores medical calendar dates as dates. This setting controls how exact timestamps "
                     "are displayed, such as observations, encounters, imports, and security events."
                 ),
             },

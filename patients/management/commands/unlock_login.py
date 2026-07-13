@@ -4,7 +4,7 @@ from patients.models import LoginLockout
 
 
 class Command(BaseCommand):
-    help = "Clear local HolyFHIR login lockout counters."
+    help = "Clear local FamilyChartVault login lockout counters."
 
     def add_arguments(self, parser):
         parser.add_argument(
