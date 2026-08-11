@@ -473,7 +473,7 @@ class FirstRunOnboardingTests(TestCase):
         self.assertTrue(user.has_usable_password())
         self.assertTrue(system_settings.app_lock_enabled)
         self.assertTrue(RecoveryCredential.objects.filter(user=user).exists())
-        self.assertContains(response, "Save your recovery key")
+        self.assertContains(response, "Write down this recovery key")
         self.assertContains(response, "HFIR-")
 
     def test_auth_enabled_requires_password_and_recovery_acknowledgement(self):
@@ -486,8 +486,8 @@ class FirstRunOnboardingTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Enter a password to require sign-in.")
-        self.assertContains(response, "Please confirm that you understand")
+        self.assertContains(response, "Please type a password.")
+        self.assertContains(response, "Please check the box")
         self.assertFalse(get_user_model().objects.exists())
 
     def test_recovery_step_continue_opens_admin(self):
@@ -510,24 +510,6 @@ class FirstRunOnboardingTests(TestCase):
         self.assertRedirects(response, "/admin/", fetch_redirect_response=False)
         self.assertNotIn("first_run_recovery_key", self.client.session)
 
-    @override_settings(DEBUG=True)
-    def test_setup_preview_renders_without_creating_user(self):
-        response = self.client.get(reverse("setup_preview"))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Preview mode")
-        self.assertContains(response, "No sign-in is easiest")
-        self.assertFalse(get_user_model().objects.exists())
-
-    @override_settings(DEBUG=True)
-    def test_setup_preview_can_render_recovery_step(self):
-        response = self.client.get(f"{reverse('setup_preview')}?step=recovery")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Preview mode")
-        self.assertContains(response, "HFIR-DEMO")
-        self.assertFalse(get_user_model().objects.exists())
-
 
 class SetupWizardTests(TestCase):
     def setUp(self):
@@ -546,9 +528,8 @@ class SetupWizardTests(TestCase):
         response = self.client.get(reverse("setup_wizard"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Setup Wizard")
-        self.assertContains(response, "Local owner")
-        self.assertContains(response, "No sign-in")
+        self.assertContains(response, "Current local account")
+        self.assertContains(response, "Open without a password")
 
     def test_setup_wizard_can_turn_auth_on_and_create_recovery_key(self):
         response = self.client.post(
@@ -569,7 +550,7 @@ class SetupWizardTests(TestCase):
         self.assertTrue(self.user.has_usable_password())
         self.assertTrue(system_settings.app_lock_enabled)
         self.assertTrue(RecoveryCredential.objects.filter(user=self.user).exists())
-        self.assertContains(response, "Save your new recovery key")
+        self.assertContains(response, "Write down this recovery key")
         self.assertContains(response, "HFIR-")
 
     def test_setup_wizard_can_turn_auth_off_and_clear_recovery_key(self):

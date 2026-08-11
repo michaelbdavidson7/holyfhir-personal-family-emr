@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, password_validation
 from django.shortcuts import redirect, render
@@ -18,35 +17,35 @@ class SecurityChoiceForm(forms.Form):
     AUTH_CHOICES = (
         (
             AUTH_OFF,
-            "No sign-in. Open my records directly on this computer.",
+            "Open without a password (recommended).",
         ),
         (
             AUTH_ON,
-            "Require a password before opening my records.",
+            "Ask for a password.",
         ),
     )
 
     auth_enabled = forms.ChoiceField(
-        label="Sign-in preference",
+        label="Choose one",
         choices=AUTH_CHOICES,
         initial=AUTH_OFF,
         widget=forms.RadioSelect,
     )
     password1 = forms.CharField(
-        label="Password",
+        label="Choose a password",
         required=False,
         strip=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-        help_text="Required only when sign-in is turned on.",
+        help_text="Only needed if you choose to use a password.",
     )
     password2 = forms.CharField(
-        label="Password again",
+        label="Type the password again",
         required=False,
         strip=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
     )
     confirm_no_password_recovery = forms.BooleanField(
-        label=f"I understand I need to save my {APP_SHORT_NAME} recovery key.",
+        label=f"I understand I must write down the {APP_SHORT_NAME} recovery key on the next screen.",
         required=False,
     )
 
@@ -66,7 +65,7 @@ class SecurityChoiceForm(forms.Form):
         if not password_required:
             self.fields[
                 "password1"
-            ].help_text = "Leave blank to keep the current password. Enter a new password to change it."
+            ].help_text = "Leave blank to keep the current password."
 
     def clean(self):
         cleaned_data = super().clean()
@@ -84,11 +83,11 @@ class SecurityChoiceForm(forms.Form):
 
         if needs_password:
             if not password1:
-                self.add_error("password1", "Enter a password to require sign-in.")
+                self.add_error("password1", "Please type a password.")
             if not password2:
-                self.add_error("password2", "Enter the password again.")
+                self.add_error("password2", "Please type the password again.")
             if password1 and password2 and password1 != password2:
-                self.add_error("password2", "The two password fields did not match.")
+                self.add_error("password2", "Those passwords do not match.")
             if password1:
                 try:
                     password_validation.validate_password(password1)
@@ -98,7 +97,7 @@ class SecurityChoiceForm(forms.Form):
         if needs_recovery_ack and not cleaned_data.get("confirm_no_password_recovery"):
             self.add_error(
                 "confirm_no_password_recovery",
-                "Please confirm that you understand the recovery key must be saved.",
+                "Please check the box so you remember to write down the recovery key.",
             )
 
         return cleaned_data
@@ -114,15 +113,15 @@ class SecurityChoiceForm(forms.Form):
 
 class FirstRunOwnerForm(SecurityChoiceForm):
     username = forms.CharField(
-        label="Owner name",
+        label="Your name",
         max_length=150,
-        initial="owner",
-        help_text="Used internally for the local owner account.",
+        initial="Owner",
+        help_text="If you decide to use a password, this is the name you type first.",
     )
     email = forms.EmailField(
         label="Email",
         required=False,
-        help_text="Optional. Stored locally with this owner account.",
+        help_text="Optional. Saved only on this computer.",
     )
 
     field_order = [

@@ -284,7 +284,7 @@ JAZZMIN_SETTINGS = {
     "custom_links": {
         "System": [
             {
-                "name": "Setup Wizard",
+                "name": "Setup the App",
                 "url": "setup_wizard",
                 "icon": "fas fa-magic",
                 "permissions": ["auth.view_user"],
