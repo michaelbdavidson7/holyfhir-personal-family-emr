@@ -188,13 +188,31 @@
         padding-left: 20px;
       }
 
-      .auth-options {
-        margin-top: 22px;
+      .decision-section {
+        border-top: 1px solid #e3eaee;
+        margin-top: 24px;
+        padding-top: 22px;
       }
 
-      .auth-options > label {
-        font-size: 18px;
+      .section-label {
+        color: #52616c;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        margin: 0 0 10px;
+        text-transform: uppercase;
+      }
+
+      .auth-options {
         margin-top: 0;
+      }
+
+      .auth-options h3,
+      .document-choice h3 {
+        color: #17212b;
+        font-size: 18px;
+        line-height: 1.25;
+        margin: 0 0 10px;
       }
 
       .auth-options ul {
@@ -249,6 +267,66 @@
 
       .auth-confirm-field label {
         margin: 0;
+      }
+
+      .info-panel {
+        background: #f8fafc;
+        border: 1px solid #d9e7e4;
+        border-radius: 8px;
+        color: #405663;
+        line-height: 1.45;
+        margin-top: 18px;
+        padding: 14px;
+      }
+
+      .info-panel h3 {
+        color: #17212b;
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+
+      .info-panel ul {
+        display: grid;
+        gap: 7px;
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .document-choice {
+        margin-top: 20px;
+      }
+
+      .document-choice-box {
+        background: #f6faf9;
+        border: 2px solid #d9e7e4;
+        border-radius: 8px;
+        color: #2d4650;
+        line-height: 1.45;
+        padding: 16px;
+      }
+
+      .document-choice label {
+        color: #17212b;
+        display: block;
+        font-weight: 800;
+        margin-bottom: 3px;
+      }
+
+      .document-choice-row {
+        align-items: flex-start;
+        display: flex;
+        gap: 9px;
+      }
+
+      .document-choice input {
+        flex: 0 0 auto;
+        margin-top: 3px;
+        min-height: 0;
+        width: auto;
+      }
+
+      .document-choice .helptext {
+        margin-left: 25px;
       }
 
       .warning {
@@ -379,21 +457,32 @@
 
             {% if setup_wizard_mode and owner %}
               <div class="owner-summary">
-                <strong>Login Name</strong>
+                <strong>Login name</strong>
                 {{ owner.username }}{% if owner.email %} / {{ owner.email }}{% endif %}
-
-                      <span class="helptext">You can change this, and add more login accounts, inside the app settings.</span>
+                <span class="helptext">You can change this, and add more login accounts, inside the app settings.</span>
               </div>
             {% endif %}
+
+            <div class="info-panel" aria-label="Already protected">
+              <h3>Already taken care of</h3>
+              <ul>
+                <li>The health records database is protected automatically.</li>
+                <li>If you choose a password, it is scrambled and cannot be read back.</li>
+                <li>You can come back to this page any time.</li>
+              </ul>
+            </div>
 
             <form method="post" novalidate>
               {% csrf_token %}
               {{ form.non_field_errors }}
 
+              <div class="decision-section">
+                <p class="section-label">Your choices</p>
+
               {% for field in form %}
                 {% if field.name == "auth_enabled" %}
                   <div class="auth-options" data-auth-options>
-                    <h3>{{ field.label }}</h3>
+                    <h3>Open the app</h3>
                     {{ field }}
                     {{ field.errors }}
                   </div>
@@ -405,6 +494,23 @@
                     {% if field.help_text %}
                       <span class="helptext">{{ field.help_text|safe }}</span>
                     {% endif %}
+                  </div>
+                {% elif field.name == "document_files_encrypted" %}
+                  <div class="document-choice">
+                    <h3>Uploaded documents</h3>
+                    <div class="document-choice-box">
+                      <div class="document-choice-row">
+                        {{ field }}
+                        <div>
+                          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                          Adds extra protection for uploaded PDFs and reports.
+                        </div>
+                      </div>
+                      {{ field.errors }}
+                      {% if field.help_text %}
+                        <span class="helptext">{{ field.help_text|safe }}</span>
+                      {% endif %}
+                    </div>
                   </div>
                 {% elif field.field.widget.input_type == "checkbox" %}
                   <div class="auth-confirm-field" data-auth-dependent>
@@ -426,6 +532,7 @@
                   {% endif %}
                 {% endif %}
               {% endfor %}
+              </div>
 
               {% if setup_wizard_mode %}
                 <div class="warning">If you choose no password, this app will open directly on this computer. Your records will not be deleted.</div>

@@ -434,6 +434,7 @@ class FirstRunOnboardingTests(TestCase):
                 "username": "owner",
                 "email": "owner@example.test",
                 "auth_enabled": "off",
+                "document_files_encrypted": "on",
             },
         )
 
@@ -449,6 +450,7 @@ class FirstRunOnboardingTests(TestCase):
         self.assertFalse(system_settings.app_lock_enabled)
         self.assertFalse(system_settings.lock_shortcut_enabled)
         self.assertFalse(system_settings.login_lockout_enabled)
+        self.assertTrue(system_settings.document_files_encrypted)
         self.assertFalse(RecoveryCredential.objects.filter(user=user).exists())
 
     def test_first_run_setup_can_enable_auth_and_create_recovery_key(self):
@@ -461,6 +463,7 @@ class FirstRunOnboardingTests(TestCase):
                 "password1": "correct-password-for-owner",
                 "password2": "correct-password-for-owner",
                 "confirm_no_password_recovery": "on",
+                "document_files_encrypted": "on",
             },
             follow=True,
         )
@@ -472,6 +475,7 @@ class FirstRunOnboardingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(user.has_usable_password())
         self.assertTrue(system_settings.app_lock_enabled)
+        self.assertTrue(system_settings.document_files_encrypted)
         self.assertTrue(RecoveryCredential.objects.filter(user=user).exists())
         self.assertContains(response, "Write down this recovery key")
         self.assertContains(response, "HFIR-")
@@ -528,8 +532,12 @@ class SetupWizardTests(TestCase):
         response = self.client.get(reverse("setup_wizard"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Current local account")
+        self.assertContains(response, "Login name")
         self.assertContains(response, "Open without a password")
+        self.assertContains(response, "Already taken care of")
+        self.assertContains(response, "Your choices")
+        self.assertContains(response, "Open the app")
+        self.assertContains(response, "Protect uploaded documents")
 
     def test_setup_wizard_can_turn_auth_on_and_create_recovery_key(self):
         response = self.client.post(
@@ -539,6 +547,7 @@ class SetupWizardTests(TestCase):
                 "password1": "correct-password-for-owner",
                 "password2": "correct-password-for-owner",
                 "confirm_no_password_recovery": "on",
+                "document_files_encrypted": "on",
             },
             follow=True,
         )
@@ -549,6 +558,7 @@ class SetupWizardTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.user.has_usable_password())
         self.assertTrue(system_settings.app_lock_enabled)
+        self.assertTrue(system_settings.document_files_encrypted)
         self.assertTrue(RecoveryCredential.objects.filter(user=self.user).exists())
         self.assertContains(response, "Write down this recovery key")
         self.assertContains(response, "HFIR-")
@@ -570,7 +580,7 @@ class SetupWizardTests(TestCase):
 
         response = self.client.post(
             reverse("setup_wizard"),
-            {"auth_enabled": "off"},
+            {"auth_enabled": "off", "document_files_encrypted": "on"},
         )
 
         self.user.refresh_from_db()
@@ -581,6 +591,7 @@ class SetupWizardTests(TestCase):
         self.assertFalse(system_settings.app_lock_enabled)
         self.assertFalse(system_settings.lock_shortcut_enabled)
         self.assertFalse(system_settings.login_lockout_enabled)
+        self.assertTrue(system_settings.document_files_encrypted)
         self.assertFalse(RecoveryCredential.objects.filter(user=self.user).exists())
 
     def test_setup_wizard_can_turn_auth_on_with_existing_password_and_key(self):

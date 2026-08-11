@@ -65,6 +65,15 @@ class SystemSettingsAdmin(admin.ModelAdmin):
             },
         ),
         (
+            "Documents",
+            {
+                "fields": ("document_files_encrypted",),
+                "description": (
+                    "Choose whether uploaded document files should be protected. Existing files are not converted automatically yet."
+                ),
+            },
+        ),
+        (
             "Meta",
             {
                 "fields": ("updated_at",),
