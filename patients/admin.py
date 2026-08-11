@@ -628,7 +628,7 @@ class UserAdmin(DjangoUserAdmin):
             {
                 "fields": ("recovery_key_status_detail",),
                 "description": (
-                    "Recovery keys are not fully enabled in first-run setup yet. "
+                    "Recovery keys are generated during first-run setup. "
                     "The raw recovery key is never stored and cannot be viewed here."
                 ),
             },

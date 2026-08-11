@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Set Up {{ holyfhir_app_short_name }}</title>
+    <title>{% if setup_wizard_mode %}Setup Wizard{% else %}Set Up {{ holyfhir_app_short_name }}{% endif %}</title>
     <style>
       :root {
         color-scheme: light;
         font-family: "Segoe UI", Arial, sans-serif;
-        color: #18212a;
-        background: #f4f7f8;
+        color: #17212b;
+        background: #eef4f4;
       }
 
       * {
@@ -19,146 +19,544 @@
       body {
         margin: 0;
         min-height: 100vh;
+        background:
+          linear-gradient(135deg, rgba(36, 111, 143, 0.14), transparent 38%),
+          linear-gradient(315deg, rgba(38, 128, 111, 0.16), transparent 34%),
+          #eef4f4;
+      }
+
+      .onboarding-shell {
+        min-height: 100vh;
         display: grid;
-        place-items: center;
-        padding: 28px;
+        grid-template-columns: minmax(260px, 0.85fr) minmax(420px, 1.15fr);
+      }
+
+      .brand-panel {
+        align-content: center;
+        background: #12313d;
+        color: #f8fbfb;
+        display: grid;
+        gap: 28px;
+        padding: clamp(28px, 6vw, 72px);
+      }
+
+      .brand-lockup {
+        align-items: center;
+        display: flex;
+        gap: 14px;
+        min-width: 0;
+      }
+
+      .brand-lockup img {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        height: 54px;
+        object-fit: contain;
+        padding: 6px;
+        width: 54px;
+      }
+
+      .brand-name {
+        color: #bce4ef;
+        display: block;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .brand-panel h1 {
+        font-size: clamp(32px, 5vw, 54px);
+        line-height: 1.02;
+        margin: 0;
+        max-width: 620px;
+      }
+
+      .brand-panel p {
+        color: #c8d9dd;
+        font-size: 17px;
+        line-height: 1.55;
+        margin: 0;
+        max-width: 560px;
+      }
+
+      .setup-steps {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .setup-steps li {
+        align-items: center;
+        color: #dcebef;
+        display: flex;
+        gap: 12px;
+        line-height: 1.35;
+        list-style: none;
+      }
+
+      .step-number {
+        align-items: center;
+        background: rgba(188, 228, 239, 0.15);
+        border: 1px solid rgba(188, 228, 239, 0.3);
+        border-radius: 999px;
+        color: #ffffff;
+        display: inline-flex;
+        flex: 0 0 30px;
+        font-size: 13px;
+        font-weight: 800;
+        height: 30px;
+        justify-content: center;
+        width: 30px;
+      }
+
+      .form-panel {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        padding: clamp(24px, 5vw, 64px);
       }
 
       main {
-        width: min(100%, 520px);
-        background: #ffffff;
-        border: 1px solid #d4dde3;
-        border-radius: 8px;
-        padding: 32px;
-        box-shadow: 0 18px 45px rgba(18, 31, 42, 0.11);
+        width: min(100%, 600px);
       }
 
-      h1 {
+      .progress-label {
+        color: #52616c;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.07em;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+      }
+
+      .setup-card {
+        background: #ffffff;
+        border: 1px solid #d5e0e4;
+        border-radius: 8px;
+        box-shadow: 0 22px 55px rgba(18, 31, 42, 0.12);
+        padding: clamp(24px, 4vw, 36px);
+      }
+
+      h2 {
+        color: #17212b;
+        font-size: clamp(27px, 4vw, 36px);
+        line-height: 1.1;
         margin: 0 0 10px;
-        font-size: 30px;
-        line-height: 1.15;
       }
 
       p {
-        margin: 0 0 24px;
         color: #52616c;
         font-size: 16px;
         line-height: 1.5;
+        margin: 0 0 22px;
       }
 
-      .warning {
-        border: 1px solid #b84232;
+      .trust-list {
+        display: grid;
+        gap: 10px;
+        margin: 0 0 24px;
+        padding: 0;
+      }
+
+      .trust-list li {
+        background: #f6faf9;
+        border: 1px solid #d9e7e4;
         border-radius: 8px;
-        background: #fff4f2;
-        color: #5d160f;
-        padding: 14px 16px;
-        margin-bottom: 24px;
-      }
-
-      .warning strong {
-        display: block;
-        margin-bottom: 4px;
-        color: #8f2418;
+        color: #2d4650;
+        list-style: none;
+        padding: 11px 13px;
       }
 
       label {
-        display: block;
-        margin: 18px 0 6px;
         color: #26333d;
-        font-weight: 650;
+        display: block;
+        font-weight: 700;
+        margin: 18px 0 6px;
       }
 
       input {
-        width: 100%;
         border: 1px solid #b9c6cf;
         border-radius: 6px;
-        padding: 11px 12px;
         font: inherit;
+        padding: 11px 12px;
+        width: 100%;
       }
 
       input[type="checkbox"] {
-        width: auto;
         margin-right: 8px;
         transform: translateY(1px);
+        width: auto;
       }
 
       input:focus {
+        border-color: #246f8f;
         outline: 3px solid #b8d9ef;
-        border-color: #2877a8;
       }
 
       .helptext {
-        display: block;
-        margin-top: 6px;
         color: #65747f;
+        display: block;
         font-size: 14px;
         line-height: 1.4;
+        margin-top: 6px;
       }
 
-      ul {
-        margin: 8px 0 0;
-        padding-left: 20px;
+      ul:not(.setup-steps):not(.trust-list) {
         color: #65747f;
         font-size: 14px;
         line-height: 1.45;
+        margin: 8px 0 0;
+        padding-left: 20px;
       }
 
       .errorlist {
-        margin: 8px 0 0;
         color: #9f241b;
+        margin: 8px 0 0;
       }
 
-      button {
-        width: 100%;
-        margin-top: 24px;
+      .checkbox-row {
+        align-items: flex-start;
+        display: flex;
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .checkbox-row label {
+        margin: 0;
+      }
+
+      button,
+      .button-link {
+        align-items: center;
         border: 0;
         border-radius: 6px;
-        background: #246f8f;
-        color: #ffffff;
-        padding: 12px 16px;
-        font: inherit;
-        font-weight: 700;
         cursor: pointer;
+        display: inline-flex;
+        font: inherit;
+        font-weight: 800;
+        justify-content: center;
+        min-height: 46px;
+        padding: 12px 16px;
+        text-decoration: none;
       }
 
-      button:hover {
+      .primary-action {
+        background: #246f8f;
+        color: #ffffff;
+        margin-top: 24px;
+        width: 100%;
+      }
+
+      .primary-action:hover {
         background: #1d5d79;
       }
 
-      .note {
-        margin-top: 18px;
-        margin-bottom: 0;
+      .recovery-key-box {
+        background: #101820;
+        border-radius: 8px;
+        color: #f8fbfb;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: clamp(18px, 3.5vw, 26px);
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        line-height: 1.35;
+        margin: 22px 0;
+        overflow-wrap: anywhere;
+        padding: 18px;
+        text-align: center;
+      }
+
+      .next-actions {
+        display: grid;
+        gap: 10px;
+        margin: 22px 0 0;
+        padding: 0;
+      }
+
+      .next-actions li {
+        align-items: center;
+        display: flex;
+        gap: 10px;
+        list-style: none;
+      }
+
+      .check-dot {
+        background: #26806f;
+        border-radius: 999px;
+        color: #ffffff;
+        flex: 0 0 24px;
         font-size: 14px;
+        font-weight: 900;
+        height: 24px;
+        line-height: 24px;
+        text-align: center;
+        width: 24px;
+      }
+
+
+
+      .preview-banner {
+        background: #edf7ff;
+        border: 1px solid #9ccff0;
+        border-radius: 8px;
+        color: #1d4d66;
+        font-weight: 700;
+        line-height: 1.45;
+        margin-bottom: 16px;
+        padding: 12px 14px;
+      }
+
+      .auth-options ul {
+        display: grid;
+        gap: 10px;
+        margin: 8px 0 0;
+        padding: 0;
+      }
+
+      .auth-options li {
+        list-style: none;
+      }
+
+      .auth-options label {
+        align-items: flex-start;
+        background: #f6faf9;
+        border: 1px solid #d9e7e4;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        gap: 10px;
+        line-height: 1.35;
+        margin: 0;
+        padding: 12px 13px;
+      }
+
+      .auth-options input[type="radio"] {
+        flex: 0 0 auto;
+        margin-top: 2px;
+        width: auto;
+      }
+
+      .auth-password-field[hidden],
+      .auth-confirm-field[hidden] {
+        display: none !important;
+      }
+
+      .owner-summary {
+        background: #f8fafc;
+        border: 1px solid #d9e7e4;
+        border-radius: 8px;
+        color: #2d4650;
+        font-size: 14px;
+        line-height: 1.45;
+        margin-bottom: 18px;
+        padding: 12px 14px;
+      }
+
+      .owner-summary strong {
+        color: #17212b;
+        display: block;
+        font-size: 15px;
+        margin-bottom: 2px;
+      }
+
+      .warning {
+        background: #fff8eb;
+        border: 1px solid #d99526;
+        border-radius: 8px;
+        color: #5e3a00;
+        line-height: 1.45;
+        margin-bottom: 22px;
+        padding: 13px 15px;
+      }
+
+      .note {
+        font-size: 14px;
+        margin: 16px 0 0;
+      }
+
+      @media (max-width: 880px) {
+        .onboarding-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .brand-panel {
+          align-content: start;
+          padding-bottom: 34px;
+        }
+
+        .form-panel {
+          align-items: start;
+        }
+      }
+
+      @media (max-width: 520px) {
+        body {
+          background: #eef4f4;
+        }
+
+        .brand-panel,
+        .form-panel {
+          padding: 22px;
+        }
+
+        .brand-panel h1 {
+          font-size: 31px;
+        }
+
+        .setup-card {
+          padding: 22px;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <h1>Create your owner account</h1>
-      <p>This account unlocks your local {{ holyfhir_app_short_name }} records on this computer. Choose a password you can remember.</p>
+    <div class="onboarding-shell">
+      <section class="brand-panel" aria-label="Setup overview">
+        <div class="brand-lockup">
+          <img src="{{ holyfhir_theme.logo_url }}" alt="{{ holyfhir_app_short_name }} logo">
+          <div>
+            <span class="brand-name">{{ holyfhir_app_short_name }}</span>
+            <strong>{{ holyfhir_app_name }}</strong>
+          </div>
+        </div>
 
-      <div class="warning">
-        <strong>No password recovery yet.</strong>
-        If this password is lost, {{ holyfhir_app_short_name }} cannot recover it for you. Keep it somewhere safe before adding health records.
-      </div>
-
-      <form method="post" novalidate>
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-
-        {% for field in form %}
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {{ field.errors }}
-          {% if field.help_text %}
-            <span class="helptext">{{ field.help_text|safe }}</span>
+        <div>
+          {% if setup_wizard_mode %}
+            <h1>Setup Wizard</h1>
+            <p>Review how this computer opens records. You can run this wizard any time without changing the health data already stored here.</p>
+          {% else %}
+            <h1>Your health records, set up for this computer.</h1>
+            <p>Choose whether this computer should open directly or ask for a password, then import records or start a patient profile. Nothing here needs a cloud account.</p>
           {% endif %}
-        {% endfor %}
+        </div>
 
-        <button type="submit">Start using {{ holyfhir_app_short_name }}</button>
-      </form>
+        <ol class="setup-steps">
+          <li><span class="step-number">1</span><span>Choose sign-in or direct open</span></li>
+          <li><span class="step-number">2</span><span>Save a recovery key if one is created</span></li>
+          <li><span class="step-number">3</span><span>Continue using your records</span></li>
+        </ol>
+      </section>
 
-      <p class="note">{{ holyfhir_app_short_name }} is designed for local records on this device. Keep this password somewhere safe.</p>
-    </main>
+      <section class="form-panel">
+        <main>
+          {% if recovery_step %}
+            <div class="progress-label">{% if setup_wizard_mode %}Setup Wizard{% else %}Step 2 of 3{% endif %}</div>
+            <div class="setup-card">
+              <h2>{% if setup_wizard_mode %}Save your new recovery key{% else %}Save your recovery key{% endif %}</h2>
+              <p>This is the only time {{ holyfhir_app_short_name }} can show this key. Keep it somewhere private before relying on password recovery.</p>
+
+              <div class="recovery-key-box" aria-label="Recovery key">{{ recovery_key }}</div>
+
+              <ul class="next-actions">
+                <li><span class="check-dot">OK</span><span>Use it with your username if you forget the owner password.</span></li>
+                <li><span class="check-dot">OK</span><span>Store it somewhere separate from this computer.</span></li>
+                <li><span class="check-dot">OK</span><span>You can rotate it later from Settings.</span></li>
+              </ul>
+
+              <form method="post">
+                {% csrf_token %}
+                <button class="primary-action" type="submit" name="continue_to_app" value="1">I saved it. Open {{ holyfhir_app_short_name }}</button>
+              </form>
+            </div>
+          {% else %}
+            <div class="progress-label">{% if setup_wizard_mode %}Setup Wizard{% else %}Step 1 of 3{% endif %}</div>
+            <div class="setup-card">
+              <h2>Choose how this computer opens records</h2>
+              <p>{% if setup_wizard_mode %}Change this whenever the computer, household, or comfort level changes.{% else %}No sign-in is easiest and is the default. Turn sign-in on only when this computer needs extra local protection.{% endif %}</p>
+
+              {% if setup_wizard_mode and owner %}
+                <div class="owner-summary">
+                  <strong>Local owner</strong>
+                  {{ owner.username }}{% if owner.email %} / {{ owner.email }}{% endif %}
+                </div>
+              {% endif %}
+
+              <ul class="trust-list">
+                {% if setup_wizard_mode %}
+                  <li>Changing this only affects local sign-in behavior.</li>
+                  <li>No sign-in opens directly for the local owner.</li>
+                  <li>Sign-in can keep the current password or create a new one.</li>
+                {% else %}
+                  <li>Local-first setup for the Windows app.</li>
+                  <li>No sign-in opens directly for the local owner.</li>
+                  <li>Sign-in creates a password and one-time recovery key.</li>
+                {% endif %}
+              </ul>
+
+              <div class="warning">
+                {% if setup_wizard_mode %}Turning sign-in off removes the local password requirement and clears the recovery key for this owner. Health records are not deleted.{% else %}Most home users can leave sign-in off. If you turn sign-in on, save the recovery key on the next screen because {{ holyfhir_app_short_name }} cannot show it again.{% endif %}
+              </div>
+
+              <form method="post" novalidate>
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                {% for field in form %}
+                  {% if field.name == "auth_enabled" %}
+                    <div class="auth-options" data-auth-options>
+                      <label>{{ field.label }}</label>
+                      {{ field }}
+                      {{ field.errors }}
+                    </div>
+                  {% elif field.name == "password1" or field.name == "password2" %}
+                    <div class="auth-password-field" data-auth-dependent>
+                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                      {{ field }}
+                      {{ field.errors }}
+                      {% if field.help_text %}
+                        <span class="helptext">{{ field.help_text|safe }}</span>
+                      {% endif %}
+                    </div>
+                  {% elif field.field.widget.input_type == "checkbox" %}
+                    <div class="checkbox-row auth-confirm-field" data-auth-dependent>
+                      {{ field }}
+                      <div>
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field.errors }}
+                        {% if field.help_text %}
+                          <span class="helptext">{{ field.help_text|safe }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% else %}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                    {% if field.help_text %}
+                      <span class="helptext">{{ field.help_text|safe }}</span>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+
+                <button class="primary-action" type="submit">{% if setup_wizard_mode %}Save setup choices{% else %}Finish setup{% endif %}</button>
+              </form>
+
+              <p class="note">{{ holyfhir_app_short_name }} is not a certified EMR/EoR system. Keep original records and consult qualified professionals for care decisions.</p>
+            </div>
+          {% endif %}
+        </main>
+      </section>
+    </div>
+    <script>
+      (function () {
+        var authInputs = document.querySelectorAll('input[name="auth_enabled"]');
+        var dependentFields = document.querySelectorAll('[data-auth-dependent]');
+
+        function syncAuthFields() {
+          var selected = document.querySelector('input[name="auth_enabled"]:checked');
+          var enabled = selected && selected.value === 'on';
+          dependentFields.forEach(function (field) {
+            field.hidden = !enabled;
+          });
+        }
+
+        authInputs.forEach(function (input) {
+          input.addEventListener('change', syncAuthFields);
+        });
+        syncAuthFields();
+      })();
+    </script>
   </body>
 </html>

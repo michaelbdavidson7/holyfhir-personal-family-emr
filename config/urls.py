@@ -39,6 +39,7 @@ from patients.views import (
     first_run_setup,
     recovery_key_reset_confirm,
     recovery_key_reset_start,
+    setup_wizard,
 )
 from system_settings.themes import DEFAULT_THEME, theme_assets
 from system_settings.views import lock_app, unlock_app
@@ -77,6 +78,7 @@ urlpatterns = [
     ),
     path("lock/", lock_app, name="app_lock"),
     path("unlock/", unlock_app, name="app_unlock"),
+    path("admin/setup/", admin.site.admin_view(setup_wizard), name="setup_wizard"),
     path("admin/settings/", admin.site.admin_view(settings_hub), name="admin_settings"),
     path(
         "admin/settings/backups/",

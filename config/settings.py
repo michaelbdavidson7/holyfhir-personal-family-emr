@@ -284,11 +284,17 @@ JAZZMIN_SETTINGS = {
     "custom_links": {
         "System": [
             {
+                "name": "Setup Wizard",
+                "url": "setup_wizard",
+                "icon": "fas fa-magic",
+                "permissions": ["auth.view_user"],
+            },
+            {
                 "name": "Settings",
                 "url": "admin_settings",
                 "icon": "fas fa-cog",
                 "permissions": ["auth.view_user"],
-            }
+            },
         ],
         "patients": [
             {

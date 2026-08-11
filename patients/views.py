@@ -1,31 +1,215 @@
 from django import forms
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model, login
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model, login, password_validation
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from config.branding import APP_SHORT_NAME
 
 from patients.forms import RecoveryKeyPasswordResetForm, RecoveryKeySetPasswordForm
+from patients.models import RecoveryCredential
 from patients.recovery import generate_recovery_key, hash_recovery_key
+from system_settings.models import SystemSettings
 
 
-class FirstRunOwnerForm(UserCreationForm):
-    confirm_no_password_recovery = forms.BooleanField(
-        label=f"I understand {APP_SHORT_NAME} cannot recover this password for me.",
-        required=True,
-        error_messages={
-            "required": "Please confirm that you understand there is no password recovery yet.",
-        },
+class SecurityChoiceForm(forms.Form):
+    AUTH_OFF = "off"
+    AUTH_ON = "on"
+    AUTH_CHOICES = (
+        (
+            AUTH_OFF,
+            "No sign-in. Open my records directly on this computer.",
+        ),
+        (
+            AUTH_ON,
+            "Require a password before opening my records.",
+        ),
     )
 
-    class Meta(UserCreationForm.Meta):
-        model = get_user_model()
-        fields = ("username",)
+    auth_enabled = forms.ChoiceField(
+        label="Sign-in preference",
+        choices=AUTH_CHOICES,
+        initial=AUTH_OFF,
+        widget=forms.RadioSelect,
+    )
+    password1 = forms.CharField(
+        label="Password",
+        required=False,
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        help_text="Required only when sign-in is turned on.",
+    )
+    password2 = forms.CharField(
+        label="Password again",
+        required=False,
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )
+    confirm_no_password_recovery = forms.BooleanField(
+        label=f"I understand I need to save my {APP_SHORT_NAME} recovery key.",
+        required=False,
+    )
+
+    def __init__(
+        self,
+        *args,
+        auth_initial=AUTH_OFF,
+        password_required=True,
+        recovery_ack_required=True,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.fields["auth_enabled"].initial = auth_initial
+        self.password_required = password_required
+        self.recovery_ack_required = recovery_ack_required
+
+        if not password_required:
+            self.fields[
+                "password1"
+            ].help_text = "Leave blank to keep the current password. Enter a new password to change it."
+
+    def clean(self):
+        cleaned_data = super().clean()
+        auth_enabled = cleaned_data.get("auth_enabled") == self.AUTH_ON
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+        password_supplied = bool(password1 or password2)
+        needs_password = auth_enabled and (self.password_required or password_supplied)
+        needs_recovery_ack = auth_enabled and (
+            self.recovery_ack_required or password_supplied
+        )
+
+        if not auth_enabled:
+            return cleaned_data
+
+        if needs_password:
+            if not password1:
+                self.add_error("password1", "Enter a password to require sign-in.")
+            if not password2:
+                self.add_error("password2", "Enter the password again.")
+            if password1 and password2 and password1 != password2:
+                self.add_error("password2", "The two password fields did not match.")
+            if password1:
+                try:
+                    password_validation.validate_password(password1)
+                except forms.ValidationError as error:
+                    self.add_error("password1", error)
+
+        if needs_recovery_ack and not cleaned_data.get("confirm_no_password_recovery"):
+            self.add_error(
+                "confirm_no_password_recovery",
+                "Please confirm that you understand the recovery key must be saved.",
+            )
+
+        return cleaned_data
+
+    @property
+    def auth_is_enabled(self):
+        return self.cleaned_data.get("auth_enabled") == self.AUTH_ON
+
+    @property
+    def has_new_password(self):
+        return bool(self.cleaned_data.get("password1"))
+
+
+class FirstRunOwnerForm(SecurityChoiceForm):
+    username = forms.CharField(
+        label="Owner name",
+        max_length=150,
+        initial="owner",
+        help_text="Used internally for the local owner account.",
+    )
+    email = forms.EmailField(
+        label="Email",
+        required=False,
+        help_text="Optional. Stored locally with this owner account.",
+    )
+
+    field_order = [
+        "username",
+        "email",
+        "auth_enabled",
+        "password1",
+        "password2",
+        "confirm_no_password_recovery",
+    ]
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+        User = get_user_model()
+
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError("That owner name is already in use.")
+
+        return username
+
+
+class SetupWizardForm(SecurityChoiceForm):
+    pass
+
+
+def _save_sign_in_setting(auth_enabled):
+    system_settings = SystemSettings.get_solo()
+    system_settings.app_lock_enabled = auth_enabled
+
+    if not auth_enabled:
+        system_settings.lock_shortcut_enabled = False
+        system_settings.login_lockout_enabled = False
+
+    system_settings.save(
+        update_fields=[
+            "app_lock_enabled",
+            "lock_shortcut_enabled",
+            "login_lockout_enabled",
+            "updated_at",
+        ]
+    )
+
+
+def _generate_recovery_key_for_user(user):
+    recovery_key = generate_recovery_key()
+    RecoveryCredential.objects.update_or_create(
+        user=user,
+        defaults={"recovery_key_hash": hash_recovery_key(recovery_key)},
+    )
+    return recovery_key
+
+
+def _security_form_options_for_user(user):
+    auth_enabled = SystemSettings.get_solo().app_lock_enabled
+    has_recovery_key = RecoveryCredential.objects.filter(user=user).exists()
+    return {
+        "auth_initial": (
+            SecurityChoiceForm.AUTH_ON if auth_enabled else SecurityChoiceForm.AUTH_OFF
+        ),
+        "password_required": not user.has_usable_password(),
+        "recovery_ack_required": not has_recovery_key,
+    }
+
+
+def _render_setup(request, **context):
+    defaults = {
+        "recovery_step": False,
+        "setup_wizard_mode": False,
+    }
+    defaults.update(context)
+    return render(request, "first_run_setup.html", defaults)
 
 
 def first_run_setup(request):
     User = get_user_model()
+    recovery_key = request.session.get("first_run_recovery_key")
+
+    if recovery_key and request.user.is_authenticated:
+        if request.method == "POST" and request.POST.get("continue_to_app"):
+            request.session.pop("first_run_recovery_key", None)
+            return redirect("/admin/")
+
+        return _render_setup(
+            request,
+            recovery_key=recovery_key,
+            recovery_step=True,
+        )
 
     if User.objects.exists():
         return redirect("/admin/")
@@ -34,16 +218,98 @@ def first_run_setup(request):
         form = FirstRunOwnerForm(request.POST)
 
         if form.is_valid():
-            user = form.save(commit=False)
-            user.is_staff = True
-            user.is_superuser = True
+            auth_enabled = form.auth_is_enabled
+            user = User(
+                username=form.cleaned_data["username"],
+                email=form.cleaned_data["email"],
+                is_staff=True,
+                is_superuser=True,
+            )
+
+            if auth_enabled:
+                user.set_password(form.cleaned_data["password1"])
+            else:
+                user.set_unusable_password()
+
             user.save()
-            login(request, user)
+            _save_sign_in_setting(auth_enabled)
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+            if auth_enabled:
+                request.session["first_run_recovery_key"] = (
+                    _generate_recovery_key_for_user(user)
+                )
+                return redirect("setup")
+
+            request.session.pop("first_run_recovery_key", None)
             return redirect("/admin/")
     else:
         form = FirstRunOwnerForm()
 
-    return render(request, "first_run_setup.html", {"form": form})
+    return _render_setup(request, form=form)
+
+
+def setup_wizard(request):
+    owner = request.user
+    recovery_key = request.session.get("setup_wizard_recovery_key")
+
+    if recovery_key:
+        if request.method == "POST" and request.POST.get("continue_to_app"):
+            request.session.pop("setup_wizard_recovery_key", None)
+            return redirect("/admin/")
+
+        return _render_setup(
+            request,
+            recovery_key=recovery_key,
+            recovery_step=True,
+            setup_wizard_mode=True,
+            owner=owner,
+        )
+
+    form_options = _security_form_options_for_user(owner)
+
+    if request.method == "POST":
+        form = SetupWizardForm(request.POST, **form_options)
+
+        if form.is_valid():
+            auth_enabled = form.auth_is_enabled
+
+            if auth_enabled:
+                if form.has_new_password:
+                    owner.set_password(form.cleaned_data["password1"])
+                    owner.save(update_fields=["password"])
+                    login(
+                        request,
+                        owner,
+                        backend="django.contrib.auth.backends.ModelBackend",
+                    )
+
+                _save_sign_in_setting(True)
+
+                if form.has_new_password or form_options["recovery_ack_required"]:
+                    request.session["setup_wizard_recovery_key"] = (
+                        _generate_recovery_key_for_user(owner)
+                    )
+                    return redirect("setup_wizard")
+
+                messages.success(request, "Setup updated. Sign-in is turned on.")
+                return redirect("/admin/")
+
+            owner.set_unusable_password()
+            owner.save(update_fields=["password"])
+            RecoveryCredential.objects.filter(user=owner).delete()
+            _save_sign_in_setting(False)
+            messages.success(request, "Setup updated. Sign-in is turned off.")
+            return redirect("/admin/")
+    else:
+        form = SetupWizardForm(**form_options)
+
+    return _render_setup(
+        request,
+        form=form,
+        setup_wizard_mode=True,
+        owner=owner,
+    )
 
 
 def recovery_key_reset_start(request):

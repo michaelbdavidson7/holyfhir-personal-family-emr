@@ -8,6 +8,7 @@ from django.core.management.base import CommandError
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.urls import reverse
 
 from config.database import (
     DEFAULT_DATABASE_CIPHER_COMPATIBILITY,
@@ -423,6 +424,202 @@ class RecoveryKeyTests(TestCase):
         )
 
         self.assertFalse(form.is_valid())
+
+
+class FirstRunOnboardingTests(TestCase):
+    def test_first_run_setup_defaults_to_no_auth(self):
+        response = self.client.post(
+            reverse("setup"),
+            {
+                "username": "owner",
+                "email": "owner@example.test",
+                "auth_enabled": "off",
+            },
+        )
+
+        User = get_user_model()
+        user = User.objects.get(username="owner")
+        system_settings = SystemSettings.get_solo()
+
+        self.assertRedirects(response, "/admin/", fetch_redirect_response=False)
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
+        self.assertEqual(user.email, "owner@example.test")
+        self.assertFalse(user.has_usable_password())
+        self.assertFalse(system_settings.app_lock_enabled)
+        self.assertFalse(system_settings.lock_shortcut_enabled)
+        self.assertFalse(system_settings.login_lockout_enabled)
+        self.assertFalse(RecoveryCredential.objects.filter(user=user).exists())
+
+    def test_first_run_setup_can_enable_auth_and_create_recovery_key(self):
+        response = self.client.post(
+            reverse("setup"),
+            {
+                "username": "owner",
+                "email": "owner@example.test",
+                "auth_enabled": "on",
+                "password1": "correct-password-for-owner",
+                "password2": "correct-password-for-owner",
+                "confirm_no_password_recovery": "on",
+            },
+            follow=True,
+        )
+
+        User = get_user_model()
+        user = User.objects.get(username="owner")
+        system_settings = SystemSettings.get_solo()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(user.has_usable_password())
+        self.assertTrue(system_settings.app_lock_enabled)
+        self.assertTrue(RecoveryCredential.objects.filter(user=user).exists())
+        self.assertContains(response, "Save your recovery key")
+        self.assertContains(response, "HFIR-")
+
+    def test_auth_enabled_requires_password_and_recovery_acknowledgement(self):
+        response = self.client.post(
+            reverse("setup"),
+            {
+                "username": "owner",
+                "auth_enabled": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Enter a password to require sign-in.")
+        self.assertContains(response, "Please confirm that you understand")
+        self.assertFalse(get_user_model().objects.exists())
+
+    def test_recovery_step_continue_opens_admin(self):
+        User = get_user_model()
+        user = User.objects.create_superuser(
+            username="owner",
+            email="owner@example.test",
+            password="correct-password",
+        )
+        self.client.force_login(user)
+        session = self.client.session
+        session["first_run_recovery_key"] = "HFIR-ABCD-EFGH-JKLM-NPQR-STUV"
+        session.save()
+
+        response = self.client.post(
+            reverse("setup"),
+            {"continue_to_app": "1"},
+        )
+
+        self.assertRedirects(response, "/admin/", fetch_redirect_response=False)
+        self.assertNotIn("first_run_recovery_key", self.client.session)
+
+    @override_settings(DEBUG=True)
+    def test_setup_preview_renders_without_creating_user(self):
+        response = self.client.get(reverse("setup_preview"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Preview mode")
+        self.assertContains(response, "No sign-in is easiest")
+        self.assertFalse(get_user_model().objects.exists())
+
+    @override_settings(DEBUG=True)
+    def test_setup_preview_can_render_recovery_step(self):
+        response = self.client.get(f"{reverse('setup_preview')}?step=recovery")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Preview mode")
+        self.assertContains(response, "HFIR-DEMO")
+        self.assertFalse(get_user_model().objects.exists())
+
+
+class SetupWizardTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="owner",
+            email="owner@example.test",
+            is_staff=True,
+            is_superuser=True,
+        )
+        self.user.set_unusable_password()
+        self.user.save(update_fields=["password"])
+        self.client.force_login(self.user)
+
+    def test_setup_wizard_renders_for_existing_owner(self):
+        response = self.client.get(reverse("setup_wizard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Setup Wizard")
+        self.assertContains(response, "Local owner")
+        self.assertContains(response, "No sign-in")
+
+    def test_setup_wizard_can_turn_auth_on_and_create_recovery_key(self):
+        response = self.client.post(
+            reverse("setup_wizard"),
+            {
+                "auth_enabled": "on",
+                "password1": "correct-password-for-owner",
+                "password2": "correct-password-for-owner",
+                "confirm_no_password_recovery": "on",
+            },
+            follow=True,
+        )
+
+        self.user.refresh_from_db()
+        system_settings = SystemSettings.get_solo()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.user.has_usable_password())
+        self.assertTrue(system_settings.app_lock_enabled)
+        self.assertTrue(RecoveryCredential.objects.filter(user=self.user).exists())
+        self.assertContains(response, "Save your new recovery key")
+        self.assertContains(response, "HFIR-")
+
+    def test_setup_wizard_can_turn_auth_off_and_clear_recovery_key(self):
+        self.user.set_password("correct-password")
+        self.user.save(update_fields=["password"])
+        RecoveryCredential.objects.create(
+            user=self.user,
+            recovery_key_hash=hash_recovery_key(generate_recovery_key()),
+        )
+        SystemSettings.get_solo()
+        SystemSettings.objects.update(
+            app_lock_enabled=True,
+            lock_shortcut_enabled=True,
+            login_lockout_enabled=True,
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("setup_wizard"),
+            {"auth_enabled": "off"},
+        )
+
+        self.user.refresh_from_db()
+        system_settings = SystemSettings.get_solo()
+
+        self.assertRedirects(response, "/admin/", fetch_redirect_response=False)
+        self.assertFalse(self.user.has_usable_password())
+        self.assertFalse(system_settings.app_lock_enabled)
+        self.assertFalse(system_settings.lock_shortcut_enabled)
+        self.assertFalse(system_settings.login_lockout_enabled)
+        self.assertFalse(RecoveryCredential.objects.filter(user=self.user).exists())
+
+    def test_setup_wizard_can_turn_auth_on_with_existing_password_and_key(self):
+        self.user.set_password("correct-password")
+        self.user.save(update_fields=["password"])
+        RecoveryCredential.objects.create(
+            user=self.user,
+            recovery_key_hash=hash_recovery_key(generate_recovery_key()),
+        )
+
+        response = self.client.post(
+            reverse("setup_wizard"),
+            {"auth_enabled": "on"},
+        )
+
+        system_settings = SystemSettings.get_solo()
+
+        self.assertRedirects(response, "/admin/", fetch_redirect_response=False)
+        self.assertTrue(system_settings.app_lock_enabled)
+        self.assertNotIn("setup_wizard_recovery_key", self.client.session)
 
 
 class PatientProfileAdminTests(TestCase):
