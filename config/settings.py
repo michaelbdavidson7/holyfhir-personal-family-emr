@@ -168,9 +168,8 @@ JAZZMIN_SETTINGS = {
     "search_model": "patients.PatientProfile",
     "order_with_respect_to": [
         "patients",
-        "clinical",
-        "documents",
         "fhir",
+        "clinical",
         "System",
     ],
     "icons": {
@@ -296,14 +295,15 @@ JAZZMIN_SETTINGS = {
                 "permissions": ["auth.view_user"],
             },
         ],
-        "patients": [],
-        "clinical": [
+        "patients": [
             {
-                "name": "Doctors & Care Team",
-                "url": "clinical_care_team_directory",
-                "icon": "fas fa-user-friends",
-                "permissions": ["clinical.view_careteam"],
+                "name": "Clinical Documents",
+                "url": "admin:documents_clinicaldocument_changelist",
+                "icon": "fas fa-file-pdf",
+                "permissions": ["documents.view_clinicaldocument"],
             },
+        ],
+        "clinical": [
             {
                 "name": "Health Trends",
                 "url": "observation_charts",
@@ -311,7 +311,13 @@ JAZZMIN_SETTINGS = {
                 "permissions": ["clinical.view_observation"],
             },
             {
-                "name": "Every Health Resource",
+                "name": "Doctors & Care Team",
+                "url": "clinical_care_team_directory",
+                "icon": "fas fa-user-friends",
+                "permissions": ["clinical.view_careteam"],
+            },
+            {
+                "name": "All Health Record Types",
                 "url": "new_clinical_resources_directory",
                 "icon": "fas fa-notes-medical",
                 "permissions": ["clinical.view_condition"],
@@ -331,7 +337,7 @@ JAZZMIN_SETTINGS = {
                 "permissions": ["fhir.view_fhirresourcesnapshot"],
             },
             {
-                "name": "More Import / Export Stuff",
+                "name": "Advanced Import / Export",
                 "url": "fhir_interop_hub",
                 "icon": "fas fa-exchange-alt",
                 "permissions": ["fhir.view_fhirresourcesnapshot"],
@@ -346,6 +352,7 @@ JAZZMIN_SETTINGS = {
     },
     "hide_apps": [
         "auth",
+        "documents",
     ],
     "hide_models": [
         "patients.RecoveryCredential",

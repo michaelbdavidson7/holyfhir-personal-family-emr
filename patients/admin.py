@@ -11,6 +11,7 @@ from clinical.models import (
     CareTeam,
     Condition,
     Encounter,
+    FamilyMemberHistory,
     Immunization,
     Medication,
     Observation,
@@ -202,6 +203,20 @@ class CareTeamInline(ReadOnlyPatientRecordInline):
         return human_date(obj.end_date)
 
 
+class FamilyMemberHistoryInline(ReadOnlyPatientRecordInline):
+    model = FamilyMemberHistory
+    ordering = ("relationship", "-updated_at", "-id")
+    fields = (
+        "relationship",
+        "status",
+        "sex",
+        "age_text",
+        "deceased",
+        "open_record",
+    )
+    readonly_fields = fields
+
+
 class ClinicalDocumentInline(ReadOnlyPatientRecordInline):
     model = ClinicalDocument
     ordering = ("-source_date", "-updated_at", "-id")
@@ -227,6 +242,7 @@ class PatientProfileAdmin(admin.ModelAdmin):
         MedicationInline,
         ImmunizationInline,
         CareTeamInline,
+        FamilyMemberHistoryInline,
         ClinicalDocumentInline,
     )
 
@@ -364,6 +380,12 @@ class PatientProfileAdmin(admin.ModelAdmin):
                 "Related People",
                 "clinical_relatedperson",
                 obj.related_people.count(),
+            ),
+            self._overview_stat_card(
+                obj,
+                "Family History",
+                "clinical_familymemberhistory",
+                obj.family_member_histories.count(),
             ),
             self._overview_stat_card(
                 obj, "Documents", "documents_clinicaldocument", obj.documents.count()
