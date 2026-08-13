@@ -1,6 +1,6 @@
 [package]
 name = "holyfhir"
-version = "0.2.1"
+version = "0.2.2"
 description = "HolyFHIR Family Health Records desktop shell"
 authors = ["HolyFHIR contributors"]
 edition = "2021"

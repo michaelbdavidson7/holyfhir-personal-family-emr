@@ -9,7 +9,7 @@ use std::{
     process::{Child, Command, Stdio},
     sync::Mutex,
     thread,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime},
 };
 
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
@@ -18,10 +18,21 @@ const HOST: &str = "127.0.0.1";
 const PORT: u16 = 8787;
 const APP_NAME: &str = "HolyFHIR Family Health Records";
 const APP_SHORT_NAME: &str = "HolyFHIR";
+const STARTUP_LOCK_FILE: &str = "holyfhir-startup.lock";
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 struct DjangoProcess(Mutex<Option<Child>>);
+
+struct StartupLock {
+    path: PathBuf,
+}
+
+impl Drop for StartupLock {
+    fn drop(&mut self) {
+        let _ = fs::remove_file(&self.path);
+    }
+}
 
 #[derive(Clone)]
 struct RuntimePaths {
@@ -85,8 +96,9 @@ fn runtime_paths(app: &tauri::AppHandle) -> Result<RuntimePaths, String> {
         installed_app_dir()?
     };
 
-    fs::create_dir_all(&app_data_dir)
-        .map_err(|error| format!("failed to create app data directory {app_data_dir:?}: {error}"))?;
+    fs::create_dir_all(&app_data_dir).map_err(|error| {
+        format!("failed to create app data directory {app_data_dir:?}: {error}")
+    })?;
 
     Ok(RuntimePaths {
         env_file: app_data_dir.join(".env"),
@@ -151,6 +163,46 @@ fn append_log(paths: &RuntimePaths, message: impl AsRef<str>) {
     }
 }
 
+fn startup_lock_path(paths: &RuntimePaths) -> PathBuf {
+    paths.app_data_dir.join(STARTUP_LOCK_FILE)
+}
+
+fn startup_lock_is_stale(lock_path: &Path) -> bool {
+    fs::metadata(lock_path)
+        .and_then(|metadata| metadata.modified())
+        .ok()
+        .and_then(|modified| SystemTime::now().duration_since(modified).ok())
+        .is_some_and(|age| age > Duration::from_secs(30 * 60))
+}
+
+fn acquire_startup_lock(paths: &RuntimePaths) -> Result<Option<StartupLock>, String> {
+    let lock_path = startup_lock_path(paths);
+
+    match OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&lock_path)
+    {
+        Ok(mut file) => {
+            let _ = writeln!(file, "pid={}", std::process::id());
+            Ok(Some(StartupLock { path: lock_path }))
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+            if startup_lock_is_stale(&lock_path) {
+                append_log(paths, "removing stale startup lock");
+                let _ = fs::remove_file(&lock_path);
+                return acquire_startup_lock(paths);
+            }
+
+            Ok(None)
+        }
+        Err(error) => Err(format!(
+            "failed to create startup lock {:?}: {error}",
+            lock_path
+        )),
+    }
+}
+
 fn configure_django_command(command: &mut Command, paths: &RuntimePaths) {
     command
         .current_dir(&paths.project_root)
@@ -211,8 +263,8 @@ fn bundled_backend_candidates(paths: &RuntimePaths) -> String {
             .join("HolyFHIRBackend")
             .join("HolyFHIRBackend.exe"),
         paths
-        .project_root
-        .join("HolyFHIRBackend")
+            .project_root
+            .join("HolyFHIRBackend")
             .join("HolyFHIRBackend.exe"),
     ]
     .iter()
@@ -315,14 +367,23 @@ fn start_django(paths: &RuntimePaths) -> Result<Child, String> {
                 .create(true)
                 .append(true)
                 .open(&paths.log_file)
-                .map_err(|error| format!("failed to open log file {:?}: {error}", paths.log_file))?,
+                .map_err(|error| {
+                    format!("failed to open log file {:?}: {error}", paths.log_file)
+                })?,
         )
         .spawn()
         .map_err(|error| format!("failed to start Django: {error}"))
 }
 
 fn wait_for_django() -> Result<(), String> {
-    let deadline = Instant::now() + Duration::from_secs(20);
+    wait_for_django_for(
+        Duration::from_secs(20),
+        "Django did not start within 20 seconds",
+    )
+}
+
+fn wait_for_django_for(timeout: Duration, timeout_message: &str) -> Result<(), String> {
+    let deadline = Instant::now() + timeout;
 
     while Instant::now() < deadline {
         if TcpStream::connect((HOST, PORT)).is_ok() {
@@ -332,7 +393,19 @@ fn wait_for_django() -> Result<(), String> {
         thread::sleep(Duration::from_millis(250));
     }
 
-    Err("Django did not start within 20 seconds".to_string())
+    Err(timeout_message.to_string())
+}
+
+fn wait_for_existing_startup(paths: &RuntimePaths) -> Result<(), String> {
+    append_log(
+        paths,
+        "another HolyFHIR startup is already running; waiting for it to finish",
+    );
+
+    wait_for_django_for(
+        Duration::from_secs(180),
+        "another copy of HolyFHIR is still starting. Please wait a moment, then try again.",
+    )
 }
 
 fn is_django_running() -> bool {
@@ -349,18 +422,33 @@ fn show_app_window(app: &mut tauri::App, url: WebviewUrl, title: &str) -> tauri:
     Ok(())
 }
 
-fn show_startup_error(app: &mut tauri::App, paths: Option<&RuntimePaths>, message: &str) -> tauri::Result<()> {
-    if let Some(paths) = paths {
-        append_log(paths, format!("startup error: {message}"));
-    } else {
-        early_log(format!("startup error before runtime paths were ready: {message}"));
-    }
+fn navigate_main_window_to_app(app: &tauri::AppHandle) -> Result<(), String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or_else(|| "main window was not available".to_string())?;
 
-    show_app_window(
-        app,
-        WebviewUrl::App(Path::new("startup-error.html").into()),
-        &format!("{APP_SHORT_NAME} Startup Help"),
-    )
+    window
+        .set_title(APP_NAME)
+        .map_err(|error| format!("failed to update window title: {error}"))?;
+    window
+        .eval(&format!(
+            "window.location.replace({:?});",
+            format!("http://{HOST}:{PORT}/")
+        ))
+        .map_err(|error| format!("failed to open {APP_SHORT_NAME}: {error}"))
+}
+
+fn navigate_main_window_to_startup_error(app: &tauri::AppHandle) -> Result<(), String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or_else(|| "main window was not available".to_string())?;
+
+    window
+        .set_title(&format!("{APP_SHORT_NAME} Startup Help"))
+        .map_err(|error| format!("failed to update window title: {error}"))?;
+    window
+        .eval("window.location.replace('/startup-error.html');")
+        .map_err(|error| format!("failed to show startup help: {error}"))
 }
 
 fn main() {
@@ -369,10 +457,19 @@ fn main() {
     tauri::Builder::default()
         .manage(DjangoProcess(Mutex::new(None)))
         .setup(|app| {
+            show_app_window(
+                app,
+                WebviewUrl::App(Path::new("index.html").into()),
+                &format!("{APP_SHORT_NAME} is starting"),
+            )?;
+
             let paths = match runtime_paths(&app.handle()) {
                 Ok(paths) => paths,
                 Err(error) => {
-                    show_startup_error(app, None, &error)?;
+                    early_log(format!(
+                        "startup error before runtime paths were ready: {error}"
+                    ));
+                    let _ = navigate_main_window_to_startup_error(&app.handle());
                     return Ok(());
                 }
             };
@@ -385,37 +482,42 @@ fn main() {
                 ),
             );
 
-            if !is_django_running() {
-                if let Err(error) = bootstrap_django(&paths) {
-                    show_startup_error(app, Some(&paths), &error)?;
-                    return Ok(());
-                }
+            let app_handle = app.handle().clone();
 
-                let child = match start_django(&paths) {
-                    Ok(child) => child,
-                    Err(error) => {
-                        show_startup_error(app, Some(&paths), &error)?;
-                        return Ok(());
+            thread::spawn(move || {
+                let startup_result = if is_django_running() {
+                    Ok(())
+                } else {
+                    match acquire_startup_lock(&paths) {
+                        Ok(Some(_lock)) => bootstrap_django(&paths)
+                            .and_then(|_| start_django(&paths))
+                            .and_then(|child| {
+                                app_handle
+                                    .state::<DjangoProcess>()
+                                    .0
+                                    .lock()
+                                    .expect("failed to lock Django process state")
+                                    .replace(child);
+
+                                wait_for_django()
+                            }),
+                        Ok(None) => wait_for_existing_startup(&paths),
+                        Err(error) => Err(error),
                     }
                 };
 
-                app.state::<DjangoProcess>()
-                    .0
-                    .lock()
-                    .expect("failed to lock Django process state")
-                    .replace(child);
-
-                if let Err(error) = wait_for_django() {
-                    show_startup_error(app, Some(&paths), &error)?;
-                    return Ok(());
+                match startup_result {
+                    Ok(()) => {
+                        if let Err(error) = navigate_main_window_to_app(&app_handle) {
+                            append_log(&paths, format!("startup error: {error}"));
+                        }
+                    }
+                    Err(error) => {
+                        append_log(&paths, format!("startup error: {error}"));
+                        let _ = navigate_main_window_to_startup_error(&app_handle);
+                    }
                 }
-            }
-
-            show_app_window(
-                app,
-                WebviewUrl::External(format!("http://{HOST}:{PORT}/").parse().unwrap()),
-                APP_NAME,
-            )?;
+            });
 
             Ok(())
         })

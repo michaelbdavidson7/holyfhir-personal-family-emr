@@ -184,13 +184,22 @@
           </div>
           <div class="card-body">
             <div class="dashboard-action-list">
+              <a href="{% url 'fhir_import' %}" class="dashboard-action">
+                <span class="dashboard-action-icon bg-info text-white" aria-hidden="true">
+                  <i class="fas fa-download"></i>
+                </span>
+                <span>
+                  <span class="dashboard-action-title">Add records from MyChart</span>
+                  <span class="dashboard-action-copy">Follow the guide, then upload the MyChart ZIP or FHIR file.</span>
+                </span>
+              </a>
               <a href="{% url 'admin:patients_patientprofile_add' %}" class="dashboard-action">
                 <span class="dashboard-action-icon bg-success text-white" aria-hidden="true">
                   <i class="fas fa-user-plus"></i>
                 </span>
                 <span>
                   <span class="dashboard-action-title">Add a family member</span>
-                  <span class="dashboard-action-copy">Create the chart before adding records for that person.</span>
+                  <span class="dashboard-action-copy">Manually create a chart before adding records for that person.</span>
                 </span>
               </a>
 
@@ -204,15 +213,6 @@
                 </span>
               </a>
 
-              <a href="{% url 'fhir_import' %}" class="dashboard-action">
-                <span class="dashboard-action-icon bg-info text-white" aria-hidden="true">
-                  <i class="fas fa-download"></i>
-                </span>
-                <span>
-                  <span class="dashboard-action-title">Add records from MyChart</span>
-                  <span class="dashboard-action-copy">Follow the guide, then upload the MyChart ZIP or FHIR file.</span>
-                </span>
-              </a>
 
               <a href="{% url 'admin:documents_clinicaldocument_changelist' %}" class="dashboard-action">
                 <span class="dashboard-action-icon bg-light text-secondary" aria-hidden="true">
