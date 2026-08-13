@@ -17,16 +17,16 @@ class SecurityChoiceForm(forms.Form):
     AUTH_CHOICES = (
         (
             AUTH_OFF,
-            "Open without a password (recommended).",
+            "Open without a password (recommended). Anyone who can use this Windows account can open the app.",
         ),
         (
             AUTH_ON,
-            "Ask for a password.",
+            "Ask for a password. This app will ask for a local app password before opening records.",
         ),
     )
 
     auth_enabled = forms.ChoiceField(
-        label="Choose one",
+        label="Choose how this computer opens the app",
         choices=AUTH_CHOICES,
         initial=AUTH_OFF,
         widget=forms.RadioSelect,
@@ -36,7 +36,7 @@ class SecurityChoiceForm(forms.Form):
         required=False,
         strip=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-        help_text="Only needed if you choose to use a password.",
+        help_text="Only needed if this computer will ask for a password.",
     )
     password2 = forms.CharField(
         label="Type the password again",
@@ -47,11 +47,6 @@ class SecurityChoiceForm(forms.Form):
     confirm_no_password_recovery = forms.BooleanField(
         label=f"I understand I must write down the {APP_SHORT_NAME} recovery key on the next screen.",
         required=False,
-    )
-    document_files_encrypted = forms.BooleanField(
-        label="Protect uploaded documents",
-        required=False,
-        help_text="Saves this choice for document files. Existing files are not changed automatically yet.",
     )
 
     def __init__(
@@ -71,12 +66,6 @@ class SecurityChoiceForm(forms.Form):
             self.fields[
                 "password1"
             ].help_text = "Leave blank to keep the current password."
-
-        try:
-            documents_protected = SystemSettings.get_solo().document_files_encrypted
-        except Exception:
-            documents_protected = False
-        self.fields["document_files_encrypted"].initial = documents_protected
 
     def clean(self):
         cleaned_data = super().clean()
@@ -124,10 +113,10 @@ class SecurityChoiceForm(forms.Form):
 
 class FirstRunOwnerForm(SecurityChoiceForm):
     username = forms.CharField(
-        label="Your name",
+        label="Password account",
         max_length=150,
         initial="Owner",
-        help_text="If you decide to use a password, this is the name you type first.",
+        help_text="This is the local app account used when password protection is on.",
     )
     email = forms.EmailField(
         label="Email",
@@ -142,7 +131,6 @@ class FirstRunOwnerForm(SecurityChoiceForm):
         "password1",
         "password2",
         "confirm_no_password_recovery",
-        "document_files_encrypted",
     ]
 
     def clean_username(self):
@@ -159,10 +147,9 @@ class SetupWizardForm(SecurityChoiceForm):
     pass
 
 
-def _save_setup_settings(auth_enabled, document_files_encrypted):
+def _save_setup_settings(auth_enabled):
     system_settings = SystemSettings.get_solo()
     system_settings.app_lock_enabled = auth_enabled
-    system_settings.document_files_encrypted = document_files_encrypted
 
     if not auth_enabled:
         system_settings.lock_shortcut_enabled = False
@@ -173,7 +160,6 @@ def _save_setup_settings(auth_enabled, document_files_encrypted):
             "app_lock_enabled",
             "lock_shortcut_enabled",
             "login_lockout_enabled",
-            "document_files_encrypted",
             "updated_at",
         ]
     )
@@ -245,9 +231,7 @@ def first_run_setup(request):
                 user.set_unusable_password()
 
             user.save()
-            _save_setup_settings(
-                auth_enabled, form.cleaned_data["document_files_encrypted"]
-            )
+            _save_setup_settings(auth_enabled)
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
             if auth_enabled:
@@ -299,9 +283,7 @@ def setup_wizard(request):
                         backend="django.contrib.auth.backends.ModelBackend",
                     )
 
-                _save_setup_settings(
-                    True, form.cleaned_data["document_files_encrypted"]
-                )
+                _save_setup_settings(True)
 
                 if form.has_new_password or form_options["recovery_ack_required"]:
                     request.session["setup_wizard_recovery_key"] = (
@@ -315,7 +297,7 @@ def setup_wizard(request):
             owner.set_unusable_password()
             owner.save(update_fields=["password"])
             RecoveryCredential.objects.filter(user=owner).delete()
-            _save_setup_settings(False, form.cleaned_data["document_files_encrypted"])
+            _save_setup_settings(False)
             messages.success(request, "Setup updated. Sign-in is turned off.")
             return redirect("/admin/")
     else:

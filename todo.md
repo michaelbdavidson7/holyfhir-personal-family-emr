@@ -34,6 +34,18 @@ This app handles health data. Treat go-live as a staged launch: first private/lo
 - [ ] Hide secrets and PHI from logs, errors, and debug output
 - [ ] Add explicit privacy warning before exporting ZIP/PDF files
 - [ ] Add an emergency "lock app / clear session" action if relevant
+- [ ] Audit where uploaded documents are stored today
+  - [ ] Confirm storage path in desktop packaged app
+  - [ ] Confirm whether document files live outside the encrypted database
+  - [ ] Confirm backup/restore includes document files, not only the database
+- [ ] Decide document file protection strategy before exposing it in setup
+  - [ ] Do not show a document encryption/decryption toggle until upload/read/backup behavior is implemented end to end
+  - [ ] Decide whether document protection means encrypted-at-rest file storage, encrypted backup bundles, or both
+  - [ ] Add conversion/migration plan for existing uploaded documents if document encryption is introduced
+- [ ] Keep setup wizard limited to real implemented choices
+  - [ ] Show database encryption and password hashing as informational status, not user toggles
+  - [ ] Keep password/no-password as the primary beginner-facing decision
+  - [ ] Move backup and document protection choices into separate wizard steps only when they are implemented
 
 ## 2. Legal, Safety, and User Trust
 
@@ -344,6 +356,12 @@ This app handles health data. Treat go-live as a staged launch: first private/lo
 - [ ] Add release notes/changelog process
 - [ ] Add crash/error report strategy that does not leak PHI
 - [ ] Add "export all data before uninstall" instructions
+- [ ] Design backup wizard separately from first setup
+  - [ ] Start with plain choices: remind me later, back up to a folder, back up to a USB drive
+  - [ ] Research rclone or similar for optional cloud backup targets
+  - [ ] Keep rclone/provider details behind advanced backup settings
+  - [ ] Decide backup encryption format and key/recovery story before shipping cloud backups
+  - [ ] Test restore from backup on a clean install before exposing backup as a user-facing promise
 - [ ] Before final naming/release, update remaining static app-name references:
   - [ ] `README.md`, `DISCLAIMER.md`, `SECURITY.md`, `TERMS_OF_USE.md`, `CONTRIBUTING.md`
   - [ ] `landing/index.html`

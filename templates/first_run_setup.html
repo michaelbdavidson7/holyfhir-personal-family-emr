@@ -209,7 +209,7 @@
       }
 
       .auth-options h3,
-      .document-choice h3 {
+      .auth-options h3 {
         color: #17212b;
         font-size: 18px;
         line-height: 1.25;
@@ -291,43 +291,6 @@
         gap: 7px;
         margin: 0;
         padding-left: 20px;
-      }
-
-      .document-choice {
-        margin-top: 20px;
-      }
-
-      .document-choice-box {
-        background: #f6faf9;
-        border: 2px solid #d9e7e4;
-        border-radius: 8px;
-        color: #2d4650;
-        line-height: 1.45;
-        padding: 16px;
-      }
-
-      .document-choice label {
-        color: #17212b;
-        display: block;
-        font-weight: 800;
-        margin-bottom: 3px;
-      }
-
-      .document-choice-row {
-        align-items: flex-start;
-        display: flex;
-        gap: 9px;
-      }
-
-      .document-choice input {
-        flex: 0 0 auto;
-        margin-top: 3px;
-        min-height: 0;
-        width: auto;
-      }
-
-      .document-choice .helptext {
-        margin-left: 25px;
       }
 
       .warning {
@@ -453,22 +416,23 @@
               <button class="primary-action" type="submit" name="continue_to_app" value="1">I wrote it down. Open {{ holyfhir_app_short_name }}</button>
             </form>
           {% else %}
-            <h2>Do you want a password?</h2>
-            <p>For most people at home, opening without a password is easiest.</p>
+            <h2>Do you want this computer to ask for a password?</h2>
+            <p>For most homes, opening without a password is easiest. Use a password if other people share this Windows account or computer.</p>
 
             {% if setup_wizard_mode and owner %}
               <div class="owner-summary">
-                <strong>Login name</strong>
+                <strong>Password account</strong>
                 {{ owner.username }}{% if owner.email %} / {{ owner.email }}{% endif %}
-                <span class="helptext">You can change this, and add more login accounts, inside the app settings.</span>
+                <span class="helptext">This is the local app account used when password protection is on.</span>
               </div>
             {% endif %}
 
-            <div class="info-panel" aria-label="Already protected">
-              <h3>Already taken care of</h3>
+            <div class="info-panel" aria-label="Important notes">
+              <h3>Important notes</h3>
               <ul>
-                <li>The health records database is protected automatically.</li>
-                <li>If you choose a password, it is scrambled and cannot be read back.</li>
+                <li>Health records saved in the database are encrypted automatically.</li>
+                <li>Uploaded document files may be stored on your computer separately and are not encrypted by this setup yet.</li>
+                <li>If this computer asks for a password, that password is scrambled and cannot be read back.</li>
                 <li>You can come back to this page any time.</li>
               </ul>
             </div>
@@ -496,23 +460,6 @@
                       <span class="helptext">{{ field.help_text|safe }}</span>
                     {% endif %}
                   </div>
-                {% elif field.name == "document_files_encrypted" %}
-                  <div class="document-choice">
-                    <h3>Uploaded documents</h3>
-                    <div class="document-choice-box">
-                      <div class="document-choice-row">
-                        {{ field }}
-                        <div>
-                          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                          Adds extra protection for uploaded PDFs and reports.
-                        </div>
-                      </div>
-                      {{ field.errors }}
-                      {% if field.help_text %}
-                        <span class="helptext">{{ field.help_text|safe }}</span>
-                      {% endif %}
-                    </div>
-                  </div>
                 {% elif field.field.widget.input_type == "checkbox" %}
                   <div class="auth-confirm-field" data-auth-dependent>
                     {{ field }}
@@ -536,7 +483,7 @@
               </div>
 
               {% if setup_wizard_mode %}
-                <div class="warning">If you choose no password, this app will open directly on this computer. Your records will not be deleted.</div>
+                <div class="warning">If you choose no password, anyone who can use this Windows account can open the app. Your records will not be deleted.</div>
               {% endif %}
 
               <button class="primary-action" type="submit">{% if setup_wizard_mode %}Save my choice{% else %}Finish setup{% endif %}</button>

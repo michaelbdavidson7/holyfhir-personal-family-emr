@@ -113,7 +113,6 @@ class SystemSettingsTests(TestCase):
         self.assertFalse(settings.app_lock_enabled)
         self.assertFalse(settings.lock_shortcut_enabled)
         self.assertFalse(settings.login_lockout_enabled)
-        self.assertFalse(settings.document_files_encrypted)
 
     def test_default_theme_is_regular(self):
         settings = SystemSettings.get_solo()

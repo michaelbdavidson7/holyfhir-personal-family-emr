@@ -40,11 +40,6 @@ class SystemSettings(models.Model):
         default=False,
         help_text="Opt in to temporary lockouts after repeated failed sign-in attempts.",
     )
-    document_files_encrypted = models.BooleanField(
-        "Protect uploaded documents",
-        default=False,
-        help_text="Store the user's choice for document file protection. Existing files are not converted automatically yet.",
-    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
