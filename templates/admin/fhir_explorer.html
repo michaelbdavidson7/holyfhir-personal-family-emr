@@ -3,8 +3,9 @@
 {% block content %}
 <style>
   .fhir-explorer { max-width: 1280px; }
-  .fhir-toolbar { display: flex; gap: 10px; margin-bottom: 16px; }
+  .fhir-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
   .fhir-toolbar input, .fhir-toolbar select { max-width: 360px; }
+  .fhir-section-actions { display: flex; gap: 8px; margin-left: auto; }
   .fhir-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
   .fhir-stat { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 14px; }
   .fhir-stat strong { display: block; font-size: 1.25rem; }
@@ -13,9 +14,9 @@
   .fhir-grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); padding: 0 16px 16px; }
   .fhir-card { align-items: center; border: 1px solid #e5e7eb; border-radius: 10px; color: #111827; display: flex; gap: 10px; padding: 10px 12px; text-decoration: none; }
   .fhir-card:hover { background: #f8fafc; color: #111827; text-decoration: none; }
-  .fhir-icon { color: #2563eb; width: 22px; }
-  .fhir-title { font-weight: 600; }
-  .fhir-count { color: #6b7280; font-size: .8rem; margin-left: auto; white-space: nowrap; }
+  .fhir-icon { align-items: center; color: #2563eb; display: inline-flex; flex: 0 0 22px; justify-content: center; line-height: 1; width: 22px; }
+  .fhir-title { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+  .fhir-count { color: #6b7280; flex: 0 0 auto; font-size: .8rem; margin-left: auto; white-space: nowrap; }
   .fhir-empty { color: #6b7280; padding: 20px 4px; }
 </style>
 
@@ -46,6 +47,15 @@
           <option value="{{ section.title|lower }}">{{ section.title }}</option>
         {% endfor %}
       </select>
+
+      <div class="fhir-section-actions">
+        <button id="fhirOpenAll" class="btn btn-outline-primary" type="button">
+          Open all
+        </button>
+        <button id="fhirCloseAll" class="btn btn-outline-secondary" type="button">
+          Close all
+        </button>
+      </div>
     </div>
 
     <div id="fhirEmpty" class="fhir-empty" hidden>
@@ -86,10 +96,18 @@
 </div>
 
 <script>
-  const searchInput = document.getElementryId("fhirSearch");
-  const sectionFilter = document.getElementryId("fhirSectionFilter");
-  const visibleCount = document.getElementryId("visibleCount");
-  const emptyMessage = document.getElementryId("fhirEmpty");
+  const searchInput = document.getElementById("fhirSearch");
+  const sectionFilter = document.getElementById("fhirSectionFilter");
+  const visibleCount = document.getElementById("visibleCount");
+  const emptyMessage = document.getElementById("fhirEmpty");
+  const openAllButton = document.getElementById("fhirOpenAll");
+  const closeAllButton = document.getElementById("fhirCloseAll");
+
+  function setAllFHIRSections(open) {
+    document.querySelectorAll(".fhir-section").forEach(section => {
+      section.open = open;
+    });
+  }
 
   function applyFHIRFilters() {
     const query = searchInput.value.trim().toLowerCase();
@@ -132,6 +150,8 @@
 
   searchInput.addEventListener("input", applyFHIRFilters);
   sectionFilter.addEventListener("change", applyFHIRFilters);
+  openAllButton.addEventListener("click", () => setAllFHIRSections(true));
+  closeAllButton.addEventListener("click", () => setAllFHIRSections(false));
   applyFHIRFilters();
 </script>
 {% endblock %}

@@ -65,6 +65,7 @@
     display: flex;
     gap: 10px;
     align-items: flex-start;
+    min-width: 0;
   }
 
   .patient-resource-icon {
@@ -80,11 +81,16 @@
     width: 34px;
   }
 
+  .patient-resource-card-content {
+    min-width: 0;
+  }
+
   .patient-resource-title {
     font-size: 0.98rem;
     font-weight: 700;
     line-height: 1.22;
     margin: 0;
+    min-width: 0;
     overflow-wrap: anywhere;
   }
 
@@ -181,7 +187,7 @@
                   <span class="patient-resource-icon" aria-hidden="true">
                     <i class="{{ card.icon }}"></i>
                   </span>
-                  <div>
+                  <div class="patient-resource-card-content">
                     <h3 class="patient-resource-title">{{ card.title }}</h3>
                     <p class="text-muted patient-resource-description">{{ card.description }}</p>
                   </div>

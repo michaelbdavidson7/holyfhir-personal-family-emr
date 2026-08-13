@@ -296,21 +296,8 @@ JAZZMIN_SETTINGS = {
                 "permissions": ["auth.view_user"],
             },
         ],
-        "patients": [
-            {
-                "name": "Add Patient",
-                "url": "admin:patients_patientprofile_add",
-                "icon": "fas fa-user-plus",
-                "permissions": ["patients.add_patientprofile"],
-            }
-        ],
+        "patients": [],
         "clinical": [
-            {
-                "name": "Health Records",
-                "url": "new_clinical_resources_directory",
-                "icon": "fas fa-notes-medical",
-                "permissions": ["clinical.view_condition"],
-            },
             {
                 "name": "Doctors & Care Team",
                 "url": "clinical_care_team_directory",
@@ -323,14 +310,14 @@ JAZZMIN_SETTINGS = {
                 "icon": "fas fa-chart-area",
                 "permissions": ["clinical.view_observation"],
             },
+            {
+                "name": "Every Health Resource",
+                "url": "new_clinical_resources_directory",
+                "icon": "fas fa-notes-medical",
+                "permissions": ["clinical.view_condition"],
+            },
         ],
         "fhir": [
-            {
-                "name": "Import / Export Help",
-                "url": "fhir_interop_hub",
-                "icon": "fas fa-exchange-alt",
-                "permissions": ["fhir.view_fhirresourcesnapshot"],
-            },
             {
                 "name": "Import My Records",
                 "url": "fhir_import",
@@ -341,6 +328,12 @@ JAZZMIN_SETTINGS = {
                 "name": "Download My Copy",
                 "url": "fhir_export",
                 "icon": "fas fa-file-export",
+                "permissions": ["fhir.view_fhirresourcesnapshot"],
+            },
+            {
+                "name": "More Import / Export Stuff",
+                "url": "fhir_interop_hub",
+                "icon": "fas fa-exchange-alt",
                 "permissions": ["fhir.view_fhirresourcesnapshot"],
             },
             {

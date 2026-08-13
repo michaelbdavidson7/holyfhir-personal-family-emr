@@ -1,18 +1,68 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
+<style>
+  .settings-status-card .card-body,
+  .settings-hub-card .card-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .settings-card-header {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    min-width: 0;
+  }
+
+  .settings-card-icon {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 34px;
+    font-size: 1.7rem;
+    justify-content: center;
+    line-height: 1;
+    width: 34px;
+  }
+
+  .settings-card-title {
+    color: #111827;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .settings-card-content {
+    min-width: 0;
+  }
+
+  .settings-card-description {
+    flex: 1 1 auto;
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+
+  .settings-hub-card .btn {
+    align-self: flex-start;
+  }
+</style>
+
 <div class="content">
   <div class="container-fluid">
     <div class="row mb-3">
       <div class="col-12">
-        <div class="card card-outline {% if recovery_status.configured %}card-success{% else %}card-warning{% endif %}">
+        <div class="card card-outline settings-status-card {% if recovery_status.configured %}card-success{% else %}card-warning{% endif %}">
           <div class="card-body">
-            <div class="d-flex align-items-start">
-              <div class="mr-3 {% if recovery_status.configured %}text-success{% else %}text-warning{% endif %}" aria-hidden="true">
-                <i class="fas fa-key fa-2x"></i>
-              </div>
-              <div>
-                <h3 class="h5 mb-1">Recovery key: {{ recovery_status.message }}</h3>
+            <div class="settings-card-header">
+              <span class="settings-card-icon {% if recovery_status.configured %}text-success{% else %}text-warning{% endif %}" aria-hidden="true">
+                <i class="fas fa-key"></i>
+              </span>
+              <div class="settings-card-content">
+                <h3 class="settings-card-title">Recovery key: {{ recovery_status.message }}</h3>
                 <p class="text-muted mb-2">{{ recovery_status.detail }}</p>
                 {% if recovery_status.created_at %}
                   <p class="mb-0 small text-muted">
@@ -41,20 +91,18 @@
     <div class="row">
       {% for card in settings_cards %}
         <div class="col-lg-4 col-md-6 col-12 mb-3">
-          <div class="card card-outline card-primary h-100">
+          <div class="card card-outline card-primary h-100 settings-hub-card">
             <div class="card-body">
-              <div class="d-flex align-items-start">
-                <div class="mr-3 text-primary" aria-hidden="true">
-                  <i class="{{ card.icon }} fa-2x"></i>
-                </div>
-                <div>
-                  <h3 class="h5 mb-2">{{ card.title }}</h3>
-                  <p class="text-muted mb-3">{{ card.description }}</p>
-                  <a href="{{ card.url }}" class="btn btn-primary btn-sm">
-                    Open {{ card.title }}
-                  </a>
-                </div>
+              <div class="settings-card-header">
+                <span class="settings-card-icon text-primary" aria-hidden="true">
+                  <i class="{{ card.icon }}"></i>
+                </span>
+                <h3 class="settings-card-title">{{ card.title }}</h3>
               </div>
+              <p class="text-muted settings-card-description">{{ card.description }}</p>
+              <a href="{{ card.url }}" class="btn btn-primary btn-sm">
+                Open {{ card.title }}
+              </a>
             </div>
           </div>
         </div>

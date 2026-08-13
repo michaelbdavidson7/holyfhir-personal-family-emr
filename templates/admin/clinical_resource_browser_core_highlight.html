@@ -10,6 +10,25 @@
     margin-bottom: 18px;
   }
 
+  .resource-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .resource-toolbar .resource-search {
+    flex: 1 1 280px;
+    margin-bottom: 0;
+    max-width: 420px;
+  }
+
+  .resource-section-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+
   .resource-section {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -82,11 +101,22 @@
   }
 
   .resource-icon {
+    align-items: center;
     color: #2563eb;
+    display: inline-flex;
+    flex: 0 0 20px;
+    justify-content: center;
+    line-height: 1;
     width: 20px;
   }
 
+  .resource-title {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   .resource-count {
+    flex: 0 0 auto;
     color: #6b7280;
     font-size: 0.82rem;
     margin-left: auto;
@@ -100,12 +130,23 @@
       See Full FHIR Resource Directory
     </button>
 
-    <input
-      id="resourceSearch"
-      class="form-control resource-search"
-      type="search"
-      placeholder="Search FHIR resources..."
-    >
+    <div class="resource-toolbar">
+      <input
+        id="resourceSearch"
+        class="form-control resource-search"
+        type="search"
+        placeholder="Search FHIR resources..."
+      >
+
+      <div class="resource-section-actions">
+        <button id="resourceOpenAll" class="btn btn-outline-primary" type="button">
+          Open all
+        </button>
+        <button id="resourceCloseAll" class="btn btn-outline-secondary" type="button">
+          Close all
+        </button>
+      </div>
+    </div>
 
     {% for section in directory_sections %}
       <details class="resource-section{% if section.is_core_chart or section.title == 'Core Chart' %} resource-section-core{% endif %}" open>
@@ -138,6 +179,14 @@
 
 <script>
   const search = document.getElementById("resourceSearch");
+  const openAllButton = document.getElementById("resourceOpenAll");
+  const closeAllButton = document.getElementById("resourceCloseAll");
+
+  function setAllResourceSections(open) {
+    document.querySelectorAll(".resource-section").forEach(section => {
+      section.open = open;
+    });
+  }
 
   search.addEventListener("input", function () {
     const query = this.value.toLowerCase();
@@ -158,5 +207,8 @@
       }
     });
   });
+
+  openAllButton.addEventListener("click", () => setAllResourceSections(true));
+  closeAllButton.addEventListener("click", () => setAllResourceSections(false));
 </script>
 {% endblock %}
