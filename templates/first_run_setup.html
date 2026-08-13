@@ -1,9 +1,11 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% if setup_wizard_mode %}Setup Wizard{% else %}Set Up {{ holyfhir_app_short_name }}{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'vendor/fontawesome-free/css/all.min.css' %}">
     <style>
       :root {
         color-scheme: light;
@@ -108,7 +110,6 @@
         display: inline-flex;
         flex: 0 0 26px;
         font-size: 12px;
-        font-weight: 900;
         height: 26px;
         justify-content: center;
         width: 26px;
@@ -429,9 +430,9 @@
         </div>
 
         <ul class="reassurance-list">
-          <li><span class="check-dot">OK</span><span>Your records stay on this computer.</span></li>
-          <li><span class="check-dot">OK</span><span>No cloud account is needed.</span></li>
-          <li><span class="check-dot">OK</span><span>You can change this choice later.</span></li>
+          <li><span class="check-dot"><i class="fas fa-check" aria-hidden="true"></i></span><span>Your records stay on this computer.</span></li>
+          <li><span class="check-dot"><i class="fas fa-check" aria-hidden="true"></i></span><span>No cloud account is needed.</span></li>
+          <li><span class="check-dot"><i class="fas fa-check" aria-hidden="true"></i></span><span>You can change this choice later.</span></li>
         </ul>
       </section>
 
