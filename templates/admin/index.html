@@ -3,23 +3,31 @@
 
 {% block content %}
 <style>
-  .dashboard-welcome {
+  .dashboard-start {
     background: #ffffff;
     border: 1px solid #d8dee6;
     border-left: 5px solid #198754;
     border-radius: 8px;
     margin-bottom: 18px;
-    padding: 18px 20px;
+    padding: 20px 22px;
   }
 
-  .dashboard-welcome h2 {
+  .dashboard-start h2 {
     font-size: 1.35rem;
     margin: 0 0 6px;
   }
 
-  .dashboard-welcome p {
+  .dashboard-start p {
     color: #5f6b76;
     margin: 0;
+    max-width: 780px;
+  }
+
+  .dashboard-start-actions {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 18px;
     max-width: 760px;
   }
 
@@ -69,6 +77,14 @@
     line-height: 1.35;
   }
 
+  .dashboard-start-action {
+    min-height: 108px;
+  }
+
+  .dashboard-start-action:first-child {
+    border-color: #9bdff1;
+  }
+
   .dashboard-helper {
     background: #f8f9fa;
     border-top: 1px solid #d8dee6;
@@ -92,28 +108,53 @@
   }
 
   @media (max-width: 720px) {
-    .dashboard-welcome {
+    .dashboard-start {
       padding: 16px;
     }
 
     .dashboard-action {
       padding: 12px;
     }
+
+    .dashboard-start-actions {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <div class="content">
   <div class="container-fluid">
-    <div class="dashboard-welcome">
+    <div class="dashboard-start">
       <h2>Family Health Dashboard</h2>
       <p>
-        Start with a person, then choose what you need: view their chart, add records from MyChart,
-        save documents, or check trends. You do not need to understand FHIR to use {{ holyfhir_app_short_name }}.
+        Start with whichever path matches what you have. A MyChart import can create the person for you,
+        and manual setup is there when you do not have portal records.
       </p>
+
+      <div class="dashboard-start-actions">
+        <a href="{% url 'fhir_import' %}" class="dashboard-action dashboard-start-action">
+          <span class="dashboard-action-icon bg-info text-white" aria-hidden="true">
+            <i class="fas fa-download"></i>
+          </span>
+          <span>
+            <span class="dashboard-action-title">Import records from MyChart</span>
+            <span class="dashboard-action-copy">Best if you have a downloaded ZIP or FHIR file. This can create the family member automatically.</span>
+          </span>
+        </a>
+        <a href="{% url 'admin:patients_patientprofile_add' %}" class="dashboard-action dashboard-start-action">
+          <span class="dashboard-action-icon bg-success text-white" aria-hidden="true">
+            <i class="fas fa-user-plus"></i>
+          </span>
+          <span>
+            <span class="dashboard-action-title">Add someone manually</span>
+            <span class="dashboard-action-copy">Best if you do not use MyChart or want to start a chart yourself.</span>
+          </span>
+        </a>
+      </div>
     </div>
 
     <div class="row">
-      <div class="col-lg-8 col-12 mb-3">
+      <div class="col-12 mb-3">
         <div class="card card-primary card-outline">
           <div class="card-header">
             <h3 class="card-title">Who are you caring for?</h3>
@@ -126,8 +167,7 @@
           </div>
 
           <div class="dashboard-helper">
-            Choose a family member to open their chart. A chart is where allergies, medicines, visits,
-            documents, and imported records live.
+            Open a chart that already exists.
           </div>
 
           <div class="card-body p-0">
@@ -162,7 +202,13 @@
                   <tr>
                     <td colspan="4" class="text-center dashboard-empty-state">
                       <strong>No family members are set up yet.</strong><br>
-                      Add a person first, then you can import records, attach documents, and build their chart.
+                      Import from MyChart to create one from real records, or add someone manually.
+                      <div class="mt-3">
+                        <a href="{% url 'fhir_import' %}" class="btn btn-info btn-sm">
+                          <i class="fas fa-download mr-1"></i>
+                          Import from MyChart
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 {% endfor %}
@@ -177,64 +223,10 @@
         </div>
       </div>
 
-      <div class="col-lg-4 col-12 mb-3">
-        <div class="card card-secondary card-outline mb-3">
-          <div class="card-header">
-            <h3 class="card-title">What do you want to do?</h3>
-          </div>
-          <div class="card-body">
-            <div class="dashboard-action-list">
-              <a href="{% url 'fhir_import' %}" class="dashboard-action">
-                <span class="dashboard-action-icon bg-info text-white" aria-hidden="true">
-                  <i class="fas fa-download"></i>
-                </span>
-                <span>
-                  <span class="dashboard-action-title">Add records from MyChart</span>
-                  <span class="dashboard-action-copy">Follow the guide, then upload the MyChart ZIP or FHIR file.</span>
-                </span>
-              </a>
-              <a href="{% url 'admin:patients_patientprofile_add' %}" class="dashboard-action">
-                <span class="dashboard-action-icon bg-success text-white" aria-hidden="true">
-                  <i class="fas fa-user-plus"></i>
-                </span>
-                <span>
-                  <span class="dashboard-action-title">Add a family member</span>
-                  <span class="dashboard-action-copy">Manually create a chart before adding records for that person.</span>
-                </span>
-              </a>
-
-              <a href="{% url 'admin:patients_patientprofile_changelist' %}" class="dashboard-action">
-                <span class="dashboard-action-icon bg-primary text-white" aria-hidden="true">
-                  <i class="fas fa-address-book"></i>
-                </span>
-                <span>
-                  <span class="dashboard-action-title">Find a chart</span>
-                  <span class="dashboard-action-copy">Open someone already in {{ holyfhir_app_short_name }}.</span>
-                </span>
-              </a>
-
-
-              <a href="{% url 'admin:documents_clinicaldocument_changelist' %}" class="dashboard-action">
-                <span class="dashboard-action-icon bg-light text-secondary" aria-hidden="true">
-                  <i class="fas fa-file-medical"></i>
-                </span>
-                <span>
-                  <span class="dashboard-action-title">Save papers and PDFs</span>
-                  <span class="dashboard-action-copy">Keep visit summaries, lab PDFs, school forms, and other documents.</span>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-info card-outline mb-3">
-          <div class="card-header">
-            <h3 class="card-title">Good to know</h3>
-          </div>
-          <div class="card-body text-muted">
-            {{ holyfhir_app_short_name }} is your personal copy and organizer. It helps you keep records together, but it does not replace your doctor, pharmacy, hospital portal, or emergency source of health information.
-          </div>
-        </div>
+      <div class="col-12 mb-3">
+        <p class="text-muted small mb-0">
+          {{ holyfhir_app_short_name }} helps you keep personal records together, but it does not replace your doctor, pharmacy, hospital portal, or emergency source of health information.
+        </p>
       </div>
     </div>
   </div>
