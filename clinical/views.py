@@ -6,6 +6,7 @@ from django.utils.dateparse import parse_date
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from urllib.parse import urlencode
 
 from patients.models import PatientProfile
 
@@ -15,6 +16,7 @@ from .models import QuickLog
 
 MAX_SERIES = 6
 QUICK_LOG_LAST_CATEGORY_SESSION_KEY = "quick_logs_last_category"
+QUICK_LOG_LAST_PATIENT_SESSION_KEY = "quick_logs_last_patient"
 
 
 class QuickLogForm(forms.ModelForm):
@@ -54,6 +56,9 @@ def quick_logs(request):
     )
     if selected_patient_id and not selected_patient_id.isdigit():
         selected_patient_id = ""
+    selected_category = request.GET.get("category") or ""
+    if selected_category not in dict(QuickLog.CATEGORY_CHOICES):
+        selected_category = ""
 
     initial = {
         "logged_at": timezone.localtime(timezone.now()).strftime("%Y-%m-%dT%H:%M")
@@ -61,6 +66,11 @@ def quick_logs(request):
     last_category = request.session.get(QUICK_LOG_LAST_CATEGORY_SESSION_KEY)
     if last_category in dict(QuickLog.CATEGORY_CHOICES):
         initial["category"] = last_category
+    if selected_category:
+        initial["category"] = selected_category
+    last_patient_id = request.session.get(QUICK_LOG_LAST_PATIENT_SESSION_KEY)
+    if last_patient_id and PatientProfile.objects.filter(pk=last_patient_id).exists():
+        initial["patient"] = last_patient_id
     if selected_patient_id:
         initial["patient"] = selected_patient_id
 
@@ -69,10 +79,9 @@ def quick_logs(request):
         if form.is_valid():
             quick_log = form.save()
             request.session[QUICK_LOG_LAST_CATEGORY_SESSION_KEY] = quick_log.category
+            request.session[QUICK_LOG_LAST_PATIENT_SESSION_KEY] = quick_log.patient_id
             messages.success(request, "Quick log added.")
-            return redirect(
-                f"{reverse('quick_logs')}?patient={form.cleaned_data['patient'].pk}"
-            )
+            return redirect(_quick_logs_url(quick_log.patient_id, quick_log.category))
     else:
         form = QuickLogForm(initial=initial)
 
@@ -81,8 +90,11 @@ def quick_logs(request):
     )
     if selected_patient_id:
         logs = logs.filter(patient_id=selected_patient_id)
+    if selected_category:
+        logs = logs.filter(category=selected_category)
 
     patients = PatientProfile.objects.order_by("last_name", "first_name")
+    category_tabs = _quick_log_category_tabs(selected_patient_id, selected_category)
 
     context = {
         **admin.site.each_context(request),
@@ -91,9 +103,44 @@ def quick_logs(request):
         "logs": logs[:100],
         "patients": patients,
         "selected_patient_id": str(selected_patient_id),
+        "selected_category": selected_category,
+        "category_tabs": category_tabs,
         "admin_changelist_url": reverse("admin:clinical_quicklog_changelist"),
     }
     return render(request, "admin/quick_logs.html", context)
+
+
+def _quick_logs_url(patient_id="", category=""):
+    params = {}
+    if patient_id:
+        params["patient"] = patient_id
+    if category:
+        params["category"] = category
+    query = urlencode(params)
+    if not query:
+        return reverse("quick_logs")
+    return f"{reverse('quick_logs')}?{query}"
+
+
+def _quick_log_category_tabs(selected_patient_id, selected_category):
+    tabs = [
+        {
+            "label": "All",
+            "category": "",
+            "url": _quick_logs_url(selected_patient_id),
+            "active": not selected_category,
+        }
+    ]
+    for category, label in QuickLog.CATEGORY_CHOICES:
+        tabs.append(
+            {
+                "label": label,
+                "category": category,
+                "url": _quick_logs_url(selected_patient_id, category),
+                "active": selected_category == category,
+            }
+        )
+    return tabs
 
 
 def observation_charts(request):

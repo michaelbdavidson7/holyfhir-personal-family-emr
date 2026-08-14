@@ -55,6 +55,38 @@
     margin-bottom: 12px;
   }
 
+  .quick-log-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .quick-log-tab {
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    color: #374151;
+    display: inline-flex;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+    padding: 7px 12px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .quick-log-tab:hover {
+    background: #f8fafc;
+    color: #111827;
+    text-decoration: none;
+  }
+
+  .quick-log-tab-selected {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+  }
+
   .quick-log-category {
     white-space: nowrap;
   }
@@ -132,7 +164,22 @@
       <div>
         <div class="card card-outline card-secondary">
           <div class="card-body">
+            <nav class="quick-log-tabs" aria-label="Quick log category lists">
+              {% for tab in category_tabs %}
+                <a
+                  class="quick-log-tab{% if tab.active %} quick-log-tab-selected{% endif %}"
+                  href="{{ tab.url }}"
+                  {% if tab.active %}aria-current="page"{% endif %}
+                >
+                  {{ tab.label }}
+                </a>
+              {% endfor %}
+            </nav>
+
             <form method="get" class="quick-log-filter">
+              {% if selected_category %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+              {% endif %}
               <div>
                 <label for="patient-filter">Patient</label>
                 <select id="patient-filter" name="patient" class="form-control">

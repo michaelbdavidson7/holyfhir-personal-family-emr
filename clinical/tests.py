@@ -94,7 +94,10 @@ class QuickLogTests(TestCase):
 
         self.assertRedirects(
             response,
-            f"{reverse('quick_logs')}?patient={self.patient.pk}",
+            (
+                f"{reverse('quick_logs')}?"
+                f"patient={self.patient.pk}&category={QuickLog.CATEGORY_BOWEL}"
+            ),
             fetch_redirect_response=False,
         )
         log = QuickLog.objects.get()
@@ -147,3 +150,103 @@ class QuickLogTests(TestCase):
             response.context["form"].initial["category"], QuickLog.CATEGORY_DIET
         )
         self.assertContains(response, '<option value="diet" selected>Dietary</option>')
+
+    def test_quick_log_form_remembers_last_patient(self):
+        self.client.force_login(self.user)
+
+        self.client.post(
+            reverse("quick_logs"),
+            {
+                "patient": self.patient.pk,
+                "category": QuickLog.CATEGORY_SLEEP,
+                "logged_at": "2026-08-13T22:15",
+                "summary": "Went to bed",
+                "details": "",
+            },
+        )
+
+        response = self.client.get(reverse("quick_logs"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].initial["patient"], self.patient.pk)
+
+    def test_quick_log_patient_query_overrides_remembered_patient(self):
+        other_patient = PatientProfile.objects.create(
+            first_name="Grace",
+            last_name="Hopper",
+        )
+        session = self.client.session
+        session["quick_logs_last_patient"] = self.patient.pk
+        session.save()
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quick_logs"), {"patient": other_patient.pk})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["form"].initial["patient"], str(other_patient.pk)
+        )
+
+    def test_quick_logs_filter_by_category_tab(self):
+        QuickLog.objects.create(
+            patient=self.patient,
+            category=QuickLog.CATEGORY_DIET,
+            logged_at=datetime(2026, 8, 13, 8, 0, tzinfo=datetime_timezone.utc),
+            summary="Breakfast",
+        )
+        QuickLog.objects.create(
+            patient=self.patient,
+            category=QuickLog.CATEGORY_BOWEL,
+            logged_at=datetime(2026, 8, 13, 9, 0, tzinfo=datetime_timezone.utc),
+            summary="BM after breakfast",
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("quick_logs"), {"category": QuickLog.CATEGORY_DIET}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["selected_category"], QuickLog.CATEGORY_DIET)
+        self.assertContains(response, "Breakfast")
+        self.assertNotContains(response, "BM after breakfast")
+        self.assertContains(response, "quick-log-tab-selected")
+        self.assertContains(response, 'aria-current="page"')
+
+    def test_quick_log_category_query_overrides_remembered_category(self):
+        session = self.client.session
+        session["quick_logs_last_category"] = QuickLog.CATEGORY_DIET
+        session.save()
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("quick_logs"), {"category": QuickLog.CATEGORY_BOWEL}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["form"].initial["category"], QuickLog.CATEGORY_BOWEL
+        )
+
+    def test_quick_log_save_redirects_to_patient_category_list(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("quick_logs"),
+            {
+                "patient": self.patient.pk,
+                "category": QuickLog.CATEGORY_MOOD,
+                "logged_at": "2026-08-13T14:15",
+                "summary": "Felt steady",
+                "details": "",
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            (
+                f"{reverse('quick_logs')}?"
+                f"patient={self.patient.pk}&category={QuickLog.CATEGORY_MOOD}"
+            ),
+            fetch_redirect_response=False,
+        )
