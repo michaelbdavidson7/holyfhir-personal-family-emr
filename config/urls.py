@@ -34,6 +34,7 @@ from config.admin_views import (
     settings_hub,
 )
 from clinical.views import observation_charts
+from clinical.views import quick_logs
 from fhir.views import export_fhir_data, import_fhir_data
 from patients.views import (
     first_run_setup,
@@ -99,6 +100,11 @@ urlpatterns = [
         "admin/clinical/observations/charts/",
         admin.site.admin_view(observation_charts),
         name="observation_charts",
+    ),
+    path(
+        "admin/clinical/quick-logs/",
+        admin.site.admin_view(quick_logs),
+        name="quick_logs",
     ),
     path(
         "admin/clinical/resources/",

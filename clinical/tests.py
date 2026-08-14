@@ -1,4 +1,6 @@
 from decimal import Decimal
+from datetime import datetime
+from datetime import timezone as datetime_timezone
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -8,6 +10,7 @@ from django.utils import timezone
 from patients.models import PatientProfile
 
 from .models import Observation
+from .models import QuickLog
 
 
 class ObservationChartTests(TestCase):
@@ -60,3 +63,87 @@ class ObservationChartTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No chartable measurements yet")
         self.assertContains(response, reverse("admin:clinical_observation_add"))
+
+
+class QuickLogTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_superuser(
+            username="owner",
+            email="owner@example.com",
+            password="correct-password",
+        )
+        self.patient = PatientProfile.objects.create(
+            first_name="Ada",
+            last_name="Lovelace",
+        )
+
+    def test_quick_log_page_creates_log(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("quick_logs"),
+            {
+                "patient": self.patient.pk,
+                "category": QuickLog.CATEGORY_BOWEL,
+                "logged_at": "2026-08-13T09:15",
+                "summary": "Normal bowel movement",
+                "details": "No discomfort.",
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            f"{reverse('quick_logs')}?patient={self.patient.pk}",
+            fetch_redirect_response=False,
+        )
+        log = QuickLog.objects.get()
+        self.assertEqual(log.patient, self.patient)
+        self.assertEqual(log.category, QuickLog.CATEGORY_BOWEL)
+        self.assertEqual(log.summary, "Normal bowel movement")
+        self.assertEqual(log.details, "No discomfort.")
+
+    def test_quick_logs_are_ordered_newest_first(self):
+        older = QuickLog.objects.create(
+            patient=self.patient,
+            category=QuickLog.CATEGORY_DIET,
+            logged_at=datetime(2026, 8, 13, 8, 0, tzinfo=datetime_timezone.utc),
+            summary="Breakfast",
+        )
+        newer = QuickLog.objects.create(
+            patient=self.patient,
+            category=QuickLog.CATEGORY_SYMPTOM,
+            logged_at=datetime(2026, 8, 13, 12, 0, tzinfo=datetime_timezone.utc),
+            summary="Mild nausea",
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quick_logs"))
+
+        self.assertEqual(response.status_code, 200)
+        logs = list(response.context["logs"])
+        self.assertEqual(logs, [newer, older])
+        self.assertContains(response, "Mild nausea")
+        self.assertContains(response, "Breakfast")
+
+    def test_quick_log_form_remembers_last_category(self):
+        self.client.force_login(self.user)
+
+        self.client.post(
+            reverse("quick_logs"),
+            {
+                "patient": self.patient.pk,
+                "category": QuickLog.CATEGORY_DIET,
+                "logged_at": "2026-08-13T09:15",
+                "summary": "Oatmeal and berries",
+                "details": "",
+            },
+        )
+
+        response = self.client.get(reverse("quick_logs"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["form"].initial["category"], QuickLog.CATEGORY_DIET
+        )
+        self.assertContains(response, '<option value="diet" selected>Dietary</option>')

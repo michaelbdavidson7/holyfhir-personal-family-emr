@@ -117,6 +117,7 @@ from .models import (
     Provenance,
     Questionnaire,
     QuestionnaireResponse,
+    QuickLog,
     RelatedPerson,
     RequestGroup,
     ResearchDefinition,
@@ -336,6 +337,16 @@ class ObservationAdmin(admin.ModelAdmin):
     @admin.display(description="Result")
     def result(self, obj):
         return obj.display_value()
+
+
+@admin.register(QuickLog)
+class QuickLogAdmin(admin.ModelAdmin):
+    list_display = ("id", "patient", "category", "summary", "logged_at")
+    list_display_links = ("summary",)
+    search_fields = ("summary", "details")
+    list_filter = ("patient", "category")
+    ordering = ("-logged_at", "-created_at")
+    autocomplete_fields = ["patient"]
 
 
 @admin.register(DiagnosticReport)

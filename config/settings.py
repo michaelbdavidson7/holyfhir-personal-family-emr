@@ -305,6 +305,12 @@ JAZZMIN_SETTINGS = {
         ],
         "clinical": [
             {
+                "name": "Quick Logs",
+                "url": "quick_logs",
+                "icon": "fas fa-bolt",
+                "permissions": ["clinical.view_quicklog"],
+            },
+            {
                 "name": "Health Trends",
                 "url": "observation_charts",
                 "icon": "fas fa-chart-area",
@@ -472,6 +478,7 @@ JAZZMIN_SETTINGS = {
         "clinical.Provenance",
         "clinical.Questionnaire",
         "clinical.QuestionnaireResponse",
+        "clinical.QuickLog",
         "clinical.RelatedPerson",
         "clinical.RequestGroup",
         "clinical.ResearchDefinition",

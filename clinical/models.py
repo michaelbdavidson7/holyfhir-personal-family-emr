@@ -357,6 +357,55 @@ class Observation(models.Model):
         return self.name
 
 
+class QuickLog(models.Model):
+    CATEGORY_BOWEL = "bowel"
+    CATEGORY_DIET = "diet"
+    CATEGORY_SYMPTOM = "symptom"
+    CATEGORY_ACTIVITY = "activity"
+    CATEGORY_MEDICATION = "medication"
+    CATEGORY_SLEEP = "sleep"
+    CATEGORY_MOOD = "mood"
+    CATEGORY_OTHER = "other"
+
+    CATEGORY_CHOICES = [
+        (CATEGORY_BOWEL, "Bowel movement"),
+        (CATEGORY_DIET, "Dietary"),
+        (CATEGORY_SYMPTOM, "Symptom"),
+        (CATEGORY_ACTIVITY, "Activity"),
+        (CATEGORY_MEDICATION, "Medication"),
+        (CATEGORY_SLEEP, "Sleep"),
+        (CATEGORY_MOOD, "Mood"),
+        (CATEGORY_OTHER, "Other"),
+    ]
+
+    patient = models.ForeignKey(
+        PatientProfile,
+        on_delete=models.CASCADE,
+        related_name="quick_logs",
+        help_text="Patient this quick log belongs to.",
+    )
+    category = models.CharField(
+        max_length=30,
+        choices=CATEGORY_CHOICES,
+        default=CATEGORY_OTHER,
+        help_text="Kind of event being logged.",
+    )
+    logged_at = models.DateTimeField(help_text="When the event happened.")
+    summary = models.CharField(max_length=255, help_text="Short description.")
+    details = models.TextField(blank=True, help_text="Optional extra notes.")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-logged_at", "-created_at", "-id")
+        verbose_name = "Quick Log"
+        verbose_name_plural = "Quick Logs"
+
+    def __str__(self):
+        return f"{self.get_category_display()}: {self.summary}"
+
+
 def format_observation_number(value):
     text = str(value)
     if "." in text:

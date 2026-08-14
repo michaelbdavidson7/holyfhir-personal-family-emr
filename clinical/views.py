@@ -1,15 +1,99 @@
 from django.contrib import admin
+from django import forms
+from django.contrib import messages
 from django.utils import timezone
 from django.utils.dateparse import parse_date
+from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from patients.models import PatientProfile
 
 from .models import Observation
+from .models import QuickLog
 
 
 MAX_SERIES = 6
+QUICK_LOG_LAST_CATEGORY_SESSION_KEY = "quick_logs_last_category"
+
+
+class QuickLogForm(forms.ModelForm):
+    class Meta:
+        model = QuickLog
+        fields = ("patient", "category", "logged_at", "summary", "details")
+        widgets = {
+            "patient": forms.Select(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-control"}),
+            "logged_at": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M",
+            ),
+            "summary": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Bowel movement, breakfast, symptom, etc.",
+                }
+            ),
+            "details": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Optional notes",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["logged_at"].input_formats = ["%Y-%m-%dT%H:%M"]
+
+
+def quick_logs(request):
+    selected_patient_id = (
+        request.GET.get("patient") or request.POST.get("patient") or ""
+    )
+    if selected_patient_id and not selected_patient_id.isdigit():
+        selected_patient_id = ""
+
+    initial = {
+        "logged_at": timezone.localtime(timezone.now()).strftime("%Y-%m-%dT%H:%M")
+    }
+    last_category = request.session.get(QUICK_LOG_LAST_CATEGORY_SESSION_KEY)
+    if last_category in dict(QuickLog.CATEGORY_CHOICES):
+        initial["category"] = last_category
+    if selected_patient_id:
+        initial["patient"] = selected_patient_id
+
+    if request.method == "POST":
+        form = QuickLogForm(request.POST)
+        if form.is_valid():
+            quick_log = form.save()
+            request.session[QUICK_LOG_LAST_CATEGORY_SESSION_KEY] = quick_log.category
+            messages.success(request, "Quick log added.")
+            return redirect(
+                f"{reverse('quick_logs')}?patient={form.cleaned_data['patient'].pk}"
+            )
+    else:
+        form = QuickLogForm(initial=initial)
+
+    logs = QuickLog.objects.select_related("patient").order_by(
+        "-logged_at", "-created_at", "-id"
+    )
+    if selected_patient_id:
+        logs = logs.filter(patient_id=selected_patient_id)
+
+    patients = PatientProfile.objects.order_by("last_name", "first_name")
+
+    context = {
+        **admin.site.each_context(request),
+        "title": "Quick Logs",
+        "form": form,
+        "logs": logs[:100],
+        "patients": patients,
+        "selected_patient_id": str(selected_patient_id),
+        "admin_changelist_url": reverse("admin:clinical_quicklog_changelist"),
+    }
+    return render(request, "admin/quick_logs.html", context)
 
 
 def observation_charts(request):

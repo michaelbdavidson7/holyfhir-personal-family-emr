@@ -1,0 +1,186 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+  .quick-log-page {
+    max-width: 1180px;
+  }
+
+  .quick-log-header {
+    align-items: flex-start;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .quick-log-header h1 {
+    margin: 0;
+  }
+
+  .quick-log-subtitle {
+    color: #4b5563;
+    margin: 4px 0 0;
+  }
+
+  .quick-log-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: minmax(260px, 360px) 1fr;
+  }
+
+  .quick-log-form-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .quick-log-form-grid label,
+  .quick-log-filter label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .quick-log-errors {
+    color: #b91c1c;
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  .quick-log-filter {
+    align-items: end;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr auto auto;
+    margin-bottom: 12px;
+  }
+
+  .quick-log-category {
+    white-space: nowrap;
+  }
+
+  .quick-log-summary {
+    min-width: 220px;
+  }
+
+  .quick-log-empty {
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    color: #4b5563;
+    padding: 28px;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .quick-log-grid,
+    .quick-log-filter {
+      grid-template-columns: 1fr;
+    }
+
+    .quick-log-filter .btn,
+    .quick-log-header .btn {
+      width: 100%;
+    }
+
+    .quick-log-header {
+      display: block;
+    }
+  }
+</style>
+
+<div class="content quick-log-page">
+  <div class="container-fluid">
+    <div class="quick-log-header">
+      <div>
+        <h1 class="h3">Quick Logs</h1>
+        <p class="quick-log-subtitle">Capture timestamped day-to-day health events and review the newest entries first.</p>
+      </div>
+      <a class="btn btn-outline-primary btn-sm" href="{{ admin_changelist_url }}">Open admin list</a>
+    </div>
+
+    <div class="quick-log-grid">
+      <div class="card card-outline card-primary">
+        <div class="card-header">
+          <h2 class="card-title mb-0">Add quick log</h2>
+        </div>
+        <div class="card-body">
+          <form method="post" class="quick-log-form-grid">
+            {% csrf_token %}
+            {% for field in form %}
+              <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                  <p class="help-block mb-0">{{ field.help_text }}</p>
+                {% endif %}
+                {% for error in field.errors %}
+                  <div class="quick-log-errors">{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <div class="quick-log-errors">{{ error }}</div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus mr-1"></i>
+              Add log
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div class="card card-outline card-secondary">
+          <div class="card-body">
+            <form method="get" class="quick-log-filter">
+              <div>
+                <label for="patient-filter">Patient</label>
+                <select id="patient-filter" name="patient" class="form-control">
+                  <option value="">All patients</option>
+                  {% for patient in patients %}
+                    <option value="{{ patient.pk }}" {% if selected_patient_id == patient.pk|stringformat:"s" %}selected{% endif %}>{{ patient }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Filter</button>
+              <a class="btn btn-outline-secondary" href="{% url 'quick_logs' %}">Clear</a>
+            </form>
+
+            {% if logs %}
+              <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th>When</th>
+                      <th>Patient</th>
+                      <th>Category</th>
+                      <th>Summary</th>
+                      <th>Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for log in logs %}
+                      <tr>
+                        <td>{{ log.logged_at|date:"M j, Y g:i A" }}</td>
+                        <td>{{ log.patient }}</td>
+                        <td class="quick-log-category">{{ log.get_category_display }}</td>
+                        <td class="quick-log-summary">{{ log.summary }}</td>
+                        <td>{{ log.details|default:"-"|linebreaksbr }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="quick-log-empty">
+                <strong>No quick logs yet.</strong><br>
+                Add one with the form on this page.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

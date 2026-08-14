@@ -110,6 +110,7 @@ from clinical.models import (
     ExplanationOfBenefit,
     Questionnaire,
     QuestionnaireResponse,
+    QuickLog,
     RequestGroup,
     SupplyDelivery,
     SupplyRequest,
@@ -415,6 +416,14 @@ def clinical_resources_directory(request):
                     ),
                     "icon": "fas fa-calendar-check",
                     "count": ImmunizationRecommendation.objects.count(),
+                    "count_label": "record",
+                },
+                {
+                    "title": "Quick Logs",
+                    "description": "Timestamped personal events such as bowel movements, meals, symptoms, activity, sleep, and mood.",
+                    "url": reverse("quick_logs"),
+                    "icon": "fas fa-bolt",
+                    "count": QuickLog.objects.count(),
                     "count_label": "record",
                 },
                 {
@@ -1279,6 +1288,13 @@ def patient_resources_directory(request, patient_id):
                     "clinical_immunization",
                     "Vaccines, dates, lots, and performers.",
                     "fas fa-syringe",
+                ),
+                card(
+                    "Quick Logs",
+                    QuickLog,
+                    "clinical_quicklog",
+                    "Timestamped events such as bowel movements, meals, symptoms, sleep, mood, and activity.",
+                    "fas fa-bolt",
                 ),
                 card(
                     "Vitals & Labs",
